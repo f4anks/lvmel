@@ -71,7 +71,7 @@ header {
     color: var(--color-red);
 }
 
-/* Estilos de la nueva barra de navegación principal */
+/* Estilos de la barra de navegación principal (Desktop) */
 .main-nav {
     margin-left: 20px; 
 }
@@ -186,13 +186,13 @@ header {
 
 /* Ajuste para la imagen en la sección "Acerca de" */
 .about_img {
-    text-align: center; /* Centra la imagen si es más pequeña que su contenedor */
+    text-align: center; 
 }
 .about_img img {
-    max-width: 85%; /* Reduce el tamaño máximo de la imagen (puedes ajustar el porcentaje) */
-    height: auto; /* Mantiene la proporción */
-    display: block; /* Para que margin: auto funcione */
-    margin: 0 auto; /* Centra la imagen horizontalmente */
+    max-width: 85%; 
+    height: auto; 
+    display: block; 
+    margin: 0 auto; 
 }
 
 /* Panel Informativo (Servicios) */
@@ -240,4 +240,9 @@ header {
 .copyright p {
     color: #ccc;
     font-size: 0.9rem;
+}
+
+/*--------------------------------------------------------------------- ESTILOS DEL MODAL DE INGRESO ---------------------------------------------------------------------*/
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Hace que la X del botón de cierre sea blanca */
 }
