@@ -73,7 +73,6 @@ header {
 
 /* Estilos de la nueva barra de navegación principal */
 .main-nav {
-    /* Agrega un margen a la izquierda para separarlo de los íconos de contacto */
     margin-left: 20px; 
 }
 .main-nav ul li a {
@@ -100,7 +99,6 @@ header {
     border-radius: 5px;
     font-weight: 500;
     transition: all 0.3s;
-    /* Ajusta el margen si el 'ms-4' de Bootstrap no es suficiente */
     margin-left: 20px !important; 
 }
 .btn-ingreso:hover {
@@ -184,6 +182,17 @@ header {
 .about_box .btn-theme-red:hover {
     background-color: var(--color-vinotinto);
     border-color: var(--color-vinotinto);
+}
+
+/* Ajuste para la imagen en la sección "Acerca de" */
+.about_img {
+    text-align: center; /* Centra la imagen si es más pequeña que su contenedor */
+}
+.about_img img {
+    max-width: 85%; /* Reduce el tamaño máximo de la imagen (puedes ajustar el porcentaje) */
+    height: auto; /* Mantiene la proporción */
+    display: block; /* Para que margin: auto funcione */
+    margin: 0 auto; /* Centra la imagen horizontalmente */
 }
 
 /* Panel Informativo (Servicios) */
