@@ -1,6 +1,5 @@
 // 1. IMPORTACIONES DE FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-// Se mantienen ambas funciones de autenticación por si se requieren en el ambiente de hosting
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -9,8 +8,8 @@ let db;
 let auth;
 let userId = '';	
 let athletesData = []; 
-let currentSortKey = 'apellido';	// Ordenamiento inicial por Apellido
-let sortDirection = 'asc';	// Dirección ascendente por defecto
+let currentSortKey = 'apellido';	
+let sortDirection = 'asc';	
 
 setLogLevel('Debug');
 
@@ -153,7 +152,7 @@ function setupRealtimeListener(appId) {
 }
 
 function setupFormListener() {
-    // 💡 CORRECCIÓN APLICADA: Usa el ID 'athleteForm'
+    // CORRECCIÓN: Usa el ID 'athleteForm'
 	const form = document.getElementById('athleteForm'); 
 	if (form) {
 		form.addEventListener('submit', handleFormSubmit);
@@ -203,10 +202,10 @@ async function handleFormSubmit(event) {
 		division: divisionValue,	
 		
         // Datos auxiliares/secundarios
-		tallaRaw: tallaValue,	 	// Guardado sin formato para ordenamiento si es necesario
-		pesoRaw: pesoValue,	 	// Guardado sin formato para ordenamiento si es necesario
-		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A', // Formateado (opcional)
-		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A', // Formateado (opcional)
+		tallaRaw: tallaValue,	 	
+		pesoRaw: pesoValue,	 	
+		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A', 
+		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A', 
 		correo: correoValue || 'N/A',
 		telefono: telefonoValue || 'N/A',
 		timestamp: Date.now()	
@@ -298,7 +297,7 @@ function renderTable() {
     let tableBody = document.getElementById('athleteTableBody');
 
     if (!table) {
-        // 1. Definición y Construcción de Encabezados (<thead>) - ¡El orden de las cabeceras es clave!
+        // 1. Definición y Construcción de Encabezados (<thead>)
         const headerKeys = [
             { key: "cedula", label: "Cédula" },
             { key: "nombre", label: "Nombre" },
@@ -332,8 +331,8 @@ function renderTable() {
         tableBody.innerHTML = '';
     }
     
-    // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORRECTO
-    // El orden de los data.campos DEBE COINCIDIR con el orden de las cabeceras TH
+    // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORREGIDO
+    // El orden de las celdas (data.propiedad) debe coincidir con el orden de los TH
     athletesData.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
