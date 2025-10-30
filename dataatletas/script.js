@@ -1,3 +1,13 @@
+// ==========================================================
+// IMPORTACIONES (ASUMIR QUE ESTÁN EN TU AMBIENTE MODULAR)
+// ==========================================================
+// import { db } from './firebase-config.js'; 
+// import { collection, addDoc, getDocs } from 'firebase/firestore'; 
+
+// IMPORTANTE: Si no estás usando módulos o no tienes definida 'db' aquí, 
+// reemplaza las llamadas a Firebase con tus funciones/rutas correctas.
+
+
 /**
  * ==========================================================
  * I. LÓGICA DE INICIALIZACIÓN Y LLENADO DEL SELECT CLUB/EQUIPO
@@ -7,20 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Llenar el campo de selección de Club/Equipo
     const clubSelect = document.getElementById('club');
     
-    // Solo si el elemento 'club' existe, procedemos a llenarlo
     if (clubSelect) { 
-        // Lista de clubes proporcionada
+        // Lista de clubes proporcionada (ordenada alfabéticamente)
         const clubes = [
-            "Bertha Carrero", "Olimpikus", "El Sisal", "Everest", 
-            "Villa Cantevista", "MG", "Santa Isabel", "Luis Hurtado", 
-            "Codigo Monarca", "Famaguaros", "Big Star", "Sporta", 
-            "Antonio Espinoza", "Los Olivos", "Ruiz Pineda", "Sanz", 
-            "Ohana"
+            "Antonio Espinoza", "Bertha Carrero", "Big Star", "Codigo Monarca", 
+            "El Sisal", "Everest", "Famaguaros", "Los Olivos", "Luis Hurtado", 
+            "MG", "Ohana", "Olimpikus", "Ruiz Pineda", "Santa Isabel", 
+            "Sanz", "Sporta", "Villa Cantevista"
         ];
-
-        // Ordenar los clubes alfabéticamente (soporta caracteres acentuados)
-        clubes.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
-
+        
         // Crear y añadir las opciones al campo select
         clubes.forEach(club => {
             const option = document.createElement('option');
@@ -30,22 +35,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // 2. Inicializar la escucha del formulario y carga de datos
     const athleteForm = document.getElementById('athleteForm');
     if (athleteForm) {
         athleteForm.addEventListener('submit', handleFormSubmit);
     }
 
-    loadRegisteredAthletes(); // Cargar y mostrar los atletas al iniciar
+    // 3. Cargar y mostrar los atletas desde Firebase al iniciar
+    loadRegisteredAthletes(); 
 });
 
 
 /**
  * ==========================================================
- * II. FUNCIONES PRINCIPALES DE MANEJO DE DATOS (EJEMPLO)
+ * II. FUNCIONES PRINCIPALES DE MANEJO DE DATOS CON FIREBASE
  * ==========================================================
- * Estas funciones asumen el uso de LocalStorage o una API. 
  */
 
 // Función auxiliar para mostrar mensajes de estado
@@ -55,7 +59,7 @@ function displayStatusMessage(message, isSuccess = true) {
 
     statusMessage.textContent = message;
     
-    // Asigna el color Vinotinto (error) o Rojo Brillante (éxito)
+    // Colores de tu tema Vinotinto/Rojo Brillante
     statusMessage.style.backgroundColor = isSuccess ? '#5C001C' : '#CC0033'; 
     statusMessage.style.opacity = 1;
 
@@ -66,68 +70,83 @@ function displayStatusMessage(message, isSuccess = true) {
 
 
 // 1. Manejar el envío del formulario
-function handleFormSubmit(event) {
+async function handleFormSubmit(event) {
     event.preventDefault(); 
 
-    // Obtener los datos del formulario
     const formData = new FormData(event.target);
     const athleteData = Object.fromEntries(formData.entries());
-
-    // Validar Cédula (ejemplo de validación simple)
-    if (!athleteData.cedula || athleteData.cedula.length < 5) {
-        displayStatusMessage('Error: La Cédula de Identidad no es válida.', false);
-        return;
-    }
     
-    // Convertir a mayúsculas para consistencia
+    // Conversión a mayúsculas para consistencia en el almacenamiento
     athleteData.nombre = athleteData.nombre.toUpperCase();
     athleteData.apellido = athleteData.apellido.toUpperCase();
     athleteData.club = athleteData.club.toUpperCase();
     athleteData.division = athleteData.division.toUpperCase();
 
-    // Guardar los datos
-    const success = saveAthlete(athleteData);
+    // Guardar los datos en Firebase
+    const success = await saveAthlete(athleteData);
 
     if (success) {
         displayStatusMessage('Atleta registrado exitosamente.');
         event.target.reset(); // Limpiar formulario
         loadRegisteredAthletes(); // Recargar la lista
     } else {
-        displayStatusMessage('Error: El atleta con esa Cédula ya está registrado.', false);
+        // El error ya es manejado dentro de saveAthlete (ej. error de conexión)
+        displayStatusMessage('Error al registrar el atleta. Revisa la consola.', false);
     }
 }
 
 
-// 2. Guardar un atleta (usando LocalStorage para el ejemplo)
-function saveAthlete(newAthlete) {
-    let athletes = loadFromLocalStorage();
-    
-    // Verificar duplicidad por Cédula
-    const exists = athletes.some(athlete => athlete.cedula === newAthlete.cedula);
-    if (exists) {
-        return false; 
+// 2. Guardar un atleta en la colección 'atletas' de Firebase
+async function saveAthlete(newAthlete) {
+    // Nota: La validación de duplicidad por Cédula debe hacerse en un ambiente 
+    // real (servidor) o mediante una consulta adicional aquí si es crítica.
+    try {
+        // Reemplaza 'db' con tu instancia de Firestore
+        // y 'addDoc' con tu método de guardado.
+        const docRef = await addDoc(collection(db, "atletas"), newAthlete);
+        console.log("Documento escrito con ID: ", docRef.id);
+        return true;
+    } catch (e) {
+        console.error("Error al añadir el documento: ", e);
+        return false;
     }
-
-    athletes.push(newAthlete);
-    saveToLocalStorage(athletes);
-    return true;
 }
 
 
-// 3. Cargar datos de atletas (usando LocalStorage para el ejemplo)
-function loadRegisteredAthletes() {
-    const athletes = loadFromLocalStorage();
-    renderAthleteTable(athletes);
+// 3. Cargar datos de atletas desde la colección 'atletas' de Firebase
+async function loadRegisteredAthletes() {
+    const container = document.getElementById('registeredData');
+    if (!container) return;
+
+    container.innerHTML = '<p class="loading-message">Cargando datos de atletas...</p>';
+
+    try {
+        // Reemplaza 'db' y los métodos de Firebase con tus rutas correctas
+        const atletasCol = collection(db, "atletas"); 
+        const atletaSnapshot = await getDocs(atletasCol);
+        
+        let athletes = [];
+        atletaSnapshot.forEach((doc) => {
+            athletes.push({ id: doc.id, ...doc.data() });
+        });
+
+        renderAthleteTable(athletes); 
+
+    } catch (error) {
+        console.error("Error al cargar atletas desde Firebase:", error);
+        container.innerHTML = '<p class="no-data-message" style="color: var(--color-red);">Error al conectar o leer la base de datos.</p>';
+        displayStatusMessage('Error al cargar datos. Revisa la conexión.', false);
+    }
 }
 
 
-// 4. Mostrar la tabla de atletas
+// 4. Mostrar la tabla de atletas (sin cambios)
 function renderAthleteTable(athletes) {
     const container = document.getElementById('registeredData');
     if (!container) return;
 
     if (athletes.length === 0) {
-        container.innerHTML = '<p class="no-data-message">Aún no hay atletas registrados.</p>';
+        container.innerHTML = '<p class="no-data-message">Aún no hay atletas registrados en la base de datos.</p>';
         return;
     }
 
@@ -153,12 +172,12 @@ function renderAthleteTable(athletes) {
     athletes.forEach(athlete => {
         html += `
             <tr>
-                <td>${athlete.cedula}</td>
-                <td>${athlete.nombre}</td>
-                <td>${athlete.apellido}</td>
-                <td>${athlete.club}</td>
-                <td>${athlete.division}</td>
-                <td>${athlete.fechaNac}</td>
+                <td>${athlete.cedula || '-'}</td>
+                <td>${athlete.nombre || '-'}</td>
+                <td>${athlete.apellido || '-'}</td>
+                <td>${athlete.club || '-'}</td>
+                <td>${athlete.division || '-'}</td>
+                <td>${athlete.fechaNac || '-'}</td>
                 <td>${athlete.talla || '-'}</td>
                 <td>${athlete.peso || '-'}</td>
                 <td>${athlete.telefono || '-'}</td>
@@ -175,29 +194,5 @@ function renderAthleteTable(athletes) {
     container.innerHTML = html;
 }
 
-
-/**
- * ==========================================================
- * III. FUNCIONES DE MANEJO DE LocalStorage
- * ==========================================================
- */
-
-// Cargar atletas desde LocalStorage
-function loadFromLocalStorage() {
-    const data = localStorage.getItem('lvm_atletas');
-    try {
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        console.error("Error parsing LocalStorage data:", e);
-        return [];
-    }
-}
-
-// Guardar atletas a LocalStorage
-function saveToLocalStorage(athletes) {
-    try {
-        localStorage.setItem('lvm_atletas', JSON.stringify(athletes));
-    } catch (e) {
-        console.error("Error saving to LocalStorage:", e);
-    }
-}
+// Nota: Las funciones de LocalStorage (loadFromLocalStorage, saveToLocalStorage) 
+// han sido eliminadas ya que estás usando Firebase.
