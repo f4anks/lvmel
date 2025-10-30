@@ -150,7 +150,7 @@ function setupRealtimeListener(appId) {
 }
 
 function setupFormListener() {
-	const form = document.getElementById('athleteRegistrationForm'); // Cambié el ID para que coincida con el HTML
+	const form = document.getElementById('athleteRegistrationForm'); // ID del formulario
 	if (form) {
 		form.addEventListener('submit', handleFormSubmit);
 		console.log("Listener de formulario de atleta adjunto.");
@@ -175,10 +175,12 @@ async function handleFormSubmit(event) {
 	const form = document.getElementById('athleteRegistrationForm');
 
 	// 1. Recolectar datos y preparar el objeto (documento)
-	const tallaValue = form.talla ? form.talla.value : ''; // Asegurar que el campo exista
-	const pesoValue = form.peso ? form.peso.value : ''; // Asegurar que el campo exista
-	
-	// Se guardan TODOS los campos del formulario, aunque solo se muestren 6
+	// Se verifica la existencia de los campos antes de acceder a .value
+	const tallaValue = form.talla ? form.talla.value : ''; 
+	const pesoValue = form.peso ? form.peso.value : ''; 
+	const correoValue = form.correo ? form.correo.value : 'N/A';
+	const telefonoValue = form.telefono ? form.telefono.value : 'N/A';
+
 	const newAthlete = {
         cedula: form.cedula.value, 
 		club: form.club.value,
@@ -186,13 +188,13 @@ async function handleFormSubmit(event) {
 		apellido: form.apellido.value,
 		fechaNac: form.fechaNac.value,
 		division: form.division.value,	
-		// Estos campos deben existir en el HTML para evitar errores, pero si no están, se usan strings vacíos
+		
 		tallaRaw: tallaValue,	
 		pesoRaw: pesoValue,	 	
 		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
 		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
-		correo: form.correo ? form.correo.value : 'N/A',
-		telefono: form.telefono ? form.telefono.value : 'N/A',
+		correo: correoValue,
+		telefono: telefonoValue,
 		timestamp: Date.now()	
 	};
 	
@@ -241,12 +243,11 @@ function sortTable(key, toggleDirection = true) {
 		let valA = a[key];
 		let valB = b[key];
 
-		// Ordenar correctamente los campos numéricos
+		// Ordenar correctamente los campos numéricos o de fecha
 		if (key === 'tallaRaw' || key === 'pesoRaw') {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
 		} else if (key === 'fechaNac') {
-			// Convertir a Date objects para una comparación precisa de fechas
 			valA = new Date(valA);
 			valB = new Date(valB);
 		} else {
@@ -266,7 +267,7 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (Muestra solo: Cédula, Nombre, Apellido, Club, F. Nac., División)
+ * RENDERIZADO DE LA TABLA (CORREGIDO: Asegura que el orden de los TD coincida con el orden de los TH)
  */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
@@ -283,8 +284,7 @@ function renderTable() {
     let tableBody = document.getElementById('athleteTableBody');
 
     if (!table) {
-        // 1. Construir Encabezados (<thead>)
-        // Se definen explícitamente los encabezados que vamos a mostrar.
+        // 1. Definición y Construcción de Encabezados (<thead>)
         const headerKeys = [
             { key: "cedula", label: "Cédula" },
             { key: "nombre", label: "Nombre" },
@@ -318,43 +318,8 @@ function renderTable() {
         tableBody.innerHTML = '';
     }
     
-    // 2. Construir Filas de Datos (<tbody>)
+    // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORRECTO
+    // El orden de los data.campos debe ser: cedula, nombre, apellido, club, fechaNac, division
     athletesData.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
-        newRow.classList.add('athlete-table-row');
-        
-        // Celdas (TD) que coinciden con el orden del encabezado
-        newRow.innerHTML = `
-            <td data-label="Cédula" class="table-data">${data.cedula || '-'}</td>
-            <td data-label="Nombre" class="table-data">${data.nombre || '-'}</td>
-            <td data-label="Apellido" class="table-data">${data.apellido || '-'}</td>
-            <td data-label="Club" class="table-data">${data.club || '-'}</td>
-            <td data-label="F. Nac." class="table-data">${data.fechaNac || '-'}</td>
-            <td data-label="División" class="table-data">${data.division || '-'}</td>
-        `;
-    });
-
-    // 3. Aplicar clases de ordenamiento
-    document.querySelectorAll('#athleteTable th').forEach(th => {
-        th.classList.remove('sorted-asc', 'sorted-desc');
-        if (th.getAttribute('data-sort-key') === currentSortKey) {
-            th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
-        }
-    });
-}
-
-function setupSorting() {
-	document.querySelectorAll('#athleteTable th').forEach(header => {
-		const key = header.getAttribute('data-sort-key');
-		if (key) {
-			header.style.cursor = 'pointer';	
-			header.addEventListener('click', () => sortTable(key, true));	
-		}
-	});
-}
-
-// Inicializar Firebase y los Listeners al cargar el contenido
-document.addEventListener('DOMContentLoaded', () => {
-	initFirebaseAndLoadData();
-	setupFormListener();
-});
+        newRow.classList.add('athlete-
