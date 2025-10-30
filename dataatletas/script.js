@@ -7,8 +7,8 @@ import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from
 let db;
 let auth;
 let userId = '';	
-let athletesData = [];	
-let currentSortKey = 'apellido';	// Ordenamiento inicial por Apellido
+let athletesData = []; 
+let currentSortKey = 'apellido';	
 let sortDirection = 'asc';	
 
 setLogLevel('Debug');
@@ -26,20 +26,9 @@ const EXTERNAL_FIREBASE_CONFIG = {
 	appId: "1:733536533303:web:3d2073504aefb2100378b2"
 };
 
-// 🏆 Mapeo ÚNICO de Cabeceras/Propiedades para garantizar la ALINEACIÓN
-// El orden en esta lista define el orden en la tabla.
-const TABLE_HEADERS = [
-    { key: "cedula", label: "Cédula" },
-    { key: "nombre", label: "Nombre" },
-    { key: "apellido", label: "Apellido" },
-    { key: "club", label: "Club" },
-    { key: "fechaNac", label: "F. Nac." },
-    { key: "division", label: "División" }
-];
-
 /**
- * Muestra un mensaje temporal de estado en la interfaz.
- */
+ * Muestra un mensaje temporal de estado en la interfaz.
+ */
 function displayStatusMessage(message, type) {
 	let statusEl = document.getElementById('statusMessage');
 	
@@ -56,15 +45,15 @@ function displayStatusMessage(message, type) {
 		statusEl.style.transition = 'opacity 0.5s ease-in-out';
 		statusEl.style.opacity = '0';
 		
-        if (document.body) {
-            document.body.appendChild(statusEl);
-        } else {
-            console.error("No se pudo mostrar el mensaje de estado: El cuerpo del documento aún no está disponible.");
-            return; 
-        }
+        if (document.body) {
+            document.body.appendChild(statusEl);
+        } else {
+            console.error("No se pudo mostrar el mensaje de estado: El cuerpo del documento aún no está disponible.");
+            return; 
+        }
 	}
 	
-	statusEl.textContent = message; 
+	statusEl.textContent = message; 
 	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
 	statusEl.style.opacity = '1';
 
@@ -75,8 +64,8 @@ function displayStatusMessage(message, type) {
 
 
 /**
- * 2. INICIALIZACIÓN Y AUTENTICACIÓN
- */
+ * 2. INICIALIZACIÓN Y AUTENTICACIÓN
+ */
 async function initFirebaseAndLoadData() {
 	console.log("Iniciando Firebase y autenticación...");
 	try {
@@ -117,13 +106,12 @@ async function initFirebaseAndLoadData() {
 
 	} catch (e) {
 		console.error("Error al inicializar Firebase:", e);
-        displayStatusMessage(`❌ Error al inicializar: ${e.message}`, 'error');
 	}
 }
 
 /**
- * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
- */
+ * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
+ */
 function setupRealtimeListener(appId) {
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
 	const q = query(athletesColRef);
@@ -133,7 +121,7 @@ function setupRealtimeListener(appId) {
 		const fetchedData = [];
 		snapshot.forEach((doc) => {
 			fetchedData.push({	
-				id: doc.id, 
+				id: doc.id, 
 				...doc.data()	
 			});
 		});
@@ -141,37 +129,36 @@ function setupRealtimeListener(appId) {
 		athletesData = fetchedData;
 		
 		if (athletesData.length > 0) {
-			// ✅ Asegura el ordenamiento inicial
+			// Al cargar, ordenar por el campo inicial (apellido)
 			sortTable(currentSortKey, false);	
 		} else {
 			renderTable();
 		}
 	}, (error) => {
+        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de lectura
 		console.error("Error en la escucha en tiempo real:", error);
-        if (error.code === 'permission-denied') {
-             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
-        } else {
-             displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
-        }
-        athletesData = [];
-        renderTable();
+        if (error.code === 'permission-denied') {
+             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+             displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
+        }
 	});
 }
 
 function setupFormListener() {
-	const form = document.getElementById('athleteForm'); 
+	const form = document.getElementById('athleteForm');
 	if (form) {
 		form.addEventListener('submit', handleFormSubmit);
-		console.log("Listener de formulario de atleta adjunto: athleteForm.");
+		console.log("Listener de formulario de atleta adjunto.");
 	} else {
-		console.error("Error: No se encontró el formulario con ID 'athleteForm'. ¡Revisa el HTML!");
+		console.error("Error: No se encontró el formulario con ID 'athleteForm'. ¿Está cargado el index.html?");
 	}
 }
 
 
 /**
- * 4. FUNCIÓN DE GUARDADO (handleFormSubmit)
- */
+ * 4. FUNCIÓN DE GUARDADO (handleFormSubmit)
+ */
 async function handleFormSubmit(event) {
 	event.preventDefault();	
 
@@ -181,39 +168,26 @@ async function handleFormSubmit(event) {
 		return false;
 	}
 
-	const form = document.getElementById('athleteForm'); 
+	const form = document.getElementById('athleteForm');
 
 	// 1. Recolectar datos y preparar el objeto (documento)
-	const cedulaValue = form.cedula.value.trim();
-	const nombreValue = form.nombre.value.trim();
-	const apellidoValue = form.apellido.value.trim();
-	// Los valores de club y division se leen directamente del elemento select
-	const clubValue = form.club.value.trim(); 
-	const fechaNacValue = form.fechaNac.value;
-	const divisionValue = form.division.value; 
-
-    // Campos auxiliares/nuevos:
-	const tallaValue = form.talla ? form.talla.value.trim() : '';
-	const pesoValue = form.peso ? form.peso.value.trim() : '';
-	const correoValue = form.correo ? form.correo.value.trim() : '';
-	const telefonoValue = form.telefono ? form.telefono.value.trim() : '';
+	const tallaValue = form.talla.value; 
+	const pesoValue = form.peso.value; 
 	
+	// Se guardan TODOS los campos del formulario, aunque solo se muestren 6
 	const newAthlete = {
-        // Los nombres de estas propiedades DEBEN coincidir con TABLE_HEADERS
-        cedula: cedulaValue, 
-		nombre: nombreValue,
-		apellido: apellidoValue,
-		club: clubValue,
-		fechaNac: fechaNacValue,
-		division: divisionValue,	
-		
-        // Datos auxiliares
-		tallaRaw: tallaValue,	 	
+        cedula: form.cedula.value, 
+		club: form.club.value,
+		nombre: form.nombre.value,
+		apellido: form.apellido.value,
+		fechaNac: form.fechaNac.value,
+		division: form.division.value,	
+		tallaRaw: tallaValue,	
 		pesoRaw: pesoValue,	 	
-		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A', 
-		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A', 
-		correo: correoValue || 'N/A',
-		telefono: telefonoValue || 'N/A',
+		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
+		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
+		correo: form.correo.value,
+		telefono: form.telefono.value,
 		timestamp: Date.now()	
 	};
 	
@@ -227,17 +201,20 @@ async function handleFormSubmit(event) {
 
 		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
 		await addDoc(athletesColRef, newAthlete);	
+		console.log("Atleta registrado y guardado en Firestore con éxito.");
 		displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
 		
 	} catch(error) {
+        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
 		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
 		if (error.code === 'permission-denied') {
-			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: No se pudo guardar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
 		} else {
 			displayStatusMessage(`❌ ERROR al guardar: ${error.message}`, 'error');
 		}
 
 	} finally {
+		console.log("handleFormSubmit ha finalizado. Reseteando formulario.");
 		form.reset();
 	}
 	
@@ -245,8 +222,8 @@ async function handleFormSubmit(event) {
 }
 
 /**
- * LÓGICA DE ORDENAMIENTO
- */
+ * LÓGICA DE ORDENAMIENTO Y RENDERIZADO
+ */
 function sortTable(key, toggleDirection = true) {
 	if (currentSortKey === key && toggleDirection) {
 		sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
@@ -259,7 +236,7 @@ function sortTable(key, toggleDirection = true) {
 		let valA = a[key];
 		let valB = b[key];
 
-		// Manejo de tipos para ordenamiento
+		// Ordenar correctamente los campos numéricos
 		if (key === 'tallaRaw' || key === 'pesoRaw') {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
@@ -267,9 +244,8 @@ function sortTable(key, toggleDirection = true) {
 			valA = new Date(valA);
 			valB = new Date(valB);
 		} else {
-			// Comparación de strings
-			valA = String(valA || '').toLowerCase();
-			valB = String(valB || '').toLowerCase();
+			valA = String(valA).toLowerCase();
+			valB = String(valB).toLowerCase();
 		}
 
 		let comparison = 0;
@@ -283,69 +259,66 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (Usa el mapeo TABLE_HEADERS)
- */
+ * RENDERIZADO DE LA TABLA (Muestra solo: Cédula, Nombre, Apellido, Club, F. Nac., División)
+ */
 function renderTable() {
-    const registeredDataContainer = document.getElementById('registeredData');
-    
-    if (athletesData.length === 0) {
-        if (!registeredDataContainer.querySelector('.error')) {
-            registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
-        }
-        return;
-    }
+    const registeredDataContainer = document.getElementById('registeredData');
+    
+    if (athletesData.length === 0) {
+        registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
+        return;
+    }
 
-    let table = document.getElementById('athleteTable');
-    let tableBody = document.getElementById('athleteTableBody');
+    let table = document.getElementById('athleteTable');
+    let tableBody = document.getElementById('athleteTableBody');
 
-    if (!table) {
-        // 1. Construir Encabezados (<thead>) usando TABLE_HEADERS
-        let headerRowHTML = TABLE_HEADERS.map(header => {
-            const isSorted = header.key === currentSortKey;
-            const sortClass = isSorted ? (sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
-            return `<th data-sort-key="${header.key}" class="${sortClass}">${header.label}</th>`;
-        }).join('');
+    if (!table) {
+        registeredDataContainer.innerHTML = `
+            <div class="table-responsive-wrapper">
+                <table id="athleteTable" class="athlete-data-table">
+                    <thead>
+                        <tr class="table-header-row">
+                            <th data-sort-key="cedula">Cédula</th>
+                            <th data-sort-key="nombre">Nombre</th>
+                            <th data-sort-key="apellido">Apellido</th>
+                            <th data-sort-key="club">Club</th> 
+                            <th data-sort-key="fechaNac">F. Nac.</th>
+                            <th data-sort-key="division">División</th>
+                        </tr>
+                    </thead>
+                    <tbody id="athleteTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note-message">Haz clic en cualquier encabezado de la tabla para ordenar los resultados.</p>
+        `;
+        tableBody = document.getElementById('athleteTableBody');
+        setupSorting();	
+    } else {
+        tableBody.innerHTML = '';
+    }
+    
+    athletesData.forEach(data => {
+        const newRow = tableBody.insertRow(-1);	
+        newRow.classList.add('athlete-table-row');
+        
+        // Celdas (TD) que coinciden con el nuevo orden de encabezados
+        newRow.innerHTML = `
+            <td data-label="Cédula" class="table-data">${data.cedula}</td>
+            <td data-label="Nombre" class="table-data">${data.nombre}</td>
+            <td data-label="Apellido" class="table-data">${data.apellido}</td>
+            <td data-label="Club" class="table-data">${data.club}</td>
+            <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
+            <td data-label="División" class="table-data">${data.division}</td>
+        `;
+    });
 
-        registeredDataContainer.innerHTML = `
-            <div class="table-responsive-wrapper">
-                <table id="athleteTable" class="athlete-data-table">
-                    <thead>
-                        <tr class="table-header-row">${headerRowHTML}</tr>
-                    </thead>
-                    <tbody id="athleteTableBody">
-                    </tbody>
-                </table>
-            </div>
-            <p class="table-note-message">Haz clic en cualquier encabezado de la tabla para ordenar los resultados.</p>
-        `;
-        tableBody = document.getElementById('athleteTableBody');
-        setupSorting();	
-    } else {
-        tableBody.innerHTML = '';
-    }
-    
-    // 2. Construir Filas de Datos (<tbody>) usando TABLE_HEADERS
-    athletesData.forEach(data => {
-        const newRow = tableBody.insertRow(-1);	
-        newRow.classList.add('athlete-table-row');
-       
-        // Creamos las celdas iterando sobre el mapeo (ORDEN GARANTIZADO)
-        // Usamos || '-' para manejar campos indefinidos o vacíos
-        let rowContent = TABLE_HEADERS.map(header => {
-            const value = data[header.key] || '-'; 
-            return `<td data-label="${header.label}" class="table-data">${value}</td>`;
-        }).join('');
-
-        newRow.innerHTML = rowContent;
-    });
-
-    // 3. Aplicar clases de ordenamiento
-    document.querySelectorAll('#athleteTable th').forEach(th => {
-        th.classList.remove('sorted-asc', 'sorted-desc');
-        if (th.getAttribute('data-sort-key') === currentSortKey) {
-            th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
-        }
-    });
+    document.querySelectorAll('#athleteTable th').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        if (th.getAttribute('data-sort-key') === currentSortKey) {
+            th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        }
+    });
 }
 
 function setupSorting() {
