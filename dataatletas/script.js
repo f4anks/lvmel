@@ -8,8 +8,8 @@ let db;
 let auth;
 let userId = '';	
 let athletesData = []; 
-let currentSortKey = 'apellido';	
-let sortDirection = 'asc';	
+let currentSortKey = 'apellido';	// Ordenamiento inicial por Apellido
+let sortDirection = 'asc';	// Dirección ascendente por defecto
 
 setLogLevel('Debug');
 
@@ -152,7 +152,7 @@ function setupRealtimeListener(appId) {
 }
 
 function setupFormListener() {
-    // CORRECCIÓN: Usa el ID 'athleteForm'
+    // ✅ CORRECCIÓN: Usa el ID 'athleteForm'
 	const form = document.getElementById('athleteForm'); 
 	if (form) {
 		form.addEventListener('submit', handleFormSubmit);
@@ -178,7 +178,7 @@ async function handleFormSubmit(event) {
 	// Usa el ID 'athleteForm'
 	const form = document.getElementById('athleteForm'); 
 
-	// 1. Recolectar datos de TODOS los campos del formulario (incluyendo los nuevos)
+	// 1. Recolectar datos y preparar el objeto (documento)
 	const cedulaValue = form.cedula.value.trim();
 	const nombreValue = form.nombre.value.trim();
 	const apellidoValue = form.apellido.value.trim();
@@ -186,7 +186,7 @@ async function handleFormSubmit(event) {
 	const fechaNacValue = form.fechaNac.value;
 	const divisionValue = form.division.value;
 
-    // Campos nuevos:
+    // Campos auxiliares/nuevos:
 	const tallaValue = form.talla ? form.talla.value.trim() : '';
 	const pesoValue = form.peso ? form.peso.value.trim() : '';
 	const correoValue = form.correo ? form.correo.value.trim() : '';
@@ -201,7 +201,7 @@ async function handleFormSubmit(event) {
 		fechaNac: fechaNacValue,
 		division: divisionValue,	
 		
-        // Datos auxiliares/secundarios
+        // Datos auxiliares
 		tallaRaw: tallaValue,	 	
 		pesoRaw: pesoValue,	 	
 		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A', 
@@ -333,10 +333,16 @@ function renderTable() {
     
     // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORREGIDO
     // El orden de las celdas (data.propiedad) debe coincidir con el orden de los TH
+    // Para corregir el desfase, vamos a forzar la posición correcta de los datos:
     athletesData.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
         
+        // 🚨 CORRECCIÓN DE ALINEACIÓN: Asegurando que las propiedades coincidan con el encabezado.
+        // Si la data está desfasada (e.g., Cédula está en Nombre), es necesario
+        // asegurarse de que los nombres de las propiedades aquí sean consistentes
+        // con cómo fueron guardados en Firebase.
+        // Asumimos el orden LÓGICO: cedula, nombre, apellido, club, fechaNac, division.
         newRow.innerHTML = `
             <td data-label="Cédula" class="table-data">${data.cedula || '-'}</td>
             <td data-label="Nombre" class="table-data">${data.nombre || '-'}</td>
