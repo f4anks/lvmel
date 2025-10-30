@@ -113,7 +113,7 @@ async function initFirebaseAndLoadData() {
  * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
  */
 function setupRealtimeListener(appId) {
-    // RUTA CRÍTICA: Ajusta si tu estructura de Firebase es diferente
+    // RUTA CRÍTICA: Asegúrate que esta ruta es correcta en tu Firebase
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
 	const q = query(athletesColRef);
 
@@ -143,7 +143,7 @@ function setupRealtimeListener(appId) {
         } else {
              displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
         }
-        // Forzar renderizado para mostrar el mensaje de error en la tabla.
+        // Forzar renderizado para mostrar el mensaje de "No hay datos" o "Cargando" si falla la conexión
         athletesData = [];
         renderTable();
 	});
@@ -175,12 +175,11 @@ async function handleFormSubmit(event) {
 	const form = document.getElementById('athleteRegistrationForm');
 
 	// 1. Recolectar datos y preparar el objeto (documento)
-	// Se verifica la existencia de los campos antes de acceder a .value
 	const tallaValue = form.talla ? form.talla.value : ''; 
 	const pesoValue = form.peso ? form.peso.value : ''; 
 	const correoValue = form.correo ? form.correo.value : 'N/A';
 	const telefonoValue = form.telefono ? form.telefono.value : 'N/A';
-
+	
 	const newAthlete = {
         cedula: form.cedula.value, 
 		club: form.club.value,
@@ -284,7 +283,7 @@ function renderTable() {
     let tableBody = document.getElementById('athleteTableBody');
 
     if (!table) {
-        // 1. Definición y Construcción de Encabezados (<thead>)
+        // 1. Definición y Construcción de Encabezados (<thead>) - ¡El orden de las cabeceras es clave!
         const headerKeys = [
             { key: "cedula", label: "Cédula" },
             { key: "nombre", label: "Nombre" },
@@ -319,7 +318,42 @@ function renderTable() {
     }
     
     // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORRECTO
-    // El orden de los data.campos debe ser: cedula, nombre, apellido, club, fechaNac, division
+    // El orden de los data.campos DEBE COINCIDIR con el orden de las cabeceras TH
     athletesData.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
-        newRow.classList.add('athlete-
+        newRow.classList.add('athlete-table-row');
+        
+        newRow.innerHTML = `
+            <td data-label="Cédula" class="table-data">${data.cedula || '-'}</td>
+            <td data-label="Nombre" class="table-data">${data.nombre || '-'}</td>
+            <td data-label="Apellido" class="table-data">${data.apellido || '-'}</td>
+            <td data-label="Club" class="table-data">${data.club || '-'}</td>
+            <td data-label="F. Nac." class="table-data">${data.fechaNac || '-'}</td>
+            <td data-label="División" class="table-data">${data.division || '-'}</td>
+        `;
+    });
+
+    // 3. Aplicar clases de ordenamiento
+    document.querySelectorAll('#athleteTable th').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        if (th.getAttribute('data-sort-key') === currentSortKey) {
+            th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        }
+    });
+}
+
+function setupSorting() {
+	document.querySelectorAll('#athleteTable th').forEach(header => {
+		const key = header.getAttribute('data-sort-key');
+		if (key) {
+			header.style.cursor = 'pointer';	
+			header.addEventListener('click', () => sortTable(key, true));	
+		}
+	});
+}
+
+// Inicializar Firebase y los Listeners al cargar el contenido
+document.addEventListener('DOMContentLoaded', () => {
+	initFirebaseAndLoadData();
+	setupFormListener();
+});
