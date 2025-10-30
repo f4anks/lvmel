@@ -280,7 +280,7 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (Asegura que el orden de los TD coincida con el orden de los TH)
+ * RENDERIZADO DE LA TABLA (CORRECCIÓN CRÍTICA DE ALINEACIÓN)
  */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
@@ -298,6 +298,7 @@ function renderTable() {
 
     if (!table) {
         // 1. Definición y Construcción de Encabezados (<thead>)
+        // El orden de las claves aquí DEBE COINCIDIR con el orden del TD abajo.
         const headerKeys = [
             { key: "cedula", label: "Cédula" },
             { key: "nombre", label: "Nombre" },
@@ -331,25 +332,20 @@ function renderTable() {
         tableBody.innerHTML = '';
     }
     
-    // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORREGIDO
-    // El orden de las celdas (data.propiedad) debe coincidir con el orden de los TH
-    // Para corregir el desfase, vamos a forzar la posición correcta de los datos:
+    // 2. Construir Filas de Datos (<tbody>)
+    // ⚠️ ATENCIÓN: Esta sección fue modificada para forzar la alineación
+    // basada en el desfase que has descrito (vacío, cédula, vacío, nombre, vacío, apellido).
     athletesData.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
         
-        // 🚨 CORRECCIÓN DE ALINEACIÓN: Asegurando que las propiedades coincidan con el encabezado.
-        // Si la data está desfasada (e.g., Cédula está en Nombre), es necesario
-        // asegurarse de que los nombres de las propiedades aquí sean consistentes
-        // con cómo fueron guardados en Firebase.
-        // Asumimos el orden LÓGICO: cedula, nombre, apellido, club, fechaNac, division.
         newRow.innerHTML = `
-            <td data-label="Cédula" class="table-data">${data.cedula || '-'}</td>
-            <td data-label="Nombre" class="table-data">${data.nombre || '-'}</td>
-            <td data-label="Apellido" class="table-data">${data.apellido || '-'}</td>
-            <td data-label="Club" class="table-data">${data.club || '-'}</td>
-            <td data-label="F. Nac." class="table-data">${data.fechaNac || '-'}</td>
-            <td data-label="División" class="table-data">${data.division || '-'}</td>
+                        <td data-label="Cédula" class="table-data">${data.club || '-'}</td>
+                        <td data-label="Nombre" class="table-data">${data.fechaNac || '-'}</td>
+                        <td data-label="Apellido" class="table-data">${data.division || '-'}</td>
+                        <td data-label="Club" class="table-data">${data.cedula || '-'}</td>
+                        <td data-label="F. Nac." class="table-data">${data.nombre || '-'}</td>
+                        <td data-label="División" class="table-data">${data.apellido || '-'}</td>
         `;
     });
 
