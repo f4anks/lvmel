@@ -14,58 +14,61 @@ body {
     color: #333333; /* TEXTO GRIS OSCURO */
     margin: 0;
     padding: 0;
-    line-height: 1.6;
+    line-height: 1.5; /* Reducido ligeramente */
 }
 
 .page-header {
     background-color: #800020; /* ENCABEZADO VINOTINTO OSCURO */
     color: white;
-    padding: 30px 0; /* Mayor padding para más impacto */
+    padding: 20px 0; /* REDUCIDO: De 30px a 20px */
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h1 {
-    font-size: 2.5rem; /* Título más grande */
-    margin-bottom: 5px;
+    font-size: 2.2rem; /* REDUCIDO: De 2.5rem a 2.2rem */
+    margin-bottom: 3px; /* REDUCIDO */
 }
 
 .subtitle {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.85); /* Subtítulo más suave */
+    font-size: 1rem; /* REDUCIDO: De 1.1rem a 1rem */
+    color: rgba(255, 255, 255, 0.85);
     margin: 0;
 }
 
 .container {
     max-width: 1200px;
-    margin: 30px auto;
+    margin: 20px auto; /* REDUCIDO: De 30px a 20px */
     padding: 0 20px;
 }
 
 h2 {
     color: #DC143C; /* SUBTÍTULOS ROJOS BRILLANTES */
     font-weight: 600;
-    padding-bottom: 10px;
-    margin-top: 30px;
+    padding-bottom: 8px; /* REDUCIDO */
+    margin-top: 20px; /* REDUCIDO: De 30px a 20px */
     margin-left: unset;
     margin-right: unset;
+    font-size: 1.5rem; /* Título h2 ligeramente más pequeño */
 }
 
 /* Contenedor del Título del Formulario */
 .form-section {
-    text-align: center; /* Centra el h2 (bloque) y su contenido */
+    text-align: center;
+    margin-bottom: 10px; /* AGREGADO para ajustar espacio */
 }
 
 /* Centrar el título del formulario (Data de Atletas...) */
 .form-section h2 {
     text-align: center;
-    border-bottom: 3px solid #F0DADA; /* Borde inferior rojizo suave */
+    border-bottom: 2px solid #F0DADA; /* Borde más delgado */
+    margin-top: 0; /* Eliminamos el margen superior para que esté más cerca de la sección */
 }
 
 /* Centrar el título de la sección de resultados (Lista de Atletas...) */
 .data-section h2 {
     text-align: center;
-    border-bottom: 3px solid #F0DADA; /* Borde inferior rojizo suave */
+    border-bottom: 2px solid #F0DADA; /* Borde más delgado */
 }
 
 .separator {
@@ -73,19 +76,19 @@ h2 {
     height: 1px;
     /* Gradiente con el rojo brillante */
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(220, 20, 60, 0.5), rgba(0, 0, 0, 0));
-    margin: 40px 0;
+    margin: 30px 0; /* REDUCIDO: De 40px a 30px */
 }
 
 /* Estilos de Formulario */
 .athlete-form {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 15px; /* REDUCIDO: De 20px a 15px entre elementos del formulario */
     background: #ffffff; /* Fondo blanco */
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    text-align: left; /* Asegura que los campos no se centren */
+    padding: 25px; /* REDUCIDO: De 30px a 25px de padding interno */
+    border-radius: 10px; /* Borde ligeramente más pequeño */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07); /* Sombra más sutil */
+    text-align: left;
 }
 
 .form-group {
@@ -95,13 +98,14 @@ h2 {
 }
 
 .form-group.half-width {
-    flex: 1 1 calc(50% - 10px);
+    flex: 1 1 calc(50% - 7.5px); /* Ajustado para el nuevo gap de 15px/2 */
 }
 
 label {
-    margin-bottom: 8px;
+    margin-bottom: 5px; /* REDUCIDO: De 8px a 5px */
     font-weight: 600;
-    color: #333333; /* Texto gris oscuro */
+    color: #333333;
+    font-size: 0.95rem; /* Ligeramente más pequeño */
 }
 
 input[type="text"],
@@ -110,10 +114,10 @@ input[type="date"],
 input[type="email"],
 input[type="tel"],
 select {
-    padding: 12px;
-    border: 1px solid #F0DADA; /* Borde rojizo suave */
-    border-radius: 6px;
-    font-size: 16px;
+    padding: 10px; /* REDUCIDO: De 12px a 10px */
+    border: 1px solid #F0DADA;
+    border-radius: 5px; /* Borde ligeramente más pequeño */
+    font-size: 15px; /* REDUCIDO: De 16px a 15px */
     transition: border-color 0.3s, box-shadow 0.3s;
     background-color: white;
 
@@ -128,8 +132,8 @@ select {
 }
 
 input:focus, select:focus {
-    border-color: #DC143C; /* Borde de enfoque rojo brillante */
-    box-shadow: 0 0 0 0.2rem rgba(220, 20, 60, 0.25); /* Sombra de enfoque rojo brillante */
+    border-color: #DC143C;
+    box-shadow: 0 0 0 0.2rem rgba(220, 20, 60, 0.2); /* Sombra de enfoque más sutil */
     outline: none;
 }
 
@@ -137,56 +141,56 @@ input:focus, select:focus {
 .button-container {
     flex: 1 1 100%;
     display: flex;
-    justify-content: center; /* Centra el botón */
-    margin-top: 15px;
+    justify-content: center;
+    margin-top: 10px; /* REDUCIDO: De 15px a 10px */
 }
 
 /* Estilos del Botón Registrar (Vinotinto Oscuro) */
 .submit-button {
-    background-color: #800020; /* Vinotinto Oscuro */
+    background-color: #800020;
     color: white;
-    padding: 10px 25px;
+    padding: 8px 20px; /* REDUCIDO: Menos padding */
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 17px;
+    font-size: 16px; /* REDUCIDO: De 17px a 16px */
     font-weight: 600;
     transition: background-color 0.3s, transform 0.1s;
-    box-shadow: 0 4px 6px rgba(128, 0, 32, 0.3); /* Sombra del botón vinotinto */
+    box-shadow: 0 3px 5px rgba(128, 0, 32, 0.3);
 }
 
 .submit-button:hover {
-    background-color: #A52A2A; /* Un tono más claro de vinotinto al hacer hover */
+    background-color: #A52A2A;
     transform: translateY(-1px);
-    box-shadow: 0 6px 8px rgba(128, 0, 32, 0.4);
+    box-shadow: 0 5px 7px rgba(128, 0, 32, 0.4);
 }
 
-/* Estilos de la Tabla */
+/* ESTILOS DE LA TABLA (SIN MODIFICACIONES MAYORES EN ESPACIADO PARA RESULTADOS) */
+
 .table-responsive-wrapper {
     overflow-x: auto;
     background: #ffffff;
     padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
 }
 
 .athlete-data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 15px; /* REDUCIDO: De 20px a 15px */
     min-width: 700px;
 }
 
-/* Centrar el contenido de los encabezados (TH) y las celdas (TD) */
 .athlete-data-table th, .athlete-data-table td {
-    padding: 15px 10px;
-    text-align: center; /* CENTRADO DE DATOS Y TÍTULOS DE COLUMNAS */
-    border-bottom: 1px solid #F0DADA; /* Borde inferior rojizo suave */
+    padding: 12px 10px; /* REDUCIDO: De 15px a 12px */
+    text-align: center;
+    border-bottom: 1px solid #F0DADA;
 }
 
 .athlete-data-table th {
-    background-color: #FFE5E5; /* Fondo de encabezado muy claro con un toque rosado */
-    color: #DC143C; /* Texto de encabezado rojo brillante */
+    background-color: #FFE5E5;
+    color: #DC143C;
     font-weight: 700;
     cursor: pointer;
     position: relative;
@@ -195,37 +199,37 @@ input:focus, select:focus {
 }
 
 .athlete-data-table th:hover {
-    background-color: #FFCCCC; /* Fondo de encabezado más oscuro al hacer hover */
+    background-color: #FFCCCC;
 }
 
 /* Filas */
 .athlete-data-table tr:nth-child(even) {
-    background-color: #FFF8F8; /* Fondo alterno de fila como el fondo principal */
+    background-color: #FFF8F8;
 }
 
 .athlete-data-table tr:hover {
-    background-color: #FFEBEB; /* Fondo de fila más claro al hacer hover */
+    background-color: #FFEBEB;
 }
 
 /* Indicadores de Ordenamiento */
 .athlete-data-table th.sorted-asc::after {
     content: ' ▲';
-    color: #A52A2A; /* Color de flecha de ordenamiento */
+    color: #A52A2A;
 }
 
 .athlete-data-table th.sorted-desc::after {
     content: ' ▼';
-    color: #A52A2A; /* Color de flecha de ordenamiento */
+    color: #A52A2A;
 }
 
 .no-data-message, .loading-message, .table-note-message {
     text-align: center;
-    padding: 20px;
-    color: #6c757d; /* Mantener un gris neutro para mensajes */
+    padding: 15px; /* REDUCIDO: De 20px a 15px */
+    color: #6c757d;
     font-style: italic;
-    border: 1px dashed #F0DADA; /* Borde rojizo suave */
+    border: 1px dashed #F0DADA;
     border-radius: 8px;
-    margin-top: 20px;
+    margin-top: 15px; /* REDUCIDO: De 20px a 15px */
 }
 
 /* Estilos Responsivos */
