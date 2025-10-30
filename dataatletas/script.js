@@ -27,6 +27,7 @@ const EXTERNAL_FIREBASE_CONFIG = {
 };
 
 // 🏆 Mapeo ÚNICO de Cabeceras/Propiedades para garantizar la ALINEACIÓN
+// El orden en esta lista define el orden en la tabla.
 const TABLE_HEADERS = [
     { key: "cedula", label: "Cédula" },
     { key: "nombre", label: "Nombre" },
@@ -257,7 +258,7 @@ function sortTable(key, toggleDirection = true) {
 		let valA = a[key];
 		let valB = b[key];
 
-		// Manejo de tipos para ordenamiento
+		// Manejo de tipos para ordenamiento (numérico, fecha, o string)
 		if (key === 'tallaRaw' || key === 'pesoRaw') {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
@@ -328,6 +329,7 @@ function renderTable() {
         newRow.classList.add('athlete-table-row');
        
         // Creamos las celdas iterando sobre el mapeo (ORDEN GARANTIZADO)
+        // ✅ CORRECCIÓN: Usamos || '-' para manejar campos indefinidos o vacíos y evitar el desfase.
         let rowContent = TABLE_HEADERS.map(header => {
             const value = data[header.key] || '-'; // Obtenemos el valor de la propiedad
             return `<td data-label="${header.label}" class="table-data">${value}</td>`;
