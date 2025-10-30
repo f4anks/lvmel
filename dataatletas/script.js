@@ -7,9 +7,9 @@ import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from
 let db;
 let auth;
 let userId = '';	
-let athletesData = []; 
+let athletesData = [];	
 let currentSortKey = 'apellido';	// Ordenamiento inicial por Apellido
-let sortDirection = 'asc';	// Dirección ascendente por defecto
+let sortDirection = 'asc';	
 
 setLogLevel('Debug');
 
@@ -25,6 +25,16 @@ const EXTERNAL_FIREBASE_CONFIG = {
 	messagingSenderId: "733536533303",
 	appId: "1:733536533303:web:3d2073504aefb2100378b2"
 };
+
+// 🏆 Mapeo ÚNICO de Cabeceras/Propiedades para garantizar la ALINEACIÓN
+const TABLE_HEADERS = [
+    { key: "cedula", label: "Cédula" },
+    { key: "nombre", label: "Nombre" },
+    { key: "apellido", label: "Apellido" },
+    { key: "club", label: "Club" },
+    { key: "fechaNac", label: "F. Nac." },
+    { key: "division", label: "División" }
+];
 
 /**
  * Muestra un mensaje temporal de estado en la interfaz.
@@ -73,7 +83,6 @@ async function initFirebaseAndLoadData() {
 		let appIdToUse;
 		let tokenToUse = '';
 
-		// Lógica para determinar la configuración a usar (interna/externa)
 		if (typeof __firebase_config !== 'undefined' && __firebase_config.length > 2) {
 			configToUse = JSON.parse(__firebase_config);
 			appIdToUse = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -115,7 +124,6 @@ async function initFirebaseAndLoadData() {
  * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
  */
 function setupRealtimeListener(appId) {
-    // RUTA CRÍTICA: Asegúrate que esta ruta es correcta en tu Firebase
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
 	const q = query(athletesColRef);
 
@@ -132,27 +140,24 @@ function setupRealtimeListener(appId) {
 		athletesData = fetchedData;
 		
 		if (athletesData.length > 0) {
-			// Ordena y renderiza los datos usando la clave de orden actual ('apellido' por defecto)
+			// ✅ Asegura el ordenamiento inicial
 			sortTable(currentSortKey, false);	
 		} else {
 			renderTable();
 		}
 	}, (error) => {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de lectura
 		console.error("Error en la escucha en tiempo real:", error);
         if (error.code === 'permission-denied') {
              displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
         } else {
              displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
         }
-        // Forzar renderizado para mostrar el mensaje de "No hay datos" si falla la conexión
         athletesData = [];
         renderTable();
 	});
 }
 
 function setupFormListener() {
-    // ✅ CORRECCIÓN: Usa el ID 'athleteForm'
 	const form = document.getElementById('athleteForm'); 
 	if (form) {
 		form.addEventListener('submit', handleFormSubmit);
@@ -175,7 +180,6 @@ async function handleFormSubmit(event) {
 		return false;
 	}
 
-	// Usa el ID 'athleteForm'
 	const form = document.getElementById('athleteForm'); 
 
 	// 1. Recolectar datos y preparar el objeto (documento)
@@ -193,7 +197,7 @@ async function handleFormSubmit(event) {
 	const telefonoValue = form.telefono ? form.telefono.value.trim() : '';
 	
 	const newAthlete = {
-        // Datos principales (mostrados en la tabla)
+        // Los nombres de estas propiedades DEBEN coincidir con TABLE_HEADERS
         cedula: cedulaValue, 
 		nombre: nombreValue,
 		apellido: apellidoValue,
@@ -221,11 +225,9 @@ async function handleFormSubmit(event) {
 
 		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
 		await addDoc(athletesColRef, newAthlete);	
-		console.log("Atleta registrado y guardado en Firestore con éxito.");
 		displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
 		
 	} catch(error) {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
 		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
 		if (error.code === 'permission-denied') {
 			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
@@ -234,7 +236,6 @@ async function handleFormSubmit(event) {
 		}
 
 	} finally {
-		console.log("handleFormSubmit ha finalizado. Reseteando formulario.");
 		form.reset();
 	}
 	
@@ -242,7 +243,7 @@ async function handleFormSubmit(event) {
 }
 
 /**
- * LÓGICA DE ORDENAMIENTO Y RENDERIZADO
+ * LÓGICA DE ORDENAMIENTO
  */
 function sortTable(key, toggleDirection = true) {
 	if (currentSortKey === key && toggleDirection) {
@@ -256,7 +257,7 @@ function sortTable(key, toggleDirection = true) {
 		let valA = a[key];
 		let valB = b[key];
 
-		// Ordenar correctamente los campos numéricos (si se usa alguno) o de fecha
+		// Manejo de tipos para ordenamiento
 		if (key === 'tallaRaw' || key === 'pesoRaw') {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
@@ -264,7 +265,7 @@ function sortTable(key, toggleDirection = true) {
 			valA = new Date(valA);
 			valB = new Date(valB);
 		} else {
-			// Comparación de strings (texto)
+			// Comparación de strings
 			valA = String(valA || '').toLowerCase();
 			valB = String(valB || '').toLowerCase();
 		}
@@ -280,13 +281,12 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (CORRECCIÓN CRÍTICA DE ALINEACIÓN)
+ * RENDERIZADO DE LA TABLA (Usa el mapeo TABLE_HEADERS)
  */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
     
     if (athletesData.length === 0) {
-        // Asegura que solo se muestre el mensaje si no hay un error más grave visible
         if (!registeredDataContainer.querySelector('.error')) {
             registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
         }
@@ -297,18 +297,8 @@ function renderTable() {
     let tableBody = document.getElementById('athleteTableBody');
 
     if (!table) {
-        // 1. Definición y Construcción de Encabezados (<thead>)
-        // El orden de las claves aquí DEBE COINCIDIR con el orden del TD abajo.
-        const headerKeys = [
-            { key: "cedula", label: "Cédula" },
-            { key: "nombre", label: "Nombre" },
-            { key: "apellido", label: "Apellido" },
-            { key: "club", label: "Club" },
-            { key: "fechaNac", label: "F. Nac." },
-            { key: "division", label: "División" }
-        ];
-
-        let headerRowHTML = headerKeys.map(header => {
+        // 1. Construir Encabezados (<thead>) usando TABLE_HEADERS
+        let headerRowHTML = TABLE_HEADERS.map(header => {
             const isSorted = header.key === currentSortKey;
             const sortClass = isSorted ? (sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
             return `<th data-sort-key="${header.key}" class="${sortClass}">${header.label}</th>`;
@@ -332,21 +322,18 @@ function renderTable() {
         tableBody.innerHTML = '';
     }
     
-    // 2. Construir Filas de Datos (<tbody>)
-    // ⚠️ ATENCIÓN: Esta sección fue modificada para forzar la alineación
-    // basada en el desfase que has descrito (vacío, cédula, vacío, nombre, vacío, apellido).
+    // 2. Construir Filas de Datos (<tbody>) usando TABLE_HEADERS
     athletesData.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
-        
-        newRow.innerHTML = `
-                        <td data-label="Cédula" class="table-data">${data.club || '-'}</td>
-                        <td data-label="Nombre" class="table-data">${data.fechaNac || '-'}</td>
-                        <td data-label="Apellido" class="table-data">${data.division || '-'}</td>
-                        <td data-label="Club" class="table-data">${data.cedula || '-'}</td>
-                        <td data-label="F. Nac." class="table-data">${data.nombre || '-'}</td>
-                        <td data-label="División" class="table-data">${data.apellido || '-'}</td>
-        `;
+       
+        // Creamos las celdas iterando sobre el mapeo (ORDEN GARANTIZADO)
+        let rowContent = TABLE_HEADERS.map(header => {
+            const value = data[header.key] || '-'; // Obtenemos el valor de la propiedad
+            return `<td data-label="${header.label}" class="table-data">${value}</td>`;
+        }).join('');
+
+        newRow.innerHTML = rowContent;
     });
 
     // 3. Aplicar clases de ordenamiento
