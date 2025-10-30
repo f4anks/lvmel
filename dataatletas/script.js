@@ -1,5 +1,6 @@
 // 1. IMPORTACIONES DE FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+// Se mantienen ambas funciones de autenticación por si se requieren en el ambiente de hosting
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -8,8 +9,8 @@ let db;
 let auth;
 let userId = '';	
 let athletesData = []; 
-let currentSortKey = 'apellido';	
-let sortDirection = 'asc';	
+let currentSortKey = 'apellido';	// Ordenamiento inicial por Apellido
+let sortDirection = 'asc';	// Dirección ascendente por defecto
 
 setLogLevel('Debug');
 
@@ -73,6 +74,7 @@ async function initFirebaseAndLoadData() {
 		let appIdToUse;
 		let tokenToUse = '';
 
+		// Lógica para determinar la configuración a usar (interna/externa)
 		if (typeof __firebase_config !== 'undefined' && __firebase_config.length > 2) {
 			configToUse = JSON.parse(__firebase_config);
 			appIdToUse = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -106,6 +108,7 @@ async function initFirebaseAndLoadData() {
 
 	} catch (e) {
 		console.error("Error al inicializar Firebase:", e);
+        displayStatusMessage(`❌ Error al inicializar: ${e.message}`, 'error');
 	}
 }
 
@@ -113,7 +116,7 @@ async function initFirebaseAndLoadData() {
  * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
  */
 function setupRealtimeListener(appId) {
-    // RUTA CRÍTICA: Asegúrate que esta ruta es correcta en tu Firebase
+    // RUTA CRÍTICA: Asegúrate que esta ruta es correcta en tu Firebase
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
 	const q = query(athletesColRef);
 
@@ -130,7 +133,7 @@ function setupRealtimeListener(appId) {
 		athletesData = fetchedData;
 		
 		if (athletesData.length > 0) {
-			// Al cargar, ordenar por el campo inicial (apellido)
+			// Ordena y renderiza los datos usando la clave de orden actual ('apellido' por defecto)
 			sortTable(currentSortKey, false);	
 		} else {
 			renderTable();
@@ -139,23 +142,24 @@ function setupRealtimeListener(appId) {
         // MANEJO DE ERROR MEJORADO: Indica problema de permisos de lectura
 		console.error("Error en la escucha en tiempo real:", error);
         if (error.code === 'permission-denied') {
-             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
         } else {
              displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
         }
-        // Forzar renderizado para mostrar el mensaje de "No hay datos" o "Cargando" si falla la conexión
-        athletesData = [];
-        renderTable();
+        // Forzar renderizado para mostrar el mensaje de "No hay datos" si falla la conexión
+        athletesData = [];
+        renderTable();
 	});
 }
 
 function setupFormListener() {
-	const form = document.getElementById('athleteRegistrationForm'); // ID del formulario
+    // 💡 CORRECCIÓN APLICADA: Usa el ID 'athleteForm'
+	const form = document.getElementById('athleteForm'); 
 	if (form) {
 		form.addEventListener('submit', handleFormSubmit);
-		console.log("Listener de formulario de atleta adjunto.");
+		console.log("Listener de formulario de atleta adjunto: athleteForm.");
 	} else {
-		console.error("Error: No se encontró el formulario con ID 'athleteRegistrationForm'. ¿Está cargado el index.html?");
+		console.error("Error: No se encontró el formulario con ID 'athleteForm'. ¡Revisa el HTML!");
 	}
 }
 
@@ -172,28 +176,39 @@ async function handleFormSubmit(event) {
 		return false;
 	}
 
-	const form = document.getElementById('athleteRegistrationForm');
+	// Usa el ID 'athleteForm'
+	const form = document.getElementById('athleteForm'); 
 
-	// 1. Recolectar datos y preparar el objeto (documento)
-	const tallaValue = form.talla ? form.talla.value : ''; 
-	const pesoValue = form.peso ? form.peso.value : ''; 
-	const correoValue = form.correo ? form.correo.value : 'N/A';
-	const telefonoValue = form.telefono ? form.telefono.value : 'N/A';
+	// 1. Recolectar datos de TODOS los campos del formulario (incluyendo los nuevos)
+	const cedulaValue = form.cedula.value.trim();
+	const nombreValue = form.nombre.value.trim();
+	const apellidoValue = form.apellido.value.trim();
+	const clubValue = form.club.value.trim();
+	const fechaNacValue = form.fechaNac.value;
+	const divisionValue = form.division.value;
+
+    // Campos nuevos:
+	const tallaValue = form.talla ? form.talla.value.trim() : '';
+	const pesoValue = form.peso ? form.peso.value.trim() : '';
+	const correoValue = form.correo ? form.correo.value.trim() : '';
+	const telefonoValue = form.telefono ? form.telefono.value.trim() : '';
 	
 	const newAthlete = {
-        cedula: form.cedula.value, 
-		club: form.club.value,
-		nombre: form.nombre.value,
-		apellido: form.apellido.value,
-		fechaNac: form.fechaNac.value,
-		division: form.division.value,	
+        // Datos principales (mostrados en la tabla)
+        cedula: cedulaValue, 
+		nombre: nombreValue,
+		apellido: apellidoValue,
+		club: clubValue,
+		fechaNac: fechaNacValue,
+		division: divisionValue,	
 		
-		tallaRaw: tallaValue,	
-		pesoRaw: pesoValue,	 	
-		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
-		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
-		correo: correoValue,
-		telefono: telefonoValue,
+        // Datos auxiliares/secundarios
+		tallaRaw: tallaValue,	 	// Guardado sin formato para ordenamiento si es necesario
+		pesoRaw: pesoValue,	 	// Guardado sin formato para ordenamiento si es necesario
+		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A', // Formateado (opcional)
+		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A', // Formateado (opcional)
+		correo: correoValue || 'N/A',
+		telefono: telefonoValue || 'N/A',
 		timestamp: Date.now()	
 	};
 	
@@ -214,7 +229,7 @@ async function handleFormSubmit(event) {
         // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
 		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
 		if (error.code === 'permission-denied') {
-			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: No se pudo guardar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
 		} else {
 			displayStatusMessage(`❌ ERROR al guardar: ${error.message}`, 'error');
 		}
@@ -242,7 +257,7 @@ function sortTable(key, toggleDirection = true) {
 		let valA = a[key];
 		let valB = b[key];
 
-		// Ordenar correctamente los campos numéricos o de fecha
+		// Ordenar correctamente los campos numéricos (si se usa alguno) o de fecha
 		if (key === 'tallaRaw' || key === 'pesoRaw') {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
@@ -266,16 +281,16 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (CORREGIDO: Asegura que el orden de los TD coincida con el orden de los TH)
+ * RENDERIZADO DE LA TABLA (Asegura que el orden de los TD coincida con el orden de los TH)
  */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
     
     if (athletesData.length === 0) {
         // Asegura que solo se muestre el mensaje si no hay un error más grave visible
-        if (!registeredDataContainer.querySelector('.error')) {
-            registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
-        }
+        if (!registeredDataContainer.querySelector('.error')) {
+            registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
+        }
         return;
     }
 
@@ -284,20 +299,20 @@ function renderTable() {
 
     if (!table) {
         // 1. Definición y Construcción de Encabezados (<thead>) - ¡El orden de las cabeceras es clave!
-        const headerKeys = [
-            { key: "cedula", label: "Cédula" },
-            { key: "nombre", label: "Nombre" },
-            { key: "apellido", label: "Apellido" },
-            { key: "club", label: "Club" },
-            { key: "fechaNac", label: "F. Nac." },
-            { key: "division", label: "División" }
-        ];
+        const headerKeys = [
+            { key: "cedula", label: "Cédula" },
+            { key: "nombre", label: "Nombre" },
+            { key: "apellido", label: "Apellido" },
+            { key: "club", label: "Club" },
+            { key: "fechaNac", label: "F. Nac." },
+            { key: "division", label: "División" }
+        ];
 
-        let headerRowHTML = headerKeys.map(header => {
-            const isSorted = header.key === currentSortKey;
-            const sortClass = isSorted ? (sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
-            return `<th data-sort-key="${header.key}" class="${sortClass}">${header.label}</th>`;
-        }).join('');
+        let headerRowHTML = headerKeys.map(header => {
+            const isSorted = header.key === currentSortKey;
+            const sortClass = isSorted ? (sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
+            return `<th data-sort-key="${header.key}" class="${sortClass}">${header.label}</th>`;
+        }).join('');
 
         registeredDataContainer.innerHTML = `
             <div class="table-responsive-wrapper">
@@ -317,8 +332,8 @@ function renderTable() {
         tableBody.innerHTML = '';
     }
     
-    // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORRECTO
-    // El orden de los data.campos DEBE COINCIDIR con el orden de las cabeceras TH
+    // 2. Construir Filas de Datos (<tbody>) con el ORDEN CORRECTO
+    // El orden de los data.campos DEBE COINCIDIR con el orden de las cabeceras TH
     athletesData.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
@@ -333,7 +348,7 @@ function renderTable() {
         `;
     });
 
-    // 3. Aplicar clases de ordenamiento
+    // 3. Aplicar clases de ordenamiento
     document.querySelectorAll('#athleteTable th').forEach(th => {
         th.classList.remove('sorted-asc', 'sorted-desc');
         if (th.getAttribute('data-sort-key') === currentSortKey) {
