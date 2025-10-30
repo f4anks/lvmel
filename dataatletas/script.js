@@ -1,6 +1,4 @@
-// ==========================================================
 // 1. IMPORTACIONES DE FIREBASE
-// ==========================================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -16,7 +14,7 @@ let sortDirection = 'asc';
 setLogLevel('Debug');
 
 // =========================================================================
-// CONFIGURACIÓN DE FIREBASE (Mantenemos la tuya)
+// CONFIGURACIÓN PARA AMBIENTE EXTERNO (Mantenemos la tuya)
 // =========================================================================
 const EXTERNAL_FIREBASE_CONFIG = {
 	apiKey: "AIzaSyA5u1whBdu_fVb2Kw7SDRZbuyiM77RXVDE",
@@ -29,12 +27,17 @@ const EXTERNAL_FIREBASE_CONFIG = {
 
 
 /**
+ * ==========================================================
+ * I. FUNCIONES DE UTILIDAD Y DISPLAY
+ * ==========================================================
+ */
+
+/**
  * Muestra un mensaje temporal de estado en la interfaz.
  */
 function displayStatusMessage(message, type) {
 	let statusEl = document.getElementById('statusMessage');
 	
-    // Si el elemento no existe, lo crea dinámicamente
 	if (!statusEl) {
 		statusEl = document.createElement('div');
 		statusEl.id = 'statusMessage';
@@ -57,8 +60,8 @@ function displayStatusMessage(message, type) {
 	}
 	
 	statusEl.textContent = message; 
-	// Colores Vinotinto y Rojo Brillante (ajustado de tu CSS)
-    statusEl.style.backgroundColor = type === 'success' ? '#5C001C' : '#CC0033';
+    // Usando los colores Vinotinto/Rojo Brillante de tu tema
+	statusEl.style.backgroundColor = type === 'success' ? '#5C001C' : '#CC0033'; 
 	statusEl.style.opacity = '1';
 
 	setTimeout(() => {
@@ -68,7 +71,13 @@ function displayStatusMessage(message, type) {
 
 
 /**
- * 2. INICIALIZACIÓN Y AUTENTICACIÓN
+ * ==========================================================
+ * II. INICIALIZACIÓN Y LISTENERS DE FIREBASE
+ * ==========================================================
+ */
+
+/**
+ * Inicialización y Autenticación de Firebase.
  */
 async function initFirebaseAndLoadData() {
 	console.log("Iniciando Firebase y autenticación...");
@@ -100,12 +109,11 @@ async function initFirebaseAndLoadData() {
 			if (user) {
 				userId = user.uid;
 				console.log("Usuario autenticado. UID:", userId);
-				// Llamada al listener: YA NO NECESITA appIdToUse COMO ARGUMENTO
-				setupRealtimeListener(); 
+				setupRealtimeListener(appIdToUse); // Mantiene tu listener con appId
 			} else {
-				console.error("No se pudo autenticar al usuario. Intentando escucha anónima...");
+				console.error("No se pudo autenticar al usuario.");
 				userId = crypto.randomUUID();	
-				setupRealtimeListener();
+				setupRealtimeListener(appIdToUse);
 			}
 		});
 
@@ -115,14 +123,11 @@ async function initFirebaseAndLoadData() {
 }
 
 /**
- * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
- * RUTA CORREGIDA: Apunta a la colección raíz 'atletas'.
+ * Escucha en Tiempo Real (onSnapshot) de tu colección.
  */
-function setupRealtimeListener() {
-    // ----------------------------------------------------
-    // !!! RUTA CORREGIDA: COLECCIÓN RAÍZ 'atletas' !!!
-    // ----------------------------------------------------
-	const athletesColRef = collection(db, `atletas`);
+function setupRealtimeListener(appId) {
+    // Mantenemos la ruta de tu script que sí funciona
+	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`); 
 	const q = query(athletesColRef);
 
 	onSnapshot(q, (snapshot) => {
@@ -138,16 +143,14 @@ function setupRealtimeListener() {
 		athletesData = fetchedData;
 		
 		if (athletesData.length > 0) {
-			// Al cargar, ordenar por el campo inicial (apellido)
 			sortTable(currentSortKey, false);	
 		} else {
 			renderTable();
 		}
 	}, (error) => {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de lectura
 		console.error("Error en la escucha en tiempo real:", error);
         if (error.code === 'permission-denied') {
-             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
         } else {
              displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
         }
@@ -166,8 +169,13 @@ function setupFormListener() {
 
 
 /**
- * 4. FUNCIÓN DE GUARDADO (handleFormSubmit)
- * RUTA CORREGIDA: Apunta a la colección raíz 'atletas'.
+ * ==========================================================
+ * III. MANEJO DEL FORMULARIO Y GUARDADO
+ * ==========================================================
+ */
+
+/**
+ * Función de Guardado (handleFormSubmit)
  */
 async function handleFormSubmit(event) {
 	event.preventDefault();	
@@ -184,12 +192,12 @@ async function handleFormSubmit(event) {
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
 	
-	// Conversión a mayúsculas para consistencia en el almacenamiento
+	// Aplicamos las conversiones a MAYÚSCULAS/validaciones requeridas
 	const newAthlete = {
-        cedula: form.cedula.value.toUpperCase(), 
-		club: form.club.value.toUpperCase(),
-		nombre: form.nombre.value.toUpperCase(),
-		apellido: form.apellido.value.toUpperCase(),
+        cedula: form.cedula.value, // Cedula se deja sin .toUpperCase()
+		club: form.club.value.toUpperCase(), // CAMPO NUEVO: A mayúsculas
+		nombre: form.nombre.value.toUpperCase(), // CAMPO NUEVO: A mayúsculas
+		apellido: form.apellido.value.toUpperCase(), // CAMPO NUEVO: A mayúsculas
 		fechaNac: form.fechaNac.value,
 		division: form.division.value,	
 		tallaRaw: tallaValue,	
@@ -197,24 +205,28 @@ async function handleFormSubmit(event) {
 		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
 		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
 		correo: form.correo.value,
-		telefono: form.telefono.value,
+		telefono: form.telefono.value, // Telefono se deja sin .toUpperCase()
 		timestamp: Date.now()	
 	};
 	
 	try {
-        // ----------------------------------------------------
-        // !!! RUTA CORREGIDA: COLECCIÓN RAÍZ 'atletas' !!!
-        // ----------------------------------------------------
-		const athletesColRef = collection(db, `atletas`);
+		let appIdToUse;
+		if (typeof __app_id !== 'undefined') {
+			appIdToUse = __app_id;
+		} else {
+			appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+		}
+
+        // Mantenemos la ruta de tu script que sí funciona
+		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`); 
 		await addDoc(athletesColRef, newAthlete);	
 		console.log("Atleta registrado y guardado en Firestore con éxito.");
 		displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
 		
 	} catch(error) {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
 		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
 		if (error.code === 'permission-denied') {
-			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: No se pudo guardar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
 		} else {
 			displayStatusMessage(`❌ ERROR al guardar: ${error.message}`, 'error');
 		}
@@ -227,8 +239,15 @@ async function handleFormSubmit(event) {
 	return false;	
 }
 
+
 /**
- * LÓGICA DE ORDENAMIENTO Y RENDERIZADO
+ * ==========================================================
+ * IV. LÓGICA DE ORDENAMIENTO Y RENDERIZADO
+ * ==========================================================
+ */
+
+/**
+ * Ordena los datos de los atletas.
  */
 function sortTable(key, toggleDirection = true) {
 	if (currentSortKey === key && toggleDirection) {
@@ -284,12 +303,12 @@ function renderTable() {
                 <table id="athleteTable" class="athlete-data-table">
                     <thead>
                         <tr class="table-header-row">
-                            <th data-sort-key="cedula" class="${currentSortKey === 'cedula' ? sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc' : ''}">Cédula</th>
-                            <th data-sort-key="nombre" class="${currentSortKey === 'nombre' ? sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc' : ''}">Nombre</th>
-                            <th data-sort-key="apellido" class="${currentSortKey === 'apellido' ? sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc' : ''}">Apellido</th>
-                            <th data-sort-key="club" class="${currentSortKey === 'club' ? sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc' : ''}">Club</th> 
-                            <th data-sort-key="fechaNac" class="${currentSortKey === 'fechaNac' ? sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc' : ''}">F. Nac.</th>
-                            <th data-sort-key="division" class="${currentSortKey === 'division' ? sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc' : ''}">División</th>
+                            <th data-sort-key="cedula">Cédula</th>
+                            <th data-sort-key="nombre">Nombre</th>
+                            <th data-sort-key="apellido">Apellido</th>
+                            <th data-sort-key="club">Club</th> 
+                            <th data-sort-key="fechaNac">F. Nac.</th>
+                            <th data-sort-key="division">División</th>
                         </tr>
                     </thead>
                     <tbody id="athleteTableBody">
@@ -308,7 +327,7 @@ function renderTable() {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
         
-        // Celdas (TD) que coinciden con el nuevo orden de encabezados
+        // Celdas (TD)
         newRow.innerHTML = `
             <td data-label="Cédula" class="table-data">${data.cedula}</td>
             <td data-label="Nombre" class="table-data">${data.nombre}</td>
@@ -319,7 +338,6 @@ function renderTable() {
         `;
     });
 
-    // Actualizar las clases de ordenamiento para el nuevo renderizado
     document.querySelectorAll('#athleteTable th').forEach(th => {
         th.classList.remove('sorted-asc', 'sorted-desc');
         if (th.getAttribute('data-sort-key') === currentSortKey) {
@@ -338,16 +356,19 @@ function setupSorting() {
 	});
 }
 
-
 /**
  * ==========================================================
  * V. LÓGICA DE INICIALIZACIÓN DE CLUBES Y LISTENERS
  * ==========================================================
  */
+
+/**
+ * Llenado del campo de selección de Club/Equipo.
+ */
 function setupClubSelect() {
     const clubSelect = document.getElementById('club');
     if (clubSelect) { 
-        // Lista de clubes ordenada alfabéticamente
+        // Lista de clubes ordenada alfabéticamente (la que definimos)
         const clubes = [
             "Antonio Espinoza", "Bertha Carrero", "Big Star", "Codigo Monarca", 
             "El Sisal", "Everest", "Famaguaros", "Los Olivos", "Luis Hurtado", 
@@ -355,7 +376,6 @@ function setupClubSelect() {
             "Sanz", "Sporta", "Villa Cantevista"
         ];
         
-        // Crear y añadir las opciones al campo select
         clubes.forEach(club => {
             const option = document.createElement('option');
             option.value = club;
@@ -369,7 +389,12 @@ function setupClubSelect() {
 
 // Inicializar Firebase, los Listeners y el selector al cargar el contenido
 document.addEventListener('DOMContentLoaded', () => {
-    setupClubSelect(); // Carga el selector antes de inicializar la app
+    // 1. Cargamos la lista de clubes (Solución al error anterior)
+    setupClubSelect(); 
+    
+    // 2. Iniciamos Firebase y el listener de datos (Tu lógica)
 	initFirebaseAndLoadData();
+    
+    // 3. Configuramos el listener del formulario
 	setupFormListener();
 });
