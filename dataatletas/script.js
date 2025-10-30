@@ -187,9 +187,10 @@ async function handleFormSubmit(event) {
 	const cedulaValue = form.cedula.value.trim();
 	const nombreValue = form.nombre.value.trim();
 	const apellidoValue = form.apellido.value.trim();
-	const clubValue = form.club.value.trim();
+	// Los valores de club y division se leen directamente del elemento select
+	const clubValue = form.club.value.trim(); 
 	const fechaNacValue = form.fechaNac.value;
-	const divisionValue = form.division.value;
+	const divisionValue = form.division.value; 
 
     // Campos auxiliares/nuevos:
 	const tallaValue = form.talla ? form.talla.value.trim() : '';
@@ -258,7 +259,7 @@ function sortTable(key, toggleDirection = true) {
 		let valA = a[key];
 		let valB = b[key];
 
-		// Manejo de tipos para ordenamiento (numérico, fecha, o string)
+		// Manejo de tipos para ordenamiento
 		if (key === 'tallaRaw' || key === 'pesoRaw') {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
@@ -329,9 +330,9 @@ function renderTable() {
         newRow.classList.add('athlete-table-row');
        
         // Creamos las celdas iterando sobre el mapeo (ORDEN GARANTIZADO)
-        // ✅ CORRECCIÓN: Usamos || '-' para manejar campos indefinidos o vacíos y evitar el desfase.
+        // Usamos || '-' para manejar campos indefinidos o vacíos
         let rowContent = TABLE_HEADERS.map(header => {
-            const value = data[header.key] || '-'; // Obtenemos el valor de la propiedad
+            const value = data[header.key] || '-'; 
             return `<td data-label="${header.label}" class="table-data">${value}</td>`;
         }).join('');
 
