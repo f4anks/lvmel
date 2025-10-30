@@ -203,22 +203,21 @@ h1, h2, h3 {
 /* Estilos de la tabla */
 .athlete-data-table {
     width: 100%;
-    min-width: 700px; /* Incrementado para mejor lectura */
+    min-width: 700px; /* Ancho mínimo para forzar el scroll y el diseño de escritorio */
     border-collapse: collapse; 
-    table-layout: fixed; /* Mantenemos fixed */
+    table-layout: fixed; /* CRÍTICO: Fuerza a respetar los anchos de columna */
     background-color: var(--color-white);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 🏆 LÓGICA CLAVE DE ALINEACIÓN: FORZAR ANCHO DE COLUMNAS 🏆 */
-/* El ancho total debe sumar 100% */
+/* 🏆 LÓGICA DE ALINEACIÓN: FORZAR ANCHO DE COLUMNAS 🏆 */
+/* El ancho total debe sumar 100% y alinea TH y TD */
 .athlete-data-table th:nth-child(1), .athlete-data-table td:nth-child(1) { width: 15%; } /* Cédula */
 .athlete-data-table th:nth-child(2), .athlete-data-table td:nth-child(2) { width: 17%; } /* Nombre */
 .athlete-data-table th:nth-child(3), .athlete-data-table td:nth-child(3) { width: 17%; } /* Apellido */
 .athlete-data-table th:nth-child(4), .athlete-data-table td:nth-child(4) { width: 25%; } /* Club */
 .athlete-data-table th:nth-child(5), .athlete-data-table td:nth-child(5) { width: 15%; } /* F. Nac. */
 .athlete-data-table th:nth-child(6), .athlete-data-table td:nth-child(6) { width: 11%; } /* División */
-
 
 /* Estilos de encabezado de tabla */
 .athlete-data-table thead {
@@ -235,7 +234,7 @@ h1, h2, h3 {
     transition: background-color 0.3s;
     position: relative;
     user-select: none;
-    box-sizing: border-box; /* Asegura que el padding no exceda el ancho */
+    box-sizing: border-box; 
 }
 
 /* Hover en encabezados */
@@ -249,7 +248,7 @@ h1, h2, h3 {
     border-bottom: 1px solid #eee;
     text-align: left;
     font-size: 0.9em;
-    box-sizing: border-box; /* Asegura que el padding no exceda el ancho */
+    box-sizing: border-box; 
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
