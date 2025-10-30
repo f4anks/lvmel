@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LVMEL - Registro de Atletas</title>
-    <link rel="stylesheet" href="styles.css"> 
     <link rel="stylesheet" href="bootstrap.min.css"> 
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <div class="home-button-container-fixed">
@@ -20,7 +20,7 @@
 
         <section class="form-section">
             <h2>Datos del Atleta</h2>
-            <form id="athleteRegistrationForm" class="athlete-form">
+            <form id="athleteRegistrationForm" class="athlete-form"> 
                 <div class="form-group half-width">
                     <label for="cedula">Cédula</label>
                     <input type="text" id="cedula" name="cedula" required>
@@ -44,6 +44,12 @@
                     <input type="text" id="club" name="club" required>
                 </div>
 
+                <input type="hidden" id="talla" name="talla" value="0">
+                <input type="hidden" id="peso" name="peso" value="0">
+                <input type="hidden" id="correo" name="correo" value="N/A">
+                <input type="hidden" id="telefono" name="telefono" value="N/A">
+
+
                 <div class="form-group half-width">
                     <label for="division">División/Categoría</label>
                     <select id="division" name="division" required>
@@ -56,8 +62,7 @@
                     <button type="submit" class="submit-button">REGISTRAR ATLETA</button>
                 </div>
             </form>
-            <div id="formStatusMessage"></div>
-        </section>
+            </section>
 
         <hr class="separator">
 
@@ -70,6 +75,6 @@
         
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
