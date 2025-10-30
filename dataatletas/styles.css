@@ -75,6 +75,42 @@ h2 {
     margin: 40px 0;
 }
 
+/* ========================================================== */
+/* ESTILOS DEL BOTÓN DE INICIO (POSICIÓN FIJA) */
+/* ========================================================== */
+.home-button-container-fixed {
+    /* Posicionamiento: Fijo a la ventana del navegador */
+    position: fixed; 
+    top: 15px; /* Distancia desde la parte superior (encima del header) */
+    right: 20px; /* Distancia desde la derecha */
+    z-index: 1100; /* Asegura que esté por encima de todo */
+    padding: 5px; /* Pequeño padding de cortesía */
+}
+
+.home-button {
+    display: inline-flex;
+    align-items: center;
+    /* Eliminamos gap: 8px; porque quitamos el icono */
+    background-color: white; /* Añadido un fondo blanco para que se destaque del encabezado vinotinto */
+    color: var(--color-vinotinto); /* Vinotinto */
+    border: 1px solid var(--color-vinotinto);
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none !important;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra para levantarlo */
+}
+
+.home-button:hover {
+    background-color: var(--color-vinotinto); /* Fondo Vinotinto al pasar */
+    color: white;
+    border-color: var(--color-vinotinto);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+/* ========================================================== */
+
+
 /* Estilos de Formulario */
 .athlete-form {
     display: flex;
@@ -238,4 +274,7 @@ input:focus, select:focus {
     .form-group.half-width {
         flex: 1 1 100%;
     }
-}
+    /* Mueve el botón de regreso hacia la izquierda para pantallas pequeñas */
+    .home-button-container-fixed {
+        top: 10px; 
+        right:
