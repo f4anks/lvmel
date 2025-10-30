@@ -7,89 +7,88 @@
     - Bordes/Rayas: #F0DADA (Gris rojizo suave)
 */
 
-/* Estilos Base y Reset (Mantiene la compresión vertical) */
+/* Estilos Base y Reset */
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #FFF8F8;
-    color: #333333;
+    background-color: #FFF8F8; /* FONDO VINOTINTO */
+    color: #333333; /* TEXTO GRIS OSCURO */
     margin: 0;
     padding: 0;
-    line-height: 1.4; 
+    line-height: 1.6; /* RESTAURADO: Al valor original (1.6) */
 }
 
 .page-header {
-    background-color: #800020;
+    background-color: #800020; /* ENCABEZADO VINOTINTO OSCURO */
     color: white;
-    padding: 15px 0;
+    padding: 30px 0; /* RESTAURADO: Al valor original (30px) */
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h1 {
-    font-size: 2rem;
-    margin-bottom: 2px;
+    font-size: 2.5rem; /* RESTAURADO: Al valor original (2.5rem) */
+    margin-bottom: 5px;
 }
 
 .subtitle {
-    font-size: 0.9rem;
+    font-size: 1.1rem; /* RESTAURADO: Al valor original (1.1rem) */
     color: rgba(255, 255, 255, 0.85);
     margin: 0;
 }
 
 .container {
     max-width: 1200px;
-    margin: 15px auto;
+    margin: 30px auto; /* RESTAURADO: Al valor original (30px) */
     padding: 0 20px;
 }
 
 h2 {
-    color: #DC143C;
+    color: #DC143C; /* SUBTÍTULOS ROJO BRILLANTE */
     font-weight: 600;
-    padding-bottom: 6px;
-    margin-top: 15px;
+    padding-bottom: 10px; /* RESTAURADO: Al valor original (10px) */
+    margin-top: 30px; /* RESTAURADO: Al valor original (30px) */
     margin-left: unset;
     margin-right: unset;
-    font-size: 1.4rem;
+    font-size: 1.5rem; /* Usamos un tamaño intermedio para la coherencia */
 }
 
 /* Contenedor del Título del Formulario */
 .form-section {
     text-align: center;
-    margin-bottom: 10px; /* Incrementado para la separación de la sección */
+    margin-bottom: 0; /* Sin margen inferior adicional */
 }
 
 /* Centrar el título del formulario (Data de Atletas...) */
 .form-section h2 {
     text-align: center;
-    border-bottom: 2px solid #F0DADA;
-    margin-top: 0;
+    border-bottom: 3px solid #F0DADA; /* Borde más visible */
+    margin-top: 0; 
 }
 
 /* Centrar el título de la sección de resultados (Lista de Atletas...) */
 .data-section h2 {
     text-align: center;
-    border-bottom: 2px solid #F0DADA;
+    border-bottom: 2px solid #F0DADA; /* Mantenemos borde delgado aquí */
 }
 
 .separator {
     border: 0;
     height: 1px;
+    /* Gradiente con el rojo brillante */
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(220, 20, 60, 0.5), rgba(0, 0, 0, 0));
-    margin: 30px 0; /* Restaurado a un espaciado más visible */
+    margin: 40px 0; /* RESTAURADO: Al valor original (40px) */
 }
 
-/* Estilos de Formulario: Aumentamos ancho y espaciado horizontal */
+/* Estilos de Formulario: Usa los márgenes de la referencia (ancho y espaciado) */
 .athlete-form {
-    /* REMOVIDO: max-width: 800px; y margin: 0 auto; -> Ahora usa el 100% del contenedor */
-    
     display: flex;
     flex-wrap: wrap;
-    gap: 20px; /* RESTAURADO: A 20px de separación entre columnas (la referencia original) */
+    gap: 20px; /* RESTAURADO: Al valor original (20px) */
     background: #ffffff;
-    padding: 30px; /* RESTAURADO: A 30px de padding interno (la referencia original) */
-    border-radius: 12px; /* Restaurado a un borde más grande */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Restaurado a una sombra más fuerte */
-    text-align: left;
+    padding: 30px; /* RESTAURADO: Al valor original (30px) */
+    border-radius: 12px; /* RESTAURADO: Al valor original (12px) */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* RESTAURADO: Al valor original */
+    text-align: left; 
 }
 
 .form-group {
@@ -99,15 +98,14 @@ h2 {
 }
 
 .form-group.half-width {
-    /* Ajustado para el gap de 20px/2 */
-    flex: 1 1 calc(50% - 10px); 
+    flex: 1 1 calc(50% - 10px);
 }
 
 label {
-    margin-bottom: 8px; /* RESTAURADO: A 8px para más espacio entre label y input */
+    margin-bottom: 8px; /* RESTAURADO: Al valor original (8px) */
     font-weight: 600;
     color: #333333;
-    font-size: 0.95rem; /* Ligeramente más grande */
+    font-size: 1rem; /* Usamos un tamaño intermedio */
 }
 
 input[type="text"],
@@ -116,10 +114,10 @@ input[type="date"],
 input[type="email"],
 input[type="tel"],
 select {
-    padding: 12px; /* RESTAURADO: A 12px de padding (la referencia original) */
-    border: 1px solid #F0DADA;
-    border-radius: 6px; /* Restaurado a un borde más grande */
-    font-size: 16px; /* RESTAURADO: A 16px */
+    padding: 12px; /* RESTAURADO: Al valor original (12px) */
+    border: 1px solid #F0DADA; /* Color Vinotinto */
+    border-radius: 6px; /* RESTAURADO: Al valor original (6px) */
+    font-size: 16px; /* RESTAURADO: Al valor original (16px) */
     transition: border-color 0.3s, box-shadow 0.3s;
     background-color: white;
 
@@ -130,12 +128,12 @@ select {
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 10px auto;
-    padding-right: 30px; 
+    padding-right: 30px;
 }
 
 input:focus, select:focus {
-    border-color: #DC143C;
-    box-shadow: 0 0 0 0.2rem rgba(220, 20, 60, 0.25); /* Restaurado la sombra de enfoque más visible */
+    border-color: #DC143C; /* ROJO BRILLANTE */
+    box-shadow: 0 0 0 0.2rem rgba(220, 20, 60, 0.25); 
     outline: none;
 }
 
@@ -144,14 +142,14 @@ input:focus, select:focus {
     flex: 1 1 100%;
     display: flex;
     justify-content: center;
-    margin-top: 15px; /* RESTAURADO: A 15px (la referencia original) */
+    margin-top: 15px; /* RESTAURADO: Al valor original (15px) */
 }
 
 /* Estilos del Botón Registrar (Vinotinto Oscuro) */
 .submit-button {
-    background-color: #800020;
+    background-color: #800020; /* VINOTINTO */
     color: white;
-    padding: 10px 25px; /* Restaurado a un padding más grande */
+    padding: 10px 25px; /* RESTAURADO: Al valor original */
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -168,33 +166,33 @@ input:focus, select:focus {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA: Sin modificaciones para mantener el orden compacto */
+/* ESTILOS DE LA TABLA (SE MANTIENEN COMPACTOS) */
 /* -------------------------------------------------------------------------- */
 
 .table-responsive-wrapper {
     overflow-x: auto;
     background: #ffffff;
     padding: 15px;
-    border-radius: 8px; /* Mantenemos el borde compacto */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Mantenemos la sombra sutil */
+    border-radius: 8px; /* Compacto */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Sutil */
 }
 
 .athlete-data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 15px; /* Compacto */
     min-width: 700px;
 }
 
 .athlete-data-table th, .athlete-data-table td {
-    padding: 12px 10px; /* Mantenemos la compresión vertical de la tabla */
+    padding: 12px 10px; /* COMPRIMIDO: Para la tabla de resultados */
     text-align: center;
     border-bottom: 1px solid #F0DADA;
 }
 
 .athlete-data-table th {
-    background-color: #FFE5E5;
-    color: #DC143C;
+    background-color: #FFE5E5; /* Color Vinotinto */
+    color: #DC143C; /* Color Vinotinto */
     font-weight: 700;
     cursor: pointer;
     position: relative;
@@ -242,7 +240,7 @@ input:focus, select:focus {
         padding: 0 10px;
     }
     .page-header h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     .form-group.half-width {
         flex: 1 1 100%;
