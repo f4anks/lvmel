@@ -3,7 +3,7 @@
     - Secundario (Rojo Brillante): #DC143C
     - Fondo Principal: #FFF8F8 (Blanco con un toque rosado/crema)
     - Fondo de Elementos: #FFFFFF
-    - Texto: #333333 (Gris muy oscuro)
+    - Texto: #333333 (Gris oscuro)
     - Borde Base/Raya: #F0DADA (Gris rojizo suave)
 */
 
@@ -14,13 +14,13 @@ body {
     color: #333333; 
     margin: 0;
     padding: 0;
-    line-height: 1.4; /* Espaciado de texto más compacto */
+    line-height: 1.4; /* Se mantiene el espaciado original Vinotinto */
 }
 
 .page-header {
-    background-color: #800020; /* ENCABEZADO VINOTINTO OSCURO */
+    background-color: #800020; /* Vinotinto Oscuro */
     color: white;
-    padding: 20px 0; /* Compacto */
+    padding: 20px 0; /* Se mantiene el padding original Vinotinto */
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -38,18 +38,18 @@ body {
 
 .container {
     max-width: 1200px;
-    margin: 20px auto; /* Compacto */
+    margin: 20px auto; 
     padding: 0 20px;
 }
 
 h2 {
-    color: #DC143C; /* SUBTÍTULOS ROJO BRILLANTE */
+    color: #DC143C; /* Rojo Brillante */
     font-weight: 700;
     padding-bottom: 8px;
     margin-top: 25px; 
-    margin-left: unset;
-    margin-right: unset;
     font-size: 1.6rem; 
+    margin-left: unset; /* Asegura la corrección de h2 */
+    margin-right: unset; /* Asegura la corrección de h2 */
 }
 
 /* Contenedor del Título del Formulario */
@@ -58,10 +58,8 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* Centrar el título del formulario (Data de Atletas...) */
 .form-section h2 {
     text-align: center;
-    /* Se elimina el border-bottom para un look más limpio */
     border-bottom: none; 
     margin-top: 0; 
     padding-bottom: 0;
@@ -70,7 +68,7 @@ h2 {
 /* Centrar el título de la sección de resultados (Lista de Atletas...) */
 .data-section h2 {
     text-align: center;
-    border-bottom: 2px solid #F0DADA; /* Mantenemos borde en tabla */
+    border-bottom: 2px solid #F0DADA; 
 }
 
 .separator {
@@ -80,34 +78,54 @@ h2 {
     margin: 30px 0; 
 }
 
-/* Estilos de Formulario: Moderno, Estrecho y Centrado */
+/* Estilos de Formulario: Estrecho, Centrado y Vertical */
 .athlete-form {
-    /* 1. ANCHO LIMITADO Y CENTRADO */
-    max-width: 700px; /* REDUCIDO: Formulario más estrecho */
-    margin: 0 auto; /* Centra el formulario */
+    max-width: 700px !important; 
+    margin: 0 auto !important; 
     
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px 20px; /* Separación vertical mayor que horizontal */
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 15px 20px; 
     background: #ffffff;
-    padding: 40px 30px; /* Padding interno más grande para el efecto 'tarjeta' */
-    border-radius: 15px; /* Bordes más redondeados */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra más fuerte y elegante */
+    
+    /* Mantenemos el padding, que actúa como margen inicial */
+    padding: 40px 30px !important; 
+    
+    border-radius: 15px; 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
     text-align: left;
 }
 
 .form-group {
+    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
+    margin-bottom: 0 !important; 
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    
+    display: flex !important;
+    flex-direction: column !important;
+    /* CLAVE: Alineación perfecta a la izquierda de la etiqueta y campo */
+    align-items: flex-start !important; 
+    
+    gap: 5px; /* Mantenemos el gap original Vinotinto */
+    
     flex: 1 1 100%;
-    display: flex;
-    flex-direction: column;
 }
 
+/* **CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA** */
 .form-group.half-width {
-    flex: 1 1 calc(50% - 10px); 
+    /* CLAVE: Anulamos cualquier margen lateral que cause desalineación */
+    margin-left: 0 !important; 
+    margin-right: 0 !important; 
+    
+    /* Recalculamos el ancho total para media columna menos el gap central */
+    flex: 1 1 calc(50% - 10px) !important; 
 }
 
 label {
-    margin-bottom: 5px; /* Compacto */
+    text-align: left !important;
+    margin-bottom: 0 !important; /* Mantenemos el margen mínimo */
+    padding: 0 !important; 
     font-weight: 600;
     color: #333333;
     font-size: 0.95rem; 
@@ -119,30 +137,33 @@ input[type="date"],
 input[type="email"],
 input[type="tel"],
 select {
-    /* 2. DISEÑO MODERNO DE BORDE INFERIOR (UNDERLINE) */
-    padding: 8px 0; /* Padding vertical reducido, padding horizontal nulo */
-    border: none; /* Elimina todos los bordes */
-    border-bottom: 2px solid #F0DADA; /* Borde inferior suave */
-    border-radius: 0; /* Elimina el redondeo */
+    /* CLAVE: Asegura el 100% del ancho sin desbordar */
+    width: 100% !important; 
+    box-sizing: border-box !important; 
+    
+    /* Mantenemos el estilo de raya inferior Vinotinto */
+    padding: 8px 0 !important; 
+    border: none !important; 
+    border-bottom: 2px solid #F0DADA !important; 
+    border-radius: 0 !important; 
     font-size: 16px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    background-color: transparent; /* Fondo transparente */
-    outline: none; /* Aseguramos que no haya outline por defecto */
+    background-color: transparent !important; 
+    outline: none !important; 
 
     appearance: none;
     -webkit-appearance: none;
-    /* Flecha del select en rojo brillante */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%2D%22292.4%22%3E%3Cpath%20fill%3D%22%23DC143C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C%2Fsvg%3E');
+    /* Color de flecha Vinotinto/Rojo Brillante */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DC143C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C/svg%3E');
     background-repeat: no-repeat;
     background-position: right 0 center;
     background-size: 10px auto;
-    padding-right: 20px; /* Ajuste para la flecha del select */
+    padding-right: 20px !important; 
 }
 
 input:focus, select:focus {
-    border-color: #DC143C; /* Borde inferior ROJO BRILLANTE al enfocar */
-    box-shadow: none; /* Eliminamos la sombra de enfoque para este estilo */
-    outline: none;
+    border-color: #DC143C !important; 
+    box-shadow: none !important; 
+    outline: none !important;
 }
 
 /* Contenedor del botón para centrarlo (dentro del form) */
@@ -150,16 +171,16 @@ input:focus, select:focus {
     flex: 1 1 100%;
     display: flex;
     justify-content: center;
-    margin-top: 25px; /* Más espacio sobre el botón */
+    margin-top: 25px; 
 }
 
 /* Estilos del Botón Registrar (Vinotinto Oscuro) */
 .submit-button {
-    background-color: #800020; 
+    background-color: #800020 !important; 
     color: white;
-    padding: 12px 30px; /* Más padding para que se vea más robusto */
+    padding: 12px 30px !important; 
     border: none;
-    border-radius: 50px; /* Borde muy redondeado (píldora) para look moderno */
+    border-radius: 50px; 
     cursor: pointer;
     font-size: 16px;
     font-weight: 600;
@@ -169,13 +190,13 @@ input:focus, select:focus {
 }
 
 .submit-button:hover {
-    background-color: #DC143C; /* Cambia a Rojo Brillante al hacer hover */
-    transform: translateY(-2px); /* Efecto 3D más pronunciado */
+    background-color: #DC143C; 
+    transform: translateY(-2px); 
     box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA (SE MANTIENEN COMPACTOS Y SEPARADOS) */
+/* ESTILOS DE LA TABLA */
 /* -------------------------------------------------------------------------- */
 
 .table-responsive-wrapper {
@@ -184,7 +205,7 @@ input:focus, select:focus {
     padding: 15px;
     border-radius: 8px; 
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
-    margin-top: 20px; /* Añadimos separación después del separador */
+    margin-top: 20px; 
 }
 
 .athlete-data-table {
@@ -195,7 +216,7 @@ input:focus, select:focus {
 }
 
 .athlete-data-table th, .athlete-data-table td {
-    padding: 12px 10px; /* Compresión vertical para la tabla */
+    padding: 12px 10px; 
     text-align: center;
     border-bottom: 1px solid #F0DADA;
 }
@@ -253,6 +274,8 @@ input:focus, select:focus {
         font-size: 1.8rem;
     }
     .form-group.half-width {
-        flex: 1 1 100%;
+        flex: 1 1 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 }
