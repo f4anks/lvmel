@@ -10,65 +10,65 @@
 /* Estilos Base y Reset */
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #FFF8F8; /* FONDO MUY CLARO con un toque rojizo */
-    color: #333333; /* TEXTO GRIS OSCURO */
+    background-color: #FFF8F8;
+    color: #333333;
     margin: 0;
     padding: 0;
-    line-height: 1.5; /* Reducido ligeramente */
+    line-height: 1.4; /* REDUCIDO: De 1.5 a 1.4 para menor espacio entre líneas */
 }
 
 .page-header {
-    background-color: #800020; /* ENCABEZADO VINOTINTO OSCURO */
+    background-color: #800020;
     color: white;
-    padding: 20px 0; /* REDUCIDO: De 30px a 20px */
+    padding: 15px 0; /* REDUCIDO AÚN MÁS: De 20px a 15px */
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h1 {
-    font-size: 2.2rem; /* REDUCIDO: De 2.5rem a 2.2rem */
-    margin-bottom: 3px; /* REDUCIDO */
+    font-size: 2rem; /* REDUCIDO AÚN MÁS: De 2.2rem a 2rem */
+    margin-bottom: 2px;
 }
 
 .subtitle {
-    font-size: 1rem; /* REDUCIDO: De 1.1rem a 1rem */
+    font-size: 0.9rem; /* REDUCIDO: De 1rem a 0.9rem */
     color: rgba(255, 255, 255, 0.85);
     margin: 0;
 }
 
 .container {
     max-width: 1200px;
-    margin: 20px auto; /* REDUCIDO: De 30px a 20px */
+    margin: 15px auto; /* REDUCIDO: De 20px a 15px */
     padding: 0 20px;
 }
 
 h2 {
-    color: #DC143C; /* SUBTÍTULOS ROJOS BRILLANTES */
+    color: #DC143C;
     font-weight: 600;
-    padding-bottom: 8px; /* REDUCIDO */
-    margin-top: 20px; /* REDUCIDO: De 30px a 20px */
+    padding-bottom: 6px; /* REDUCIDO: De 8px a 6px */
+    margin-top: 15px; /* REDUCIDO: De 20px a 15px */
     margin-left: unset;
     margin-right: unset;
-    font-size: 1.5rem; /* Título h2 ligeramente más pequeño */
+    font-size: 1.4rem; /* REDUCIDO: De 1.5rem a 1.4rem */
 }
 
 /* Contenedor del Título del Formulario */
 .form-section {
     text-align: center;
-    margin-bottom: 10px; /* AGREGADO para ajustar espacio */
+    margin-bottom: 5px; /* REDUCIDO: De 10px a 5px */
 }
 
 /* Centrar el título del formulario (Data de Atletas...) */
 .form-section h2 {
     text-align: center;
-    border-bottom: 2px solid #F0DADA; /* Borde más delgado */
-    margin-top: 0; /* Eliminamos el margen superior para que esté más cerca de la sección */
+    border-bottom: 2px solid #F0DADA;
+    margin-top: 0;
 }
 
 /* Centrar el título de la sección de resultados (Lista de Atletas...) */
 .data-section h2 {
     text-align: center;
-    border-bottom: 2px solid #F0DADA; /* Borde más delgado */
+    border-bottom: 2px solid #F0DADA;
 }
 
 .separator {
@@ -76,18 +76,23 @@ h2 {
     height: 1px;
     /* Gradiente con el rojo brillante */
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(220, 20, 60, 0.5), rgba(0, 0, 0, 0));
-    margin: 30px 0; /* REDUCIDO: De 40px a 30px */
+    margin: 20px 0; /* REDUCIDO: De 30px a 20px */
 }
 
 /* Estilos de Formulario */
 .athlete-form {
+    /* *** ANCHO DEL FORMULARIO REDUCIDO *** */
+    max-width: 800px; /* AGREGADO: Limita el ancho máximo del formulario */
+    margin: 0 auto; /* Centra el formulario en la página */
+    /* *************************************** */
+    
     display: flex;
     flex-wrap: wrap;
-    gap: 15px; /* REDUCIDO: De 20px a 15px entre elementos del formulario */
-    background: #ffffff; /* Fondo blanco */
-    padding: 25px; /* REDUCIDO: De 30px a 25px de padding interno */
-    border-radius: 10px; /* Borde ligeramente más pequeño */
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07); /* Sombra más sutil */
+    gap: 10px; /* REDUCIDO: De 15px a 10px entre elementos del formulario */
+    background: #ffffff;
+    padding: 20px; /* REDUCIDO: De 25px a 20px de padding interno */
+    border-radius: 8px; /* Borde ligeramente más pequeño */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Sombra más sutil */
     text-align: left;
 }
 
@@ -98,14 +103,14 @@ h2 {
 }
 
 .form-group.half-width {
-    flex: 1 1 calc(50% - 7.5px); /* Ajustado para el nuevo gap de 15px/2 */
+    flex: 1 1 calc(50% - 5px); /* Ajustado para el nuevo gap de 10px/2 */
 }
 
 label {
-    margin-bottom: 5px; /* REDUCIDO: De 8px a 5px */
+    margin-bottom: 3px; /* REDUCIDO: De 5px a 3px */
     font-weight: 600;
     color: #333333;
-    font-size: 0.95rem; /* Ligeramente más pequeño */
+    font-size: 0.9rem; /* REDUCIDO: De 0.95rem a 0.9rem */
 }
 
 input[type="text"],
@@ -114,10 +119,10 @@ input[type="date"],
 input[type="email"],
 input[type="tel"],
 select {
-    padding: 10px; /* REDUCIDO: De 12px a 10px */
+    padding: 8px; /* REDUCIDO AÚN MÁS: De 10px a 8px */
     border: 1px solid #F0DADA;
-    border-radius: 5px; /* Borde ligeramente más pequeño */
-    font-size: 15px; /* REDUCIDO: De 16px a 15px */
+    border-radius: 4px; /* Borde más pequeño */
+    font-size: 14px; /* REDUCIDO: De 15px a 14px */
     transition: border-color 0.3s, box-shadow 0.3s;
     background-color: white;
 
@@ -126,14 +131,14 @@ select {
     /* Flecha del select en rojo brillante */
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DC143C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat;
-    background-position: right 10px center;
+    background-position: right 8px center; /* Ajustado el fondo */
     background-size: 10px auto;
-    padding-right: 30px;
+    padding-right: 25px; /* Ajustado el padding derecho */
 }
 
 input:focus, select:focus {
     border-color: #DC143C;
-    box-shadow: 0 0 0 0.2rem rgba(220, 20, 60, 0.2); /* Sombra de enfoque más sutil */
+    box-shadow: 0 0 0 0.15rem rgba(220, 20, 60, 0.15); /* Sombra de enfoque más sutil */
     outline: none;
 }
 
@@ -142,48 +147,48 @@ input:focus, select:focus {
     flex: 1 1 100%;
     display: flex;
     justify-content: center;
-    margin-top: 10px; /* REDUCIDO: De 15px a 10px */
+    margin-top: 5px; /* REDUCIDO: De 10px a 5px */
 }
 
 /* Estilos del Botón Registrar (Vinotinto Oscuro) */
 .submit-button {
     background-color: #800020;
     color: white;
-    padding: 8px 20px; /* REDUCIDO: Menos padding */
+    padding: 7px 18px; /* REDUCIDO AÚN MÁS */
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 16px; /* REDUCIDO: De 17px a 16px */
+    font-size: 15px; /* REDUCIDO: De 16px a 15px */
     font-weight: 600;
     transition: background-color 0.3s, transform 0.1s;
-    box-shadow: 0 3px 5px rgba(128, 0, 32, 0.3);
+    box-shadow: 0 2px 4px rgba(128, 0, 32, 0.3);
 }
 
 .submit-button:hover {
     background-color: #A52A2A;
     transform: translateY(-1px);
-    box-shadow: 0 5px 7px rgba(128, 0, 32, 0.4);
+    box-shadow: 0 4px 6px rgba(128, 0, 32, 0.4);
 }
 
-/* ESTILOS DE LA TABLA (SIN MODIFICACIONES MAYORES EN ESPACIADO PARA RESULTADOS) */
+/* ESTILOS DE LA TABLA (MÍNIMAS MODIFICACIONES PARA COHERENCIA, SIN AFECTAR EL ESPACIADO INTERNO) */
 
 .table-responsive-wrapper {
     overflow-x: auto;
     background: #ffffff;
     padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .athlete-data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px; /* REDUCIDO: De 20px a 15px */
+    margin-top: 15px;
     min-width: 700px;
 }
 
 .athlete-data-table th, .athlete-data-table td {
-    padding: 12px 10px; /* REDUCIDO: De 15px a 12px */
+    padding: 12px 10px; /* Se mantiene para no desordenar los resultados */
     text-align: center;
     border-bottom: 1px solid #F0DADA;
 }
@@ -224,12 +229,12 @@ input:focus, select:focus {
 
 .no-data-message, .loading-message, .table-note-message {
     text-align: center;
-    padding: 15px; /* REDUCIDO: De 20px a 15px */
+    padding: 15px;
     color: #6c757d;
     font-style: italic;
     border: 1px dashed #F0DADA;
     border-radius: 8px;
-    margin-top: 15px; /* REDUCIDO: De 20px a 15px */
+    margin-top: 15px;
 }
 
 /* Estilos Responsivos */
@@ -238,7 +243,7 @@ input:focus, select:focus {
         padding: 0 10px;
     }
     .page-header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     .form-group.half-width {
         flex: 1 1 100%;
