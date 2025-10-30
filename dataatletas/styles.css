@@ -1,280 +1,300 @@
-/*--------------------------------------------------------------------- PALETA DE COLORES ADAPTADA ---------------------------------------------------------------------*/
+/*
+ * ==========================================================
+ * ESTILOS GLOBALES Y VARIABLES DEL TEMA VINOTINTO/ROJO
+ * ==========================================================
+ */
+
 :root {
-    --color-red: #CC0033; /* Rojo Brillante (Acento/Énfasis) */
-    --color-vinotinto: #5C001C; /* Vinotinto Oscuro (Principal/Encabezados) */
-    --color-gray-dark: #343A40; /* Texto principal */
-    --color-light-gray: #F5F5F5; /* Fondo muy claro (casi blanco) */
-    --color-dark-gray: #212529; /* Texto muy oscuro */
+    /* Paleta de colores LVMEL */
+    --color-primary: #5C001C;      /* Vinotinto (Fondo y botones principales) */
+    --color-secondary: #CC0033;    /* Rojo Brillante (Énfasis/Hover) */
+    --color-accent: #FFC0CB;       /* Rosa Claro (Detalles/Bordes) */
+    --color-dark: #333333;         /* Texto oscuro */
+    --color-light: #F8F8F8;        /* Fondo claro */
+    --color-white: #FFFFFF;        /* Texto blanco */
 }
 
-/* Estilos Base y Reset */
+/* Aplicación de fuentes y reset básico */
 body {
-    font-family: 'Poppins', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: var(--color-light-gray); /* FONDO MUY CLARO */
-    color: var(--color-gray-dark); /* TEXTO GRIS OSCURO */
+    font-family: 'Arial', sans-serif;
+    background-color: var(--color-light);
+    color: var(--color-dark);
     margin: 0;
     padding: 0;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.page-header {
-    background-color: var(--color-vinotinto); /* ENCABEZADO VINOTINTO OSCURO */
-    color: white;
-    padding: 30px 0; 
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada */
-}
-
-.page-header h1 {
-    font-size: 2.5rem; 
-    margin-bottom: 5px;
+h1, h2, h3 {
+    color: var(--color-primary);
+    text-transform: uppercase;
     font-weight: 700;
 }
 
-.subtitle {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.9); 
-    margin: 0;
-}
+/*
+ * ==========================================================
+ * CONTENEDOR Y ENCABEZADO DE PÁGINA
+ * ==========================================================
+ */
 
 .container {
     max-width: 1200px;
-    margin: 30px auto;
-    padding: 0 20px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-h2 {
-    color: var(--color-vinotinto); /* SUBTÍTULOS VINOTINTO */
-    font-weight: 700;
-    padding-bottom: 10px;
-    margin-top: 30px;
-    margin-left: unset;
-    margin-right: unset;
-}
-
-/* Contenedor del Título del Formulario (Centrado) */
-.form-section {
+.page-header {
     text-align: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+    background-color: var(--color-white);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.form-section h2 {
-    text-align: center; 
-    border-bottom: 3px solid var(--color-red); /* Borde Rojo Brillante */
+.page-header h1 {
+    margin-bottom: 5px;
 }
 
-/* Centrar el título de la sección de resultados */
-.data-section h2 {
-    text-align: center; 
-    border-bottom: 3px solid var(--color-red); 
+.page-header .subtitle {
+    color: var(--color-secondary);
+    font-style: italic;
+    margin-top: 0;
 }
 
-.separator {
-    border: 0;
-    height: 2px; /* Separador más grueso */
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--color-red), rgba(0, 0, 0, 0));
-    margin: 40px 0;
-}
+/*
+ * ==========================================================
+ * BOTÓN VOLVER AL INICIO (Fijo)
+ * ==========================================================
+ */
 
-/* ========================================================== */
-/* ESTILOS DEL BOTÓN DE INICIO (POSICIÓN FIJA) */
-/* ========================================================== */
 .home-button-container-fixed {
-    /* Posicionamiento: Fijo a la ventana del navegador */
-    position: fixed; 
-    top: 15px; /* Distancia desde la parte superior (encima del header) */
-    right: 20px; /* Distancia desde la derecha */
-    z-index: 1100; /* Asegura que esté por encima de todo */
-    padding: 5px; /* Pequeño padding de cortesía */
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1001; /* Asegura que esté por encima de todo */
 }
 
 .home-button {
-    display: inline-flex;
-    align-items: center;
-    /* Eliminamos gap: 8px; porque quitamos el icono */
-    background-color: white; /* Añadido un fondo blanco para que se destaque del encabezado vinotinto */
-    color: var(--color-vinotinto); /* Vinotinto */
-    border: 1px solid var(--color-vinotinto);
-    padding: 8px 15px;
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    text-decoration: none;
     border-radius: 5px;
-    text-decoration: none !important;
-    font-weight: 600;
-    transition: all 0.3s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra para levantarlo */
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .home-button:hover {
-    background-color: var(--color-vinotinto); /* Fondo Vinotinto al pasar */
-    color: white;
-    border-color: var(--color-vinotinto);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: var(--color-secondary);
+    transform: translateY(-2px);
 }
-/* ========================================================== */
 
+/*
+ * ==========================================================
+ * FORMULARIO DE REGISTRO
+ * ==========================================================
+ */
 
-/* Estilos de Formulario */
+.form-section {
+    background-color: var(--color-white);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
 .athlete-form {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    background: #ffffff; /* Fondo del formulario: Blanco */
-    padding: 30px;
-    border-radius: 12px; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    text-align: left; 
 }
 
 .form-group {
-    flex: 1 1 100%;
     display: flex;
     flex-direction: column;
+    width: 100%; /* Default a ancho completo */
 }
 
 .form-group.half-width {
-    flex: 1 1 calc(50% - 10px);
+    width: calc(50% - 10px); /* Dos columnas con un espacio de 20px entre ellas */
 }
 
-label {
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--color-dark-gray);
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--color-primary);
 }
 
-input[type="text"], 
-input[type="number"], 
-input[type="date"], 
-input[type="email"], 
-input[type="tel"],
-select {
-    padding: 12px;
-    border: 1px solid #ced4da; 
-    border-radius: 6px;
-    font-size: 16px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    background-color: white;
-    
-    appearance: none; 
-    -webkit-appearance: none;
-    /* Flecha del Select Vinotinto */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%235C001C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 10px auto;
-    padding-right: 30px; 
+.athlete-form input[type="text"],
+.athlete-form input[type="number"],
+.athlete-form input[type="date"],
+.athlete-form input[type="email"],
+.athlete-form input[type="tel"],
+.athlete-form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
 }
 
-input:focus, select:focus {
-    border-color: var(--color-red);
-    box-shadow: 0 0 0 0.2rem rgba(204, 0, 51, 0.25); /* Sombra de enfoque Rojo Brillante claro */
+.athlete-form input:focus,
+.athlete-form select:focus {
+    border-color: var(--color-secondary);
     outline: none;
+    box-shadow: 0 0 5px rgba(204, 0, 51, 0.5);
 }
 
-/* Contenedor del botón para centrarlo (dentro del form) */
-.button-container {
-    flex: 1 1 100%;
-    display: flex;
-    justify-content: center; 
-    margin-top: 15px; 
-}
-
-/* Estilos del Botón Registrar (Ahora Vinotinto Oscuro) */
 .submit-button {
-    background-color: var(--color-vinotinto); /* BOTÓN VINOTINTO */
-    color: white;
-    padding: 10px 25px; 
+    background-color: var(--color-primary);
+    color: var(--color-white);
     border: none;
-    border-radius: 6px;
+    padding: 12px 25px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 17px; 
-    font-weight: 600;
-    transition: background-color 0.3s, transform 0.1s;
-    box-shadow: 0 4px 6px rgba(92, 0, 28, 0.3); 
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    width: 100%;
 }
 
 .submit-button:hover {
-    background-color: var(--color-red); /* HOVER A ROJO BRILLANTE */
-    transform: translateY(-1px); 
-    box-shadow: 0 6px 8px rgba(204, 0, 51, 0.4);
+    background-color: var(--color-secondary);
+    transform: translateY(-1px);
 }
 
-/* Estilos de la Tabla */
+.form-group.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*
+ * ==========================================================
+ * SECCIÓN DE TABLA DE DATOS (Solución de Alineación)
+ * ==========================================================
+ */
+
+.separator {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 40px 0;
+}
+
+.data-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--color-primary);
+}
+
+/* Contenedor que permite el scroll horizontal en pantallas pequeñas */
 .table-responsive-wrapper {
-    overflow-x: auto;
-    background: #ffffff;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    overflow-x: auto; 
+    margin-bottom: 20px;
 }
 
+/* Estilos de la tabla */
 .athlete-data-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    min-width: 700px; 
+    min-width: 600px; /* Ancho mínimo para evitar colapsar */
+    border-collapse: collapse; 
+    table-layout: fixed; /* **CRUCIAL** para la alineación TH/TD */
+    background-color: var(--color-white);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Centrar el contenido de los encabezados (TH) y las celdas (TD) */
-.athlete-data-table th, .athlete-data-table td {
-    padding: 15px 10px; 
-    text-align: center; 
-    border-bottom: 1px solid #e9ecef;
+/* Estilos de encabezado de tabla */
+.athlete-data-table thead {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    text-transform: uppercase;
 }
 
 .athlete-data-table th {
-    background-color: #f7e6e6; /* Fondo de encabezado muy claro */
-    color: var(--color-vinotinto); /* Texto de encabezado Vinotinto */
-    font-weight: 700;
+    padding: 10px 8px;
+    text-align: left;
+    font-size: 0.9em;
     cursor: pointer;
+    transition: background-color 0.3s;
     position: relative;
-    white-space: nowrap; 
-    transition: background-color 0.2s;
+    user-select: none;
 }
 
+/* Hover en encabezados */
 .athlete-data-table th:hover {
-    background-color: #fcebeb; 
+    background-color: var(--color-secondary);
 }
 
-/* Filas */
-.athlete-data-table tr:nth-child(even) {
-    background-color: var(--color-light-gray); /* Raya de fondo claro */
+/* Estilos para las filas de datos */
+.athlete-data-table td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 0.9em;
+    box-sizing: border-box;
+    white-space: nowrap; /* Evita que el contenido de las celdas se envuelva */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.athlete-data-table tr:hover {
-    background-color: #ffefef; /* Resaltado Rojo/Vinotinto claro */
+/* Alternancia de color de fila */
+.athlete-data-table tbody tr:nth-child(even) {
+    background-color: #f7f7f7;
 }
 
-/* Indicadores de Ordenamiento (Vinotinto) */
+/* Mensajes de estado y datos no encontrados */
+.loading-message, .no-data-message, .table-note-message {
+    text-align: center;
+    padding: 15px;
+    font-style: italic;
+    color: var(--color-dark);
+}
+
+/* Estilos para el indicador de ordenamiento */
+.athlete-data-table th.sorted-asc::after,
+.athlete-data-table th.sorted-desc::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+}
+
 .athlete-data-table th.sorted-asc::after {
-    content: ' ▲';
-    color: var(--color-vinotinto);
+    border-top-color: var(--color-white);
+    margin-top: 5px; /* Flecha hacia arriba */
 }
 
 .athlete-data-table th.sorted-desc::after {
-    content: ' ▼';
-    color: var(--color-vinotinto);
+    border-bottom-color: var(--color-white);
+    margin-top: -5px; /* Flecha hacia abajo */
 }
 
-.no-data-message, .loading-message, .table-note-message {
-    text-align: center;
-    padding: 20px;
-    color: #6c757d;
-    font-style: italic;
-    border: 1px dashed #ced4da;
-    border-radius: 8px;
-    margin-top: 20px;
-}
+/*
+ * ==========================================================
+ * MEDIA QUERIES (RESPONSIVE DESIGN)
+ * ==========================================================
+ */
 
-/* Estilos Responsivos */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 10px;
-    }
-    .page-header h1 {
-        font-size: 2rem;
-    }
     .form-group.half-width {
-        flex: 1 1 100%;
+        width: 100%; /* Una sola columna en pantallas pequeñas */
     }
-    /* Mueve el botón de regreso hacia la izquierda para pantallas pequeñas */
-    .home-button-container-fixed {
-        top: 10px; 
-        right:
+
+    /* En pantallas pequeñas, aseguramos que la tabla siga la estructura estándar */
+    .athlete-data-table {
+        /* No usamos table-layout: fixed; aquí si queremos que se ajusten al contenido */
+        table-layout: auto; 
+    }
+    
+    /* Si el problema de alineación persiste, es por el min-width en .athlete-data-table */
+    /* Manteniendo el min-width asegura que los datos sigan bajo los títulos */
+}
