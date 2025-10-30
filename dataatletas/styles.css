@@ -203,7 +203,7 @@ h1, h2, h3 {
 /* Estilos de la tabla */
 .athlete-data-table {
     width: 100%;
-    min-width: 600px; /* Ancho mínimo para evitar colapsar */
+    min-width: 600px;
     border-collapse: collapse; 
     table-layout: fixed; 
     background-color: var(--color-white);
