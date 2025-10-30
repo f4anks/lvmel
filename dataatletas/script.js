@@ -1,6 +1,62 @@
+// --- (INICIO DE ARCHIVO script.js) ---
+
+// Definiciones necesarias (asume que estas ya existen):
+let athletesData = [];
+let currentSortKey = 'apellido';
+let sortDirection = 'asc';
+// const db = getFirestore(app); // Asume que 'db' está inicializado
+
+// ... (Otras funciones y definiciones de Firebase) ...
+
+
 /**
- * RENDERIZADO DE LA TABLA (Asegura que TH y TD coincidan)
- */
+ * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
+ * Muestra el estado de "Cargando datos..." y luego renderiza la tabla.
+ */
+function setupRealtimeListener(appId) {
+    // Muestra el mensaje de carga mientras espera la respuesta de Firebase
+    displayStatusMessage("🔄 Cargando datos de atletas...", 'info');
+    
+	// Ruta crítica: Asegúrate de que esta ruta sea correcta para tu estructura
+	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`); 
+	const q = query(athletesColRef);
+
+	onSnapshot(q, (snapshot) => {
+		console.log("Datos de Firestore actualizados. Sincronizando tabla...");
+		const fetchedData = [];
+		snapshot.forEach((doc) => {
+			fetchedData.push({	
+				id: doc.id, 
+				...doc.data()	
+			});
+		});
+		
+		athletesData = fetchedData;
+		
+		if (athletesData.length > 0) {
+			// Al cargar, ordenar por el campo inicial (apellido) y renderizar
+			sortTable(currentSortKey, false);	
+		} else {
+            // Renderiza la tabla con el mensaje de "No hay atletas"
+			renderTable(); 
+		}
+	}, (error) => {
+        // MANEJO DE ERROR CRÍTICO
+		console.error("Error en la escucha en tiempo real:", error);
+        if (error.code === 'permission-denied') {
+             displayStatusMessage("❌ ERROR DE PERMISO: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+             displayStatusMessage(`❌ Error al cargar datos: ${error.message}. Verifica tu conexión.`, 'error');
+        }
+        // Forzar el renderizado para mostrar el mensaje de error
+        athletesData = [];
+        renderTable(); 
+	});
+}
+
+/**
+ * RENDERIZADO DE LA TABLA (Asegura que TH y TD coincidan y se apliquen clases)
+ */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
     const tableHeaders = [
@@ -10,11 +66,13 @@ function renderTable() {
         { key: "club", label: "Club" },
         { key: "fechaNac", label: "F. Nac." },
         { key: "division", label: "División" }
-        // Si quieres añadir Talla, Peso, Teléfono, etc., agrégales aquí
     ];
     
     if (athletesData.length === 0) {
-        registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
+        // Muestra el mensaje "No hay atletas" si no se ha mostrado un error más grave
+        if (!registeredDataContainer.querySelector('.error')) {
+            registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
+        }
         return;
     }
 
@@ -42,6 +100,7 @@ function renderTable() {
             <p class="table-note-message">Haz clic en cualquier encabezado de la tabla para ordenar los resultados.</p>
         `;
         tableBody = document.getElementById('athleteTableBody');
+        // Asegura que esta función exista y que añada los event listeners a los <th>
         setupSorting();	
     } else {
         tableBody.innerHTML = '';
@@ -52,7 +111,7 @@ function renderTable() {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
         
-        // Asegura que las celdas se inserten en el mismo orden que los encabezados
+        // Las celdas se insertan en el ORDEN EXACTO de los encabezados (tableHeaders)
         newRow.innerHTML = `
             <td data-label="Cédula" class="table-data">${data.cedula || '-'}</td>
             <td data-label="Nombre" class="table-data">${data.nombre || '-'}</td>
@@ -71,3 +130,7 @@ function renderTable() {
         }
     });
 }
+
+// ... (Resto de tu script.js, incluyendo sortTable, setupSorting, initFirebaseAndLoadData, etc.) ...
+
+// --- (FIN DE ARCHIVO script.js) ---
