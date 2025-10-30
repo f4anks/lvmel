@@ -203,7 +203,7 @@ h1, h2, h3 {
 /* Estilos de la tabla */
 .athlete-data-table {
     width: 100%;
-    min-width: 700px; /* Incrementado para mejor presentación de escritorio */
+    min-width: 700px;
     border-collapse: collapse; 
     table-layout: fixed; /* CRÍTICO: Fuerza a respetar los anchos de columna */
     background-color: var(--color-white);
@@ -299,8 +299,6 @@ h1, h2, h3 {
         width: 100%;
     }
 
-    /* En pantallas pequeñas, podemos volver a auto para que la tabla se ajuste al contenido, 
-       confiando en el scroll horizontal. */
     .athlete-data-table {
         table-layout: auto; 
     }
