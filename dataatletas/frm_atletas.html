@@ -1,169 +1,113 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  </head>
-  <body oncontextmenu="return false;">&nbsp; &nbsp; &nbsp; &nbsp;
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    &nbsp; &nbsp;
     <title>Data de Atletas - Registro O</title>
-    &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
-    <link rel="stylesheet" href="styles.css?v=4">
-    &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
-    <style>
-        /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
-        #statusMessage {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 10px 20px;
-            border-radius: 8px;
-            color: #fff;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-    </style>
-    <header class="page-header"><br>
-      <h1 style="margin-top: -12.4167px;">Data de Atletas</h1>
-      &nbsp; &nbsp; &nbsp; &nbsp;
+    <link rel="stylesheet" href="styles.css?v=5"> <style>
+        /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
+        #statusMessage {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+  </head>
+  <body> 
+    <header class="page-header">
+      <br>
+      <h1>Data de Atletas</h1>
       <p class="subtitle">Liga de Voleibol Menor del Estado Lara</p>
-      &nbsp; &nbsp; </header>
+    </header>
+    
     <main class="container">
-      <section class="form-section"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      <section class="form-section"> 
         <h2>Formulario para el Registro de Atletas</h2>
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
-        &nbsp; &nbsp; &nbsp; <br>
         <div style="text-align: left;">
           <form id="athleteForm" class="athlete-form">
-            <div class="form-group half-width"><label for="cedula">Cédula de
-                Identidad:</label> <input id="cedula" name="cedula" placeholder="Ej: 34123100"
-
-                required="" type="text"></div>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            &nbsp;
-            <div class="form-group half-width"><label for="club">Club/Equipo:</label>
+            
+            <div class="form-group half-width">
+              <label for="cedula">Cédula de Identidad:</label> 
+              <input id="cedula" name="cedula" placeholder="Ej: 34123100" required="" type="text">
+            </div>
+            <div class="form-group half-width">
+              <label for="club">Club/Equipo:</label>
               <select id="club" name="club" required="">
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
-                <option value="" disabled="disabled" selected="selected">Selecciona
-                  un Club</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
+                <option value="" disabled="disabled" selected="selected">Selecciona un Club</option>
                 <option value="Bertha Carrero">Bertha Carrero</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
                 <option value="Olimpikus">Olimpikus</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
                 <option value="Villa Cantevista">Villa Cantevista</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
                 <option value="MG">MG</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
                 <option value="JPD">JPD</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp;&nbsp;
               </select>
             </div>
-            &nbsp;<br>
-            <br>
-            <div class="form-group half-width"><label for="nombre">Nombre:</label>
-              <input id="nombre" name="nombre" required="" type="text"> </div>
-            <br>
-            <div class="form-group half-width"><label for="apellido">Apellido:</label>
-              <input id="apellido" name="apellido" required="" type="text"> </div>
-            &nbsp;<br>
-            <div class="form-group half-width"><label for="fechaNac">Fecha de
-                Nacimiento:</label> <input id="fechaNac" name="fechaNac" required=""
-
-                type="date"> </div>
-            &nbsp;<br>
-            <div class="form-group half-width"><label for="division">División:</label>
+            
+            <div class="form-group half-width">
+              <label for="nombre">Nombre:</label>
+              <input id="nombre" name="nombre" required="" type="text"> 
+            </div>
+            <div class="form-group half-width">
+              <label for="apellido">Apellido:</label>
+              <input id="apellido" name="apellido" required="" type="text"> 
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="fechaNac">Fecha de Nacimiento:</label> 
+              <input id="fechaNac" name="fechaNac" required="" type="date"> 
+            </div>
+            <div class="form-group half-width">
+              <label for="division">División:</label>
               <select id="division" name="division" required="">
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
-                <option value="" disabled="disabled" selected="selected">Selecciona
-                  una División</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
+                <option value="" disabled="disabled" selected="selected">Selecciona una División</option>
                 <option value="CIAR">CIAR</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
                 <option value="1ra Division">1ra Division</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
                 <option value="2da Division">2da Division</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp; &nbsp; &nbsp;
                 <option value="3ra Division">3ra Division</option>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                &nbsp;&nbsp;
               </select>
             </div>
-            &nbsp;<br>
+            
             <div class="form-group half-width">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <label for="talla">Talla
-                (m):</label>
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <input id="talla"
-
-                name="talla" step="0.01" min="0.5" max="3" placeholder="Ej: 1.75"
-
-                type="number">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            &nbsp; &nbsp; &nbsp;
+              <label for="talla">Talla (m):</label>
+              <input id="talla" name="talla" step="0.01" min="0.5" max="3" placeholder="Ej: 1.75" type="number">
+            </div>
             <div class="form-group half-width">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <label for="peso">Peso
-                (kg):</label>
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <input id="peso"
-
-                name="peso" step="0.01" min="10" max="300" placeholder="Ej: 50.80"
-
-                type="number">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+              <label for="peso">Peso (kg):</label>
+              <input id="peso" name="peso" step="0.01" min="10" max="300" placeholder="Ej: 50.80" type="number"> 
+            </div>
+            
             <div class="form-group half-width">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <label for="correo">Correo
-                Electrónico:</label> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-              &nbsp; <input id="correo" name="correo" placeholder="opcional@ejemplo.com"
-
-                type="email">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            &nbsp; &nbsp; &nbsp;
+              <label for="correo">Correo Electrónico:</label> 
+              <input id="correo" name="correo" placeholder="opcional@ejemplo.com" type="email">
+            </div>
             <div class="form-group half-width">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <label for="telefono">Teléfono:</label>
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <input id="telefono"
-
-                name="telefono" placeholder="Ej: 04261234455" type="tel">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+              <label for="telefono">Teléfono:</label>
+              <input id="telefono" name="telefono" placeholder="Ej: 04261234455" type="tel">
+            </div>
+            
             <div class="form-group button-container" style="text-align: center;">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <button type="submit"
-
-                class="submit-button">Registrar Atleta</button>
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
+              <button type="submit" class="submit-button">Registrar Atleta</button>
+            </div>
           </form>
         </div>
       </section>
+      
       <hr class="separator">
+      
       <section class="data-section">
         <h2>Lista de Atletas Registrados</h2>
-        <div id="registeredData" class="registered-data-container"> &nbsp;
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        <div id="registeredData" class="registered-data-container"> 
           <p class="loading-message">Cargando datos...</p>
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
-        &nbsp; &nbsp; &nbsp; &nbsp; </section>
-      &nbsp; &nbsp; </main>
-    &nbsp; &nbsp;
+        </div>
+      </section>
+      
+    </main>
+    
     <script type="module" src="script.js"></script>
   </body>
 </html>
