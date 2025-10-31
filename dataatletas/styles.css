@@ -92,7 +92,6 @@ h2 {
     padding: 40px 30px !important; 
     border-radius: 15px; 
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
-    /* ELIMINADO: text-align: left; */
 }
 
 .form-group {
@@ -163,13 +162,19 @@ input:focus, select:focus {
 .button-container {
     flex: 1 1 100%;
     display: flex;
-    /* CENTRADO HORIZONTAL */
+    /* CENTRADO FLEXBOX */
     justify-content: center; 
+    /* CENTRADO DE TEXTO (Medida de seguridad) */
+    text-align: center; 
     margin-top: 5px; 
 }
 
 /* Estilos del Botón Registrar (Vinotinto Oscuro) */
 .submit-button {
+    /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
+    display: block; 
+    margin: 0 auto;
+    
     background-color: #800020 !important; 
     color: white;
     padding: 12px 30px !important; 
