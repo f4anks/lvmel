@@ -14,13 +14,13 @@ body {
     color: #333333; 
     margin: 0;
     padding: 0;
-    line-height: 1.4; 
+    line-height: 1.4; /* Se mantiene el espaciado original Vinotinto */
 }
 
 .page-header {
     background-color: #800020; /* Vinotinto Oscuro */
     color: white;
-    padding: 20px 0; 
+    padding: 20px 0; /* Se mantiene el padding original Vinotinto */
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -48,8 +48,8 @@ h2 {
     padding-bottom: 8px;
     margin-top: 25px; 
     font-size: 1.6rem; 
-    margin-left: unset; 
-    margin-right: unset; 
+    margin-left: unset; /* Asegura la corrección de h2 */
+    margin-right: unset; /* Asegura la corrección de h2 */
 }
 
 /* Contenedor del Título del Formulario */
@@ -85,54 +85,46 @@ h2 {
     
     display: flex !important;
     flex-wrap: wrap !important;
-    
-    /* SOLUCIÓN: Usamos row-gap para el espacio vertical */
-    row-gap: 15px; 
-    /* SOLUCIÓN: Usamos justify-content para alinear los campos laterales */
-    justify-content: space-between !important; 
-    
+    gap: 15px 20px; 
     background: #ffffff;
-    padding: 40px 30px !important; /* Padding del formulario (margen interior) */
+    
+    /* Mantenemos el padding, que actúa como margen inicial */
+    padding: 40px 30px !important; 
+    
     border-radius: 15px; 
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
     text-align: left;
 }
 
 .form-group {
-    /* ANULACIONES BASE */
+    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
     margin-bottom: 0 !important; 
     padding-left: 0 !important;
     padding-right: 0 !important;
     
     display: flex !important;
     flex-direction: column !important;
-    align-items: flex-start !important; /* Alineación del contenido (etiqueta/campo) */
+    /* CLAVE: Alineación perfecta a la izquierda de la etiqueta y campo */
+    align-items: flex-start !important; 
     
-    gap: 5px; 
+    gap: 5px; /* Mantenemos el gap original Vinotinto */
+    
     flex: 1 1 100%;
 }
 
-/* CORRECCIÓN FOCALIZADA: SOLO PARA EL CAMPO CÉDULA DE IDENTIDAD */
-/* Aplica al primer elemento con la clase .half-width */
-.form-group.half-width:first-of-type {
-    /* CLAVE FINAL: Forzamos la eliminación de cualquier margen/padding a la izquierda */
-    margin-left: 0 !important; 
-    padding-left: 0 !important;
-}
-
-/* Estilos para todos los campos de media columna */
+/* **CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA** */
 .form-group.half-width {
-    /* Anulación de márgenes laterales persistentes */
+    /* CLAVE: Anulamos cualquier margen lateral que cause desalineación */
     margin-left: 0 !important; 
     margin-right: 0 !important; 
     
-    /* Calculamos el ancho exacto para usar 'space-between' en el contenedor padre */
-    flex: 0 0 calc(50% - 10px) !important; 
+    /* Recalculamos el ancho total para media columna menos el gap central */
+    flex: 1 1 calc(50% - 10px) !important; 
 }
 
 label {
     text-align: left !important;
-    margin-bottom: 0 !important; 
+    margin-bottom: 0 !important; /* Mantenemos el margen mínimo */
     padding: 0 !important; 
     font-weight: 600;
     color: #333333;
@@ -145,9 +137,11 @@ input[type="date"],
 input[type="email"],
 input[type="tel"],
 select {
+    /* CLAVE: Asegura el 100% del ancho sin desbordar */
     width: 100% !important; 
     box-sizing: border-box !important; 
     
+    /* Mantenemos el estilo de raya inferior Vinotinto */
     padding: 8px 0 !important; 
     border: none !important; 
     border-bottom: 2px solid #F0DADA !important; 
@@ -158,6 +152,7 @@ select {
 
     appearance: none;
     -webkit-appearance: none;
+    /* Color de flecha Vinotinto/Rojo Brillante */
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DC143C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C/svg%3E');
     background-repeat: no-repeat;
     background-position: right 0 center;
@@ -201,7 +196,7 @@ input:focus, select:focus {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA (SIN CAMBIOS) */
+/* ESTILOS DE LA TABLA */
 /* -------------------------------------------------------------------------- */
 
 .table-responsive-wrapper {
