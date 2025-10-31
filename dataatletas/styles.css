@@ -85,14 +85,14 @@ h2 {
     
     display: flex !important;
     flex-wrap: wrap !important;
-    /* CAMBIO 1: Espaciado uniforme de 20px entre filas y columnas */
+    /* Espaciado uniforme de 20px entre filas y columnas */
     gap: 20px; 
     
     background: #ffffff;
     padding: 40px 30px !important; 
     border-radius: 15px; 
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
-    text-align: left;
+    /* ELIMINADO: text-align: left; */
 }
 
 .form-group {
@@ -113,7 +113,7 @@ h2 {
     margin-left: 0 !important; 
     margin-right: 0 !important; 
     
-    /* Recalculado para acomodar el nuevo gap uniforme de 20px */
+    /* Recalculado para acomodar el gap uniforme de 20px */
     flex: 1 1 calc(50% - 10px) !important; 
 }
 
@@ -163,7 +163,7 @@ input:focus, select:focus {
 .button-container {
     flex: 1 1 100%;
     display: flex;
-    /* CAMBIO 2: Centra el botón horizontalmente */
+    /* CENTRADO HORIZONTAL */
     justify-content: center; 
     margin-top: 5px; 
 }
@@ -190,7 +190,7 @@ input:focus, select:focus {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA (SIN MODIFICACIÓN) */
+/* ESTILOS DE LA TABLA */
 /* -------------------------------------------------------------------------- */
 
 .table-responsive-wrapper {
