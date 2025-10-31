@@ -10,17 +10,17 @@
 /* Estilos Base y Reset */
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #FFF8F8; 
-    color: #333333; 
+    background-color: #FFF8F8; /* Fondo suave */
+    color: #333333; /* Gris oscuro */
     margin: 0;
     padding: 0;
-    line-height: 1.4; /* Se mantiene el espaciado original Vinotinto */
+    line-height: 1.4;
 }
 
 .page-header {
     background-color: #800020; /* Vinotinto Oscuro */
     color: white;
-    padding: 20px 0; /* Se mantiene el padding original Vinotinto */
+    padding: 20px 0;
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -48,8 +48,8 @@ h2 {
     padding-bottom: 8px;
     margin-top: 25px; 
     font-size: 1.6rem; 
-    margin-left: unset; /* Asegura la corrección de h2 */
-    margin-right: unset; /* Asegura la corrección de h2 */
+    margin-left: unset;
+    margin-right: unset;
 }
 
 /* Contenedor del Título del Formulario */
@@ -85,12 +85,11 @@ h2 {
     
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 15px 20px; 
+    /* CAMBIO 1: Espaciado uniforme de 20px entre filas y columnas */
+    gap: 20px; 
+    
     background: #ffffff;
-    
-    /* Mantenemos el padding, que actúa como margen inicial */
     padding: 40px 30px !important; 
-    
     border-radius: 15px; 
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
     text-align: left;
@@ -104,27 +103,23 @@ h2 {
     
     display: flex !important;
     flex-direction: column !important;
-    /* CLAVE: Alineación perfecta a la izquierda de la etiqueta y campo */
     align-items: flex-start !important; 
-    
-    gap: 5px; /* Mantenemos el gap original Vinotinto */
     
     flex: 1 1 100%;
 }
 
 /* **CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA** */
 .form-group.half-width {
-    /* CLAVE: Anulamos cualquier margen lateral que cause desalineación */
     margin-left: 0 !important; 
     margin-right: 0 !important; 
     
-    /* Recalculamos el ancho total para media columna menos el gap central */
+    /* Recalculado para acomodar el nuevo gap uniforme de 20px */
     flex: 1 1 calc(50% - 10px) !important; 
 }
 
 label {
     text-align: left !important;
-    margin-bottom: 0 !important; /* Mantenemos el margen mínimo */
+    margin-bottom: 0 !important;
     padding: 0 !important; 
     font-weight: 600;
     color: #333333;
@@ -137,11 +132,9 @@ input[type="date"],
 input[type="email"],
 input[type="tel"],
 select {
-    /* CLAVE: Asegura el 100% del ancho sin desbordar */
     width: 100% !important; 
     box-sizing: border-box !important; 
     
-    /* Mantenemos el estilo de raya inferior Vinotinto */
     padding: 8px 0 !important; 
     border: none !important; 
     border-bottom: 2px solid #F0DADA !important; 
@@ -170,8 +163,9 @@ input:focus, select:focus {
 .button-container {
     flex: 1 1 100%;
     display: flex;
-    justify-content: center;
-    margin-top: 25px; 
+    /* CAMBIO 2: Centra el botón horizontalmente */
+    justify-content: center; 
+    margin-top: 5px; 
 }
 
 /* Estilos del Botón Registrar (Vinotinto Oscuro) */
@@ -196,7 +190,7 @@ input:focus, select:focus {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA */
+/* ESTILOS DE LA TABLA (SIN MODIFICACIÓN) */
 /* -------------------------------------------------------------------------- */
 
 .table-responsive-wrapper {
@@ -279,4 +273,3 @@ input:focus, select:focus {
         margin-right: 0 !important;
     }
 }
-
