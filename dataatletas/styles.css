@@ -158,22 +158,19 @@ input:focus, select:focus {
     outline: none !important;
 }
 
-/* Contenedor del botón para centrarlo (dentro del form) */
+/* Contenedor del botón de REGISTRO para centrarlo */
 .button-container {
     flex: 1 1 100%;
     display: flex;
-    /* CENTRADO FLEXBOX */
     justify-content: center; 
-    /* CENTRADO DE TEXTO (Medida de seguridad) */
     text-align: center; 
     margin-top: 5px; 
 }
 
-/* Estilos del Botón Registrar (Vinotinto Oscuro) */
+/* Estilos del Botón REGISTRO */
 .submit-button {
-    /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
-    display: block; 
-    margin: 0 auto;
+    display: block; /* CLAVE para el centrado */
+    margin: 0 auto; /* CLAVE para el centrado */
     
     background-color: #800020 !important; 
     color: white;
@@ -193,6 +190,69 @@ input:focus, select:focus {
     transform: translateY(-2px); 
     box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
 }
+
+
+/* --- ESTILOS ESPECÍFICOS PARA LA BÚSQUEDA --- */
+
+.search-section .athlete-form {
+    /* Ajustamos el ancho para que se vea como una barra de búsqueda concentrada */
+    max-width: 500px !important;
+    padding: 20px 30px !important;
+    gap: 10px;
+}
+
+.search-input-group {
+    /* Mantenemos el input y el botón en línea y centrados */
+    flex-direction: row !important;
+    align-items: center !important; 
+    justify-content: center !important;
+    gap: 15px !important;
+}
+
+.search-input-group label {
+    font-weight: 700 !important; 
+    color: #800020 !important; 
+    margin-right: 5px !important; 
+    flex-shrink: 0 !important;
+}
+
+.search-input-group input[type="text"] {
+    /* Controlamos el ancho del input de búsqueda */
+    max-width: 200px !important;
+    flex-grow: 1 !important;
+}
+
+.search-button {
+    /* Ajustamos el tamaño del botón de búsqueda */
+    padding: 10px 15px !important; 
+    width: auto !important; 
+    margin: 0 !important; 
+    display: inline-block !important;
+    flex-shrink: 0;
+}
+
+/* Estilo para el aviso del formulario */
+#formStatusMessage {
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s;
+    flex: 1 1 100%; /* Ocupa todo el ancho */
+}
+#formStatusMessage.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+#formStatusMessage.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
 
 /* -------------------------------------------------------------------------- */
 /* ESTILOS DE LA TABLA */
@@ -276,5 +336,15 @@ input:focus, select:focus {
         flex: 1 1 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
+    }
+    .search-input-group {
+        flex-direction: column !important; /* Apilamos en móviles */
+        gap: 5px !important;
+    }
+    .search-input-group label {
+        align-self: flex-start;
+    }
+    .search-input-group input[type="text"] {
+        max-width: 100% !important;
     }
 }
