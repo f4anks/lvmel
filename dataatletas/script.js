@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(statusDiv);
     }
     
-    // 2. Initial table render (CORRECCIÓN CRÍTICA: DEBE ESTAR AQUÍ)
+    // 2. Initial table render (Carga la data al iniciar)
     const initialData = loadData();
     renderTable(initialData);
 
