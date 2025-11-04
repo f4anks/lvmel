@@ -128,14 +128,14 @@ let sortDirection = 'asc';
 function renderTable(athletes) {
     const container = document.getElementById('registeredData');
     
-    if (!container) return; // Validación extra
+    if (!container) return; 
 
     if (athletes.length === 0) {
         container.innerHTML = '<p class="no-data-message">No hay atletas registrados aún.</p>';
         return;
     }
 
-    // Sort the data before rendering (Logic omitted for brevity, but exists)
+    // Sort the data before rendering
     if (sortColumn) {
         athletes.sort((a, b) => {
             let aValue = a[sortColumn];
