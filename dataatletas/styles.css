@@ -231,7 +231,7 @@ input:focus, select:focus {
     flex-shrink: 0;
 }
 
-/* Estilo para el aviso del formulario */
+/* Estilo para el aviso del formulario de búsqueda */
 #formStatusMessage {
     padding: 10px;
     margin-top: 5px;
