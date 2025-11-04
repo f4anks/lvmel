@@ -54,6 +54,7 @@ function displayFormMessage(message, isSuccess) {
     msgEl.classList.add(isSuccess ? 'success' : 'error');
     msgEl.style.opacity = '1';
 
+    // Opcional: Ocultar después de 4 segundos
     setTimeout(() => {
         msgEl.style.opacity = '0';
     }, 4000);
@@ -129,6 +130,10 @@ function handleSearch(event) {
     const athletes = loadData();
     const foundAthlete = athletes.find(a => a.cedula === cedulaToSearch);
 
+    // Aseguramos que el botón de registro se restablezca
+    const registerButton = document.querySelector('#athleteForm .submit-button');
+
+
     if (foundAthlete) {
         // 1. Mostrar mensaje de éxito
         displayFormMessage(`¡Atleta con Cédula ${cedulaToSearch} encontrado!`, true);
@@ -136,8 +141,8 @@ function handleSearch(event) {
         // 2. Llenar el formulario principal
         fillForm(foundAthlete);
         
-        // 3. Opcional: cambiar el texto del botón a "Actualizar"
-        document.querySelector('.submit-button').textContent = "Actualizar Atleta";
+        // 3. Cambiar el texto del botón a "Actualizar"
+        registerButton.textContent = "Actualizar Atleta";
         
     } else {
         // 1. Mostrar mensaje de error
@@ -150,7 +155,7 @@ function handleSearch(event) {
         document.getElementById('cedula').value = cedulaToSearch;
         
         // 4. Asegurar el texto del botón
-        document.querySelector('.submit-button').textContent = "Registrar Atleta";
+        registerButton.textContent = "Registrar Atleta";
     }
 }
 
@@ -282,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialData = loadData();
     renderTable(initialData);
 
-    // 3. Attach search listener (NUEVO)
+    // 3. Attach search listener
     const searchForm = document.getElementById('athleteSearchForm');
     if (searchForm) {
         searchForm.addEventListener('submit', handleSearch);
@@ -290,6 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Form submission logic (MODIFICADA para Actualizar/Registrar)
     const form = document.getElementById('athleteForm');
+    const registerButton = document.querySelector('#athleteForm .submit-button');
+
     form.addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent default form submission
 
@@ -321,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Clear the form fields and reset button
         form.reset();
-        document.querySelector('.submit-button').textContent = "Registrar Atleta";
+        registerButton.textContent = "Registrar Atleta";
         document.getElementById('searchCedula').value = '';
         displayFormMessage("Formulario listo para nuevo registro.", true);
 
