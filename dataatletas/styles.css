@@ -194,8 +194,8 @@ input:focus, select:focus {
     box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
 }
 
+/* --- ESTILOS ESPECÍFICOS PARA LA BÚSQUEDA --- */
 
-/* --- AÑADIDO: ESTILOS ESPECÍFICOS PARA LA BÚSQUEDA --- */
 .search-section .athlete-form {
     /* Ajustamos el ancho para que se vea como una barra de búsqueda concentrada */
     max-width: 500px !important;
@@ -254,7 +254,7 @@ input:focus, select:focus {
     color: #155724;
     border: 1px solid #c3e6cb;
 }
-/* --- FIN AÑADIDO --- */
+/* --- FIN ESTILOS DE BÚSQUEDA --- */
 
 
 /* -------------------------------------------------------------------------- */
