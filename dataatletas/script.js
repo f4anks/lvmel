@@ -28,14 +28,17 @@ const EXTERNAL_FIREBASE_CONFIG = {
 
 /**
  * Muestra un mensaje temporal de estado en la interfaz.
+ * NOTA: Utiliza los estilos definidos en el bloque <style> del HTML
  */
 function displayStatusMessage(message, type) {
 	let statusEl = document.getElementById('statusMessage');
 	
 	if (!statusEl) {
+		// En caso de que el elemento no esté en el DOM (a pesar de estar en el HTML)
 		statusEl = document.createElement('div');
 		statusEl.id = 'statusMessage';
-		statusEl.style.position = 'fixed';
+        // Agregamos estilos dinámicos que garantizan la visibilidad
+        statusEl.style.position = 'fixed';
 		statusEl.style.top = '10px';
 		statusEl.style.right = '10px';
 		statusEl.style.padding = '10px 20px';
@@ -44,17 +47,11 @@ function displayStatusMessage(message, type) {
 		statusEl.style.color = '#fff';
 		statusEl.style.transition = 'opacity 0.5s ease-in-out';
 		statusEl.style.opacity = '0';
-		
-        if (document.body) {
-            document.body.appendChild(statusEl);
-        } else {
-            console.error("No se pudo mostrar el mensaje de estado: El cuerpo del documento aún no está disponible.");
-            return; 
-        }
+		document.body.appendChild(statusEl);
 	}
 	
 	statusEl.textContent = message; 
-	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+	statusEl.className = type; // Usa la clase CSS para el color (success o error)
 	statusEl.style.opacity = '1';
 
 	setTimeout(() => {
@@ -69,7 +66,6 @@ function displayStatusMessage(message, type) {
 async function initFirebaseAndLoadData() {
 	console.log("Iniciando Firebase y autenticación...");
 	try {
-		// Usamos la configuración externa ya que estamos en un entorno web normal (sin inyección de tokens)
 		const configToUse = EXTERNAL_FIREBASE_CONFIG;
 		const appIdToUse = configToUse.projectId;	
 
@@ -77,7 +73,6 @@ async function initFirebaseAndLoadData() {
 		db = getFirestore(app);
 		auth = getAuth(app);
 		
-		// Autenticación anónima para permitir la lectura y escritura pública si las reglas lo permiten
 		await signInAnonymously(auth);
 		
 		onAuthStateChanged(auth, (user) => {
@@ -88,7 +83,7 @@ async function initFirebaseAndLoadData() {
 			} else {
 				console.error("No se pudo autenticar al usuario.");
 				userId = crypto.randomUUID();	
-				setupRealtimeListener(appIdToUse); // Intenta cargar incluso sin autenticación perfecta
+				setupRealtimeListener(appIdToUse);
 			}
 		});
 
@@ -102,7 +97,7 @@ async function initFirebaseAndLoadData() {
  * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
  */
 function setupRealtimeListener(appId) {
-    // RUTA DE LA COLECCIÓN: artifacts/datalvmel/public/data/athletes (Usando el projectId como ID del artifact)
+    // RUTA DE LA COLECCIÓN
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
 	const q = query(athletesColRef);
 
@@ -119,14 +114,12 @@ function setupRealtimeListener(appId) {
 		athletesData = fetchedData;
 		
 		if (athletesData.length > 0) {
-			// Al cargar, ordenar por el campo inicial (apellido)
+			// Ordenar por el campo inicial (apellido)
 			sortTable(currentSortKey, false);	
 		} else {
-            // Si no hay datos, renderiza una tabla vacía con el mensaje de no datos
 			renderTable(); 
 		}
 	}, (error) => {
-        // MANEJO DE ERROR MEJORADO
 		console.error("Error en la escucha en tiempo real:", error);
         if (error.code === 'permission-denied') {
              displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
@@ -161,11 +154,11 @@ async function handleFormSubmit(event) {
 
 	const form = document.getElementById('athleteForm');
 
-	// 1. Recolectar datos y preparar el objeto (documento)
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
 	
 	const newAthlete = {
+        // Campos actualizados según el nuevo HTML:
         cedula: form.cedula.value, 
 		club: form.club.value,
 		nombre: form.nombre.value,
@@ -185,14 +178,12 @@ async function handleFormSubmit(event) {
 		const appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
 		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
 		
-        // USANDO addDoc para agregar un nuevo documento con ID automático
 		await addDoc(athletesColRef, newAthlete);	
 		
 		console.log("Atleta registrado y guardado en Firestore con éxito.");
 		displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
 		
 	} catch(error) {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
 		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
 		if (error.code === 'permission-denied') {
 			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
@@ -228,9 +219,9 @@ function sortTable(key, toggleDirection = true) {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
 		} else if (key === 'fechaNac') {
-            // Convertir fechas a objetos Date para una comparación precisa
-			valA = new Date(valA);
-			valB = new Date(valB);
+            // Comparar fechas: las más antiguas (fechas de nacimiento más tempranas) van primero en ASC
+			valA = new Date(valA).getTime(); 
+			valB = new Date(valB).getTime();
 		} else {
             // Comparación de strings por defecto
 			valA = String(valA).toLowerCase();
@@ -274,7 +265,7 @@ function renderTable() {
                             <th data-sort-key="club">Club</th> 
                             <th data-sort-key="fechaNac">F. Nac.</th>
                             <th data-sort-key="division">División</th>
-                                                    </tr>
+                        </tr>
                     </thead>
                     <tbody id="athleteTableBody">
                     </tbody>
@@ -300,7 +291,7 @@ function renderTable() {
             <td data-label="Club" class="table-data">${data.club}</td>
             <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
             <td data-label="División" class="table-data">${data.division}</td>
-                    `;
+        `;
     });
 
     // Actualizar iconos de ordenamiento en los encabezados
