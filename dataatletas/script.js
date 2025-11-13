@@ -1,6 +1,6 @@
 // Importa las funciones necesarias desde el SDK de Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, getDocs, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Tu configuración de Firebase (DEBES REEMPLAZAR ESTO CON TUS CREDENCIALES)
 const firebaseConfig = {
@@ -21,9 +21,6 @@ const athletesCol = collection(db, "atletas");
 const athleteForm = document.getElementById('athleteForm');
 const registeredDataContainer = document.getElementById('registeredData');
 const statusMessage = document.getElementById('statusMessage');
-const searchCedulaInput = document.getElementById('searchCedula');
-const searchButton = document.getElementById('searchButton');
-const searchResultArea = document.getElementById('searchResult');
 
 // Variables para el ordenamiento de la tabla
 let sortColumn = 'cedula';
@@ -107,7 +104,6 @@ function renderTable(athletes) {
     `;
 
     athletes.forEach(athlete => {
-        // Formateo simple de fecha (si el campo de entrada es 'date', ya tiene formato YYYY-MM-DD)
         const formattedDate = athlete.fechaNac || 'N/A';
         const formattedTalla = athlete.talla ? athlete.talla.toFixed(2) : 'N/A';
         const formattedPeso = athlete.peso ? athlete.peso.toFixed(2) : 'N/A';
@@ -159,9 +155,7 @@ function handleSort(column) {
 
 // Suscripción en tiempo real a la colección de atletas
 function subscribeToData() {
-    // Si la columna de ordenamiento es un string (como cédula, club), usa 'asc'/'desc'
-    // Si es un número (como talla, peso), también usamos 'asc'/'desc'
-
+    // Usar la columna y dirección de ordenamiento actuales
     const q = query(athletesCol, orderBy(sortColumn, sortDirection));
 
     onSnapshot(q, (snapshot) => {
@@ -178,56 +172,3 @@ function subscribeToData() {
 
 // Inicia la suscripción al cargar la página
 subscribeToData();
-
-// --------------------------------------------------------------------------
-// 3. LÓGICA DE BÚSQUEDA
-// --------------------------------------------------------------------------
-
-searchButton.addEventListener('click', () => {
-    const cedula = searchCedulaInput.value.trim();
-    if (cedula) {
-        searchAthleteByCedula(cedula);
-    } else {
-        searchResultArea.innerHTML = '<p class="search-message empty-search">Por favor, introduce una cédula.</p>';
-    }
-});
-
-async function searchAthleteByCedula(cedula) {
-    searchResultArea.innerHTML = '<p class="search-message">Buscando...</p>';
-
-    try {
-        // Creamos una consulta para encontrar un documento donde el campo 'cedula' coincida
-        const q = query(athletesCol, where("cedula", "==", cedula));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            searchResultArea.innerHTML = '<p class="search-message not-found-athlete">Atleta no encontrado. Verifica la cédula.</p>';
-            return;
-        }
-
-        // Debería haber un solo resultado ya que la cédula es única
-        querySnapshot.forEach((doc) => {
-            const athlete = doc.data();
-            renderSearchResult(athlete);
-        });
-
-    } catch (e) {
-        console.error("Error al buscar el atleta: ", e);
-        searchResultArea.innerHTML = '<p class="search-message not-found-athlete">Ocurrió un error en la búsqueda.</p>';
-    }
-}
-
-function renderSearchResult(athlete) {
-    const formattedTalla = athlete.talla ? athlete.talla.toFixed(2) : 'N/A';
-    const formattedPeso = athlete.peso ? athlete.peso.toFixed(2) : 'N/A';
-
-    searchResultArea.innerHTML = `
-        <div class="athlete-card">
-            <p><strong>Cédula:</strong> ${athlete.cedula}</p>
-            <p><strong>Nombre:</strong> ${athlete.nombre} ${athlete.apellido}</p>
-            <p><strong>Club:</strong> ${athlete.club} - <strong>División:</strong> ${athlete.division}</p>
-            <p><strong>Nacimiento:</strong> ${athlete.fechaNac}</p>
-            <p><strong>Medidas:</strong> ${formattedTalla}m / ${formattedPeso}kg</p>
-        </div>
-    `;
-}
