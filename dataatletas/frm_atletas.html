@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data de Atletas - Registro O</title>
+    <title>Data de Atletas - Registro LVMEL</title>
     <link rel="stylesheet" href="styles.css"> 
     <style>
         /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
@@ -28,6 +28,21 @@
     </header>
     
     <main class="container">
+      
+      <section class="search-section">
+        <form id="searchForm" class="search-form-card">
+          <h2>Búsqueda por Cédula</h2>
+          <div class="search-group">
+            <input id="searchInput" type="text" placeholder="Introduce Cédula a buscar (Ej: 34123100)" required>
+            <button type="submit" class="search-button">Buscar</button>
+          </div>
+        </form>
+        <div id="searchResults" class="search-results-container">
+          </div>
+      </section>
+      
+      <hr class="separator">
+      
       <section class="form-section"> 
         <h2>Formulario para el Registro de Atletas</h2>
         
