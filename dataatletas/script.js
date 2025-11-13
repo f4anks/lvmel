@@ -1,13 +1,14 @@
 // 1. IMPORTACIONES DE FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, query, addDoc, onSnapshot, getDocs, where, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // VARIABLES DE ESTADO Y FIREBASE
 let db;
 let auth;
 let userId = '';	
 let athletesData = []; 
+let searchResultData = null; // NUEVA VARIABLE PARA EL RESULTADO DE BÚSQUEDA
 let currentSortKey = 'apellido';	
 let sortDirection = 'asc';	
 
@@ -54,8 +55,8 @@ function displayStatusMessage(message, type) {
 	}
 	
 	statusEl.textContent = message; 
-	// Colores Vinotinto/Rojo Brillante para el status
-	statusEl.style.backgroundColor = type === 'success' ? '#800020' : '#DC143C'; 
+	// Mantenemos los colores simples originales para evitar conflictos de diseño.
+	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444'; 
 	statusEl.style.opacity = '1';
 
 	setTimeout(() => {
@@ -114,7 +115,6 @@ async function initFirebaseAndLoadData() {
  * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
  */
 function setupRealtimeListener(appId) {
-	// Ruta correcta para la colección de atletas:
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
 	const q = query(athletesColRef);
 
@@ -157,6 +157,88 @@ function setupFormListener() {
 	}
 }
 
+// ----------------------------------------------------------------------
+// 5. LÓGICA DE BÚSQUEDA (NUEVA SECCIÓN)
+// ----------------------------------------------------------------------
+
+function setupSearchListener() {
+	const searchForm = document.getElementById('searchForm');
+	if (searchForm) {
+		searchForm.addEventListener('submit', searchAthleteByCedula);
+		console.log("Listener de formulario de búsqueda adjunto.");
+	}
+}
+
+async function searchAthleteByCedula(event) {
+	event.preventDefault();
+	
+	const cedula = document.getElementById('searchInput').value.trim();
+	const resultsContainer = document.getElementById('searchResults');
+	resultsContainer.innerHTML = '<p class="loading-message">Buscando...</p>';
+
+	if (!cedula) {
+		resultsContainer.innerHTML = '<p class="no-data-message">Por favor, introduce un número de cédula para buscar.</p>';
+		return;
+	}
+
+	if (!db) {
+		resultsContainer.innerHTML = '<p class="no-data-message">Error: Base de datos no inicializada.</p>';
+		return;
+	}
+
+	try {
+		let appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+		// Asumimos que la cédula se guarda como 'cedula' en Firestore
+		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
+		const q = query(athletesColRef, where("cedula", "==", cedula));
+		
+		const querySnapshot = await getDocs(q);
+		
+		if (querySnapshot.empty) {
+			searchResultData = null;
+			resultsContainer.innerHTML = `<p class="no-data-message">No se encontró ningún atleta con C.I. ${cedula}.</p>`;
+		} else {
+			// Solo tomamos el primer resultado (asumiendo que la cédula es única)
+			const doc = querySnapshot.docs[0];
+			searchResultData = { id: doc.id, ...doc.data() };
+			renderSearchResults();
+		}
+
+	} catch (error) {
+		console.error("Error en la búsqueda por cédula:", error);
+		resultsContainer.innerHTML = `<p class="no-data-message">Ocurrió un error al buscar: ${error.message}</p>`;
+	}
+}
+
+function renderSearchResults() {
+	const resultsContainer = document.getElementById('searchResults');
+	
+	if (!searchResultData) {
+		resultsContainer.innerHTML = '<p class="no-data-message">Inicia una búsqueda o el atleta no fue encontrado.</p>';
+		return;
+	}
+
+	// Esta es la tabla de resultados de búsqueda, que debe ser diferente a la tabla principal.
+	// Usamos un diseño de tarjeta/lista para la búsqueda para evitar conflictos de estilo con la tabla de listado.
+	resultsContainer.innerHTML = `
+		<div class="search-result-card">
+			<h3>Resultado de Búsqueda (C.I.: ${searchResultData.cedula})</h3>
+			<ul>
+				<li><strong>Nombre Completo:</strong> ${searchResultData.nombre} ${searchResultData.apellido}</li>
+				<li><strong>Club/Equipo:</strong> ${searchResultData.club}</li>
+				<li><strong>División:</strong> ${searchResultData.division}</li>
+				<li><strong>Fecha de Nacimiento:</strong> ${searchResultData.fechaNac}</li>
+				<li><strong>Talla:</strong> ${searchResultData.tallaFormatted || 'N/A'}</li>
+				<li><strong>Peso:</strong> ${searchResultData.pesoFormatted || 'N/A'}</li>
+				<li><strong>Contacto:</strong> ${searchResultData.telefono || 'N/A'}</li>
+			</ul>
+		</div>
+	`;
+	
+	// Limpiar el campo de búsqueda después de mostrar el resultado
+	document.getElementById('searchInput').value = '';
+}
+
 
 /**
  * 4. FUNCIÓN DE GUARDADO (handleFormSubmit)
@@ -172,9 +254,11 @@ async function handleFormSubmit(event) {
 
 	const form = document.getElementById('athleteForm');
 
+	// 1. Recolectar datos y preparar el objeto (documento)
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
 	
+	// Se guardan TODOS los campos del formulario, aunque solo se muestren 6
 	const newAthlete = {
         cedula: form.cedula.value, 
 		club: form.club.value,
@@ -205,6 +289,7 @@ async function handleFormSubmit(event) {
 		displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
 		
 	} catch(error) {
+        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
 		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
 		if (error.code === 'permission-denied') {
 			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: No se pudo guardar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
@@ -235,6 +320,7 @@ function sortTable(key, toggleDirection = true) {
 		let valA = a[key];
 		let valB = b[key];
 
+		// Ordenar correctamente los campos numéricos
 		if (key === 'tallaRaw' || key === 'pesoRaw') {
 			valA = parseFloat(valA) || 0;
 			valB = parseFloat(valB) || 0;
@@ -257,7 +343,7 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA 
+ * RENDERIZADO DE LA TABLA (Muestra solo: Cédula, Nombre, Apellido, Club, F. Nac., División)
  */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
@@ -300,6 +386,7 @@ function renderTable() {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
         
+        // Celdas (TD) que coinciden con el nuevo orden de encabezados
         newRow.innerHTML = `
             <td data-label="Cédula" class="table-data">${data.cedula}</td>
             <td data-label="Nombre" class="table-data">${data.nombre}</td>
@@ -332,4 +419,6 @@ function setupSorting() {
 document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
 	setupFormListener();
+	setupSearchListener(); // NUEVO LISTENER DE BÚSQUEDA
+	renderSearchResults(); // RENDERIZA EL CONTENEDOR DE RESULTADOS VACÍO
 });
