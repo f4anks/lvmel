@@ -173,7 +173,6 @@ input:focus, select:focus {
 .submit-button {
     /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
     display: block; 
-    margin: 0 auto;
     
     background-color: #800020 !important; 
     color: white;
@@ -193,6 +192,26 @@ input:focus, select:focus {
     transform: translateY(-2px); 
     box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
 }
+
+/* **NUEVO** Estilos para el botón de Cancelar/Reset */
+.cancel-button {
+    background-color: #F0DADA !important; /* Gris rojizo suave */
+    color: #800020; /* Vinotinto Oscuro */
+    padding: 12px 30px !important;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: 10px; /* Separación del botón de Submit */
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.cancel-button:hover {
+    background-color: #DC143C; /* Rojo Brillante */
+    color: white;
+}
+/* FIN NUEVO */
 
 /* -------------------------------------------------------------------------- */
 /* ESTILOS DE LA TABLA */
@@ -263,6 +282,35 @@ input:focus, select:focus {
     border-radius: 8px;
     margin-top: 15px;
 }
+
+/* **NUEVO** Estilos para los botones de Editar y Eliminar dentro de la tabla */
+.action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px 8px;
+    margin: 0 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.edit-button {
+    color: #007bff; /* Azul para editar */
+}
+.edit-button:hover {
+    color: white;
+    background-color: #007bff;
+}
+
+.delete-button {
+    color: #DC143C; /* Rojo Brillante para eliminar */
+}
+.delete-button:hover {
+    color: white;
+    background-color: #DC143C;
+}
+/* FIN NUEVO */
 
 /* Estilos Responsivos */
 @media (max-width: 768px) {
