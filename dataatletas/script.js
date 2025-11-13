@@ -336,4 +336,3 @@ document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
 	setupFormListener();
 });
-
