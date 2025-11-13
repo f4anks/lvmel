@@ -95,6 +95,7 @@ h2 {
 }
 
 .form-group {
+    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
     margin-bottom: 0 !important; 
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -106,7 +107,7 @@ h2 {
     flex: 1 1 100%;
 }
 
-/* CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA */
+/* **CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA** */
 .form-group.half-width {
     margin-left: 0 !important; 
     margin-right: 0 !important; 
@@ -263,110 +264,6 @@ input:focus, select:focus {
     margin-top: 15px;
 }
 
-
-/* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA SECCIÓN DE BÚSQUEDA (NUEVOS) */
-/* -------------------------------------------------------------------------- */
-
-.search-section {
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 0 20px;
-}
-
-.search-form-card {
-    background: #ffffff;
-    padding: 20px 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.search-form-card h2 {
-    color: #800020; /* Vinotinto */
-    font-size: 1.4rem;
-    margin-top: 0;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #F0DADA;
-    padding-bottom: 10px;
-}
-
-.search-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-#searchInput {
-    flex-grow: 1;
-    /* Estilos de input base, anulando la flecha del select */
-    border-bottom: 2px solid #F0DADA !important;
-    padding: 8px 10px !important;
-    background-image: none !important; 
-    border-radius: 5px !important;
-    text-align: left;
-}
-
-#searchInput:focus {
-    border-color: #DC143C !important;
-}
-
-.search-button {
-    background-color: #DC143C; /* Rojo Brillante */
-    color: white;
-    padding: 8px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s, transform 0.1s;
-    box-shadow: 0 2px 4px rgba(220, 20, 60, 0.3);
-}
-
-.search-button:hover {
-    background-color: #800020; /* Vinotinto Oscuro */
-    transform: translateY(-1px);
-}
-
-/* Contenedor de Resultados (usando estilo de tarjeta) */
-.search-results-container {
-    margin-top: 20px;
-}
-
-.search-result-card {
-    background: #FFEBEB; /* Fondo muy suave */
-    border: 1px solid #F0DADA;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: left;
-}
-
-.search-result-card h3 {
-    color: #DC143C; /* Rojo Brillante */
-    margin-top: 0;
-    font-size: 1.2rem;
-    border-bottom: 1px dashed #DC143C;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-.search-result-card ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.search-result-card li {
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.search-result-card li strong {
-    color: #800020; /* Vinotinto */
-}
-
 /* Estilos Responsivos */
 @media (max-width: 768px) {
     .container {
@@ -380,11 +277,4 @@ input:focus, select:focus {
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
-    .search-group {
-        flex-direction: column;
-        gap: 15px;
-    }
-    .search-button {
-        width: 100%;
-    }
 }
