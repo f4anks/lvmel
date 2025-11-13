@@ -1,114 +1,114 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data de Atletas - Registro O</title>
-    <link rel="stylesheet" href="styles.css?v=5">
-    <style>
-        /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
-        #statusMessage {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 10px 20px;
-            border-radius: 8px;
-            color: #fff;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-    </style>
-  </head>
-  <body> 
-    <header class="page-header">
-      <br>
-      <h1>Data de Atletas</h1>
-      <p class="subtitle">Liga de Voleibol Menor del Estado Lara</p>
-    </header>
-    
-    <main class="container">
-      <section class="form-section"> 
-        <h2>Formulario para el Registro de Atletas</h2>
-        
-        <form id="athleteForm" class="athlete-form">
-            
-            <div class="form-group half-width">
-              <label for="cedula">Cédula de Identidad:</label> 
-              <input id="cedula" name="cedula" placeholder="Ej: 34123100" required="" type="text">
-            </div>
-            <div class="form-group half-width">
-              <label for="club">Club/Equipo:</label>
-              <select id="club" name="club" required="">
-                <option value="" disabled="disabled" selected="selected">Selecciona un Club</option>
-                <option value="Bertha Carrero">Bertha Carrero</option>
-                <option value="Olimpikus">Olimpikus</option>
-                <option value="Villa Cantevista">Villa Cantevista</option>
-                <option value="MG">MG</option>
-                <option value="JPD">JPD</option>
-              </select>
-            </div>
-            
-            <div class="form-group half-width">
-              <label for="nombre">Nombre:</label>
-              <input id="nombre" name="nombre" required="" type="text"> 
-            </div>
-            <div class="form-group half-width">
-              <label for="apellido">Apellido:</label>
-              <input id="apellido" name="apellido" required="" type="text"> 
-            </div>
-            
-            <div class="form-group half-width">
-              <label for="fechaNac">Fecha de Nacimiento:</label> 
-              <input id="fechaNac" name="fechaNac" required="" type="date"> 
-            </div>
-            <div class="form-group half-width">
-              <label for="division">División:</label>
-              <select id="division" name="division" required="">
-                <option value="" disabled="disabled" selected="selected">Selecciona una División</option>
-                <option value="CIAR">CIAR</option>
-                <option value="1ra Division">1ra Division</option>
-                <option value="2da Division">2da Division</option>
-                <option value="3ra Division">3ra Division</option>
-              </select>
-            </div>
-            
-            <div class="form-group half-width">
-              <label for="talla">Talla (m):</label>
-              <input id="talla" name="talla" step="0.01" min="0.5" max="3" placeholder="Ej: 1.75" type="number">
-            </div>
-            <div class="form-group half-width">
-              <label for="peso">Peso (kg):</label>
-              <input id="peso" name="peso" step="0.01" min="10" max="300" placeholder="Ej: 50.80" type="number"> 
-            </div>
-            
-            <div class="form-group half-width">
-              <label for="correo">Correo Electrónico:</label> 
-              <input id="correo" name="correo" placeholder="opcional@ejemplo.com" type="email">
-            </div>
-            <div class="form-group half-width">
-              <label for="telefono">Teléfono:</label>
-              <input id="telefono" name="telefono" placeholder="Ej: 04261234455" type="tel">
-            </div>
-            
-            <div class="form-group button-container">
-              <button type="submit" class="submit-button">Registrar Atleta</button>
-            </div>
-        </form>
-        
-      </section>
-      
-      <hr class="separator">
-      
-      <section class="data-section">
-        <h2>Lista de Atletas Registrados</h2>
-        <div id="registeredData" class="registered-data-container"> 
-          <p class="loading-message">Cargando datos...</p>
-        </div>
-      </section>
-      
-    </main>
-    
-    <script type="module" src="script.js"></script>
-  </body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data de Atletas - Registro O</title>
+    <link rel="stylesheet" href="styles.css?v=5">
+    <style>
+        /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
+        #statusMessage {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+  </head>
+  <body> 
+    <header class="page-header">
+      <br>
+      <h1>Data de Atletas</h1>
+      <p class="subtitle">Liga de Voleibol Menor del Estado Lara</p>
+    </header>
+    
+    <main class="container">
+      <section class="form-section"> 
+        <h2>Formulario para el Registro de Atletas</h2>
+        
+        <form id="athleteForm" class="athlete-form">
+            
+            <div class="form-group half-width">
+              <label for="cedula">Cédula de Identidad:</label> 
+              <input id="cedula" name="cedula" placeholder="Ej: 34123100" required="" type="text">
+            </div>
+            <div class="form-group half-width">
+              <label for="club">Club/Equipo:</label>
+              <select id="club" name="club" required="">
+                <option value="" disabled="disabled" selected="selected">Selecciona un Club</option>
+                <option value="Bertha Carrero">Bertha Carrero</option>
+                <option value="Olimpikus">Olimpikus</option>
+                <option value="Villa Cantevista">Villa Cantevista</option>
+                <option value="MG">MG</option>
+                <option value="JPD">JPD</option>
+              </select>
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="nombre">Nombre:</label>
+              <input id="nombre" name="nombre" required="" type="text"> 
+            </div>
+            <div class="form-group half-width">
+              <label for="apellido">Apellido:</label>
+              <input id="apellido" name="apellido" required="" type="text"> 
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="fechaNac">Fecha de Nacimiento:</label> 
+              <input id="fechaNac" name="fechaNac" required="" type="date"> 
+            </div>
+            <div class="form-group half-width">
+              <label for="division">División:</label>
+              <select id="division" name="division" required="">
+                <option value="" disabled="disabled" selected="selected">Selecciona una División</option>
+                <option value="CIAR">CIAR</option>
+                <option value="1ra Division">1ra Division</option>
+                <option value="2da Division">2da Division</option>
+                <option value="3ra Division">3ra Division</option>
+              </select>
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="talla">Talla (m):</label>
+              <input id="talla" name="talla" step="0.01" min="0.5" max="3" placeholder="Ej: 1.75" type="number">
+            </div>
+            <div class="form-group half-width">
+              <label for="peso">Peso (kg):</label>
+              <input id="peso" name="peso" step="0.01" min="10" max="300" placeholder="Ej: 50.80" type="number"> 
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="correo">Correo Electrónico:</label> 
+              <input id="correo" name="correo" placeholder="opcional@ejemplo.com" type="email">
+            </div>
+            <div class="form-group half-width">
+              <label for="telefono">Teléfono:</label>
+              <input id="telefono" name="telefono" placeholder="Ej: 04261234455" type="tel">
+            </div>
+            
+            <div class="form-group button-container">
+              <button type="submit" class="submit-button">Registrar Atleta</button>
+            </div>
+        </form>
+        
+      </section>
+      
+      <hr class="separator">
+      
+      <section class="data-section">
+        <h2>Lista de Atletas Registrados</h2>
+        <div id="registeredData" class="registered-data-container"> 
+          <p class="loading-message">Cargando datos...</p>
+        </div>
+      </section>
+      
+    </main>
+    
+    <script type="module" src="script.js"></script>
+  </body>
 </html>
