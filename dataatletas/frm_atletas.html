@@ -31,6 +31,18 @@
       <section class="form-section"> 
         <h2>Formulario para el Registro de Atletas</h2>
         
+        <div class="search-container">
+            <h3>Búsqueda por Cédula</h3>
+            <div class="search-input-group">
+                <input id="searchCedula" name="searchCedula" placeholder="Introduce Cédula a buscar (Ej: 34123100)" type="text">
+                <button type="button" id="searchButton" class="search-button">Buscar</button>
+            </div>
+            <div id="searchResult" class="search-result-area"></div>
+        </div>
+        <hr class="separator">
+
+        <h3 class="subsection-title">Registro de Nuevo Atleta</h3>
+
         <form id="athleteForm" class="athlete-form">
             
             <div class="form-group half-width">
