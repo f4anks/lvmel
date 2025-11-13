@@ -1,7 +1,7 @@
-// 1. IMPORTACIONES DE FIREBASE
+// 1. IMPORTACIONES DE FIREBASE (ACTUALIZADO: Añadir updateDoc, doc, deleteDoc)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // VARIABLES DE ESTADO Y FIREBASE
 let db;
@@ -86,11 +86,8 @@ async function initFirebaseAndLoadData() {
 		db = getFirestore(app);
 		auth = getAuth(app);
 		
-		if (tokenToUse.length > 0) {
-			await signInWithCustomToken(auth, tokenToUse);
-		} else {
-			await signInAnonymously(auth);
-		}
+		// Simplificado a autenticación anónima para este contexto
+		await signInAnonymously(auth);
 		
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
@@ -155,9 +152,34 @@ function setupFormListener() {
 	}
 }
 
+/**
+ * Lógica para alternar el formulario entre "Registro" y "Edición"
+ */
+function setFormMode(isEditing) {
+    const form = document.getElementById('athleteForm');
+    const submitBtn = document.getElementById('submitButton');
+    const cancelBtn = document.getElementById('cancelEditButton');
+    const cedulaInput = form.cedula;
+
+    if (isEditing) {
+        submitBtn.textContent = 'Guardar Cambios';
+        cancelBtn.style.display = 'inline-block';
+        cedulaInput.disabled = true; // No permitir cambiar la cédula durante la edición
+        form.classList.add('editing');
+    } else {
+        submitBtn.textContent = 'Registrar Atleta';
+        cancelBtn.style.display = 'none';
+        cedulaInput.disabled = false;
+        form.athleteId.value = ''; // Limpiar el ID
+        form.reset();
+        form.classList.remove('editing');
+    }
+}
+
 
 /**
- * 4. FUNCIÓN DE GUARDADO (handleFormSubmit)
+ * 4. FUNCIÓN DE GUARDADO/ACTUALIZACIÓN (handleFormSubmit)
+ * Esta función ahora maneja el registro (addDoc) y la edición (updateDoc).
  */
 async function handleFormSubmit(event) {
 	event.preventDefault();	
@@ -169,14 +191,16 @@ async function handleFormSubmit(event) {
 	}
 
 	const form = document.getElementById('athleteForm');
+    const athleteId = form.athleteId.value; // Obtener el ID del campo oculto
 
 	// 1. Recolectar datos y preparar el objeto (documento)
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
 	
 	// Se guardan TODOS los campos del formulario, aunque solo se muestren 6
-	const newAthlete = {
-        cedula: form.cedula.value, 
+	const athleteData = {
+        // La cédula solo se incluye si es un nuevo registro
+        ...(athleteId ? {} : { cedula: form.cedula.value }), 
 		club: form.club.value,
 		nombre: form.nombre.value,
 		apellido: form.apellido.value,
@@ -191,35 +215,107 @@ async function handleFormSubmit(event) {
 		timestamp: Date.now()	
 	};
 	
-	try {
-		let appIdToUse;
-		if (typeof __app_id !== 'undefined') {
-			appIdToUse = __app_id;
-		} else {
-			appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
-		}
+	let appIdToUse;
+	if (typeof __app_id !== 'undefined') {
+		appIdToUse = __app_id;
+	} else {
+		appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+	}
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
 
-		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
-		await addDoc(athletesColRef, newAthlete);	
-		console.log("Atleta registrado y guardado en Firestore con éxito.");
-		displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
-		
+	try {
+        if (athleteId) {
+            // **MODO EDICIÓN (updateDoc)**
+            const athleteDocRef = doc(db, athletesColPath, athleteId);
+            await updateDoc(athleteDocRef, athleteData);
+            console.log("Atleta actualizado en Firestore con éxito. ID:", athleteId);
+            displayStatusMessage("¡Atleta actualizado con éxito! (Sincronizando tabla...)", 'success');
+        } else {
+            // **MODO REGISTRO (addDoc)**
+            const athletesColRef = collection(db, athletesColPath);
+            await addDoc(athletesColRef, athleteData);	
+            console.log("Atleta registrado y guardado en Firestore con éxito.");
+            displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
+        }
+
 	} catch(error) {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
-		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
+        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura/actualización
+		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR/ACTUALIZAR !!!", error.message);
 		if (error.code === 'permission-denied') {
-			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: No se pudo guardar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+			displayStatusMessage("❌ ERROR DE PERMISO: No se pudo guardar/actualizar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
 		} else {
 			displayStatusMessage(`❌ ERROR al guardar: ${error.message}`, 'error');
 		}
 
 	} finally {
 		console.log("handleFormSubmit ha finalizado. Reseteando formulario.");
-		form.reset();
+		setFormMode(false); // Resetear el formulario al modo registro
 	}
 	
 	return false;	
 }
+
+/**
+ * 5. FUNCIÓN DE EDICIÓN
+ * Carga los datos del atleta seleccionado en el formulario para editar.
+ */
+function editAthlete(id) {
+    const athlete = athletesData.find(a => a.id === id);
+    if (!athlete) {
+        displayStatusMessage("Error: No se encontró el atleta para editar.", 'error');
+        return;
+    }
+
+    const form = document.getElementById('athleteForm');
+
+    // Cargar los datos al formulario
+    form.athleteId.value = id; // Clave: Guardar el ID
+    form.cedula.value = athlete.cedula || '';
+    form.club.value = athlete.club || '';
+    form.nombre.value = athlete.nombre || '';
+    form.apellido.value = athlete.apellido || '';
+    form.fechaNac.value = athlete.fechaNac || '';
+    form.division.value = athlete.division || '';
+    form.talla.value = athlete.tallaRaw || '';
+    form.peso.value = athlete.pesoRaw || '';
+    form.correo.value = athlete.correo || '';
+    form.telefono.value = athlete.telefono || '';
+
+    setFormMode(true); // Cambiar el formulario a modo edición
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mover la vista al formulario
+}
+
+/**
+ * 6. FUNCIÓN DE ELIMINACIÓN
+ * Elimina un documento de Firestore por su ID.
+ */
+async function deleteAthlete(id, name) {
+    if (!confirm(`¿Estás seguro de que quieres ELIMINAR al atleta ${name}?`)) {
+        return;
+    }
+    
+    let appIdToUse;
+    if (typeof __app_id !== 'undefined') {
+        appIdToUse = __app_id;
+    } else {
+        appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+    }
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+
+    try {
+        const athleteDocRef = doc(db, athletesColPath, id);
+        await deleteDoc(athleteDocRef);
+        displayStatusMessage(`✅ Atleta ${name} eliminado con éxito. (Sincronizando tabla...)`, 'success');
+    } catch (error) {
+        console.error("!!! ERROR CRÍTICO AL INTENTAR ELIMINAR !!!", error);
+        if (error.code === 'permission-denied') {
+            displayStatusMessage("❌ ERROR DE PERMISO DE ELIMINACIÓN: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+            displayStatusMessage(`❌ ERROR al eliminar a ${name}: ${error.message}`, 'error');
+        }
+    }
+}
+
 
 /**
  * LÓGICA DE ORDENAMIENTO Y RENDERIZADO
@@ -259,7 +355,7 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (Muestra solo: Cédula, Nombre, Apellido, Club, F. Nac., División)
+ * RENDERIZADO DE LA TABLA (Añadir la columna de Acciones)
  */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
@@ -284,7 +380,7 @@ function renderTable() {
                             <th data-sort-key="club">Club</th> 
                             <th data-sort-key="fechaNac">F. Nac.</th>
                             <th data-sort-key="division">División</th>
-                        </tr>
+                            <th class="no-sort">Acciones</th>                         </tr>
                     </thead>
                     <tbody id="athleteTableBody">
                     </tbody>
@@ -310,12 +406,17 @@ function renderTable() {
             <td data-label="Club" class="table-data">${data.club}</td>
             <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
             <td data-label="División" class="table-data">${data.division}</td>
+            <td data-label="Acciones" class="table-data">
+                <button class="action-button edit-button" onclick="editAthlete('${data.id}')">Editar</button>
+                <button class="action-button delete-button" onclick="deleteAthlete('${data.id}', '${data.nombre} ${data.apellido}')">Eliminar</button>
+            </td>
         `;
     });
 
     document.querySelectorAll('#athleteTable th').forEach(th => {
         th.classList.remove('sorted-asc', 'sorted-desc');
-        if (th.getAttribute('data-sort-key') === currentSortKey) {
+        // No añadir el indicador de ordenamiento a la columna de Acciones
+        if (th.getAttribute('data-sort-key') === currentSortKey) {
             th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
         }
     });
@@ -331,8 +432,21 @@ function setupSorting() {
 	});
 }
 
+function setupCancelButton() {
+    const cancelBtn = document.getElementById('cancelEditButton');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => setFormMode(false));
+    }
+}
+
 // Inicializar Firebase y los Listeners al cargar el contenido
 document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
 	setupFormListener();
+    setupCancelButton(); // Añadir el listener del botón Cancelar
 });
+
+// Exponer funciones globales para que los onclick de la tabla funcionen
+window.editAthlete = editAthlete;
+window.deleteAthlete = deleteAthlete;
+window.setFormMode = setFormMode;
