@@ -1,6 +1,7 @@
 // 1. IMPORTACIONES DE FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+// Se añade getDocs y where para la nueva funcionalidad de búsqueda
 import { getFirestore, collection, query, addDoc, onSnapshot, getDocs, where, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // VARIABLES DE ESTADO Y FIREBASE
@@ -8,7 +9,7 @@ let db;
 let auth;
 let userId = '';	
 let athletesData = []; 
-let searchResultData = null; // NUEVA VARIABLE PARA EL RESULTADO DE BÚSQUEDA
+let searchResultData = null; // VARIABLE PARA EL RESULTADO DE BÚSQUEDA
 let currentSortKey = 'apellido';	
 let sortDirection = 'asc';	
 
@@ -55,8 +56,8 @@ function displayStatusMessage(message, type) {
 	}
 	
 	statusEl.textContent = message; 
-	// Mantenemos los colores simples originales para evitar conflictos de diseño.
-	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444'; 
+	// Colores simples originales
+	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
 	statusEl.style.opacity = '1';
 
 	setTimeout(() => {
@@ -188,7 +189,7 @@ async function searchAthleteByCedula(event) {
 
 	try {
 		let appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
-		// Asumimos que la cédula se guarda como 'cedula' en Firestore
+		// Consulta usando where para buscar por el campo 'cedula'
 		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
 		const q = query(athletesColRef, where("cedula", "==", cedula));
 		
@@ -218,8 +219,7 @@ function renderSearchResults() {
 		return;
 	}
 
-	// Esta es la tabla de resultados de búsqueda, que debe ser diferente a la tabla principal.
-	// Usamos un diseño de tarjeta/lista para la búsqueda para evitar conflictos de estilo con la tabla de listado.
+	// Usamos un diseño de lista/tarjeta para la búsqueda para no afectar la tabla principal
 	resultsContainer.innerHTML = `
 		<div class="search-result-card">
 			<h3>Resultado de Búsqueda (C.I.: ${searchResultData.cedula})</h3>
@@ -230,7 +230,8 @@ function renderSearchResults() {
 				<li><strong>Fecha de Nacimiento:</strong> ${searchResultData.fechaNac}</li>
 				<li><strong>Talla:</strong> ${searchResultData.tallaFormatted || 'N/A'}</li>
 				<li><strong>Peso:</strong> ${searchResultData.pesoFormatted || 'N/A'}</li>
-				<li><strong>Contacto:</strong> ${searchResultData.telefono || 'N/A'}</li>
+				<li><strong>Correo:</strong> ${searchResultData.correo || 'N/A'}</li>
+				<li><strong>Teléfono:</strong> ${searchResultData.telefono || 'N/A'}</li>
 			</ul>
 		</div>
 	`;
@@ -258,7 +259,7 @@ async function handleFormSubmit(event) {
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
 	
-	// Se guardan TODOS los campos del formulario, aunque solo se muestren 6
+	// Se guardan TODOS los campos del formulario
 	const newAthlete = {
         cedula: form.cedula.value, 
 		club: form.club.value,
@@ -386,7 +387,7 @@ function renderTable() {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
         
-        // Celdas (TD) que coinciden con el nuevo orden de encabezados
+        // Celdas (TD) que coinciden con el orden de encabezados
         newRow.innerHTML = `
             <td data-label="Cédula" class="table-data">${data.cedula}</td>
             <td data-label="Nombre" class="table-data">${data.nombre}</td>
@@ -419,6 +420,6 @@ function setupSorting() {
 document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
 	setupFormListener();
-	setupSearchListener(); // NUEVO LISTENER DE BÚSQUEDA
-	renderSearchResults(); // RENDERIZA EL CONTENEDOR DE RESULTADOS VACÍO
+	setupSearchListener(); // INICIALIZA EL LISTENER DE BÚSQUEDA
+	renderSearchResults(); // INICIALIZA EL CONTENEDOR DE RESULTADOS VACÍO
 });
