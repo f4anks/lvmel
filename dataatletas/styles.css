@@ -204,11 +204,11 @@ input:focus, select:focus {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTILOS AÑADIDOS PARA LA BÚSQUEDA (Detallados y Responsivos) */
+/* ESTILOS AÑADIDOS PARA LA BÚSQUEDA */
 /* -------------------------------------------------------------------------- */
 
 .search-container {
-    max-width: 500px; /* Un poco más estrecho para centrar la atención */
+    max-width: 500px; 
     margin: 10px auto 30px auto;
     padding: 20px;
     background: #FFFAF0; /* Fondo muy claro para diferenciar */
@@ -236,22 +236,19 @@ input:focus, select:focus {
     border: 1px solid #DC143C; /* Borde sólido para destacarlo */
     border-bottom: 2px solid #DC143C !important;
     padding: 10px !important;
-    /* Reemplazar la apariencia por defecto del input normal */
     background-color: #FFFFFF !important;
     border-radius: 5px; 
     transition: border-color 0.3s;
-    /* Resetear estilos específicos de select/date que no aplican */
     background-image: none; 
     padding-right: 10px !important;
 }
 
 #searchCedula:focus {
-    border-color: #800020 !important; /* Vinotinto en el foco */
+    border-color: #800020 !important; 
 }
 
 .search-button {
-    /* Mismos estilos que el botón de registro, pero con el color secundario */
-    background-color: #DC143C; /* Rojo Brillante para el botón de acción */
+    background-color: #DC143C; 
     color: white;
     padding: 10px 15px;
     border: none;
@@ -259,18 +256,18 @@ input:focus, select:focus {
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-    white-space: nowrap; /* Evita que el texto se rompa */
+    white-space: nowrap; 
 }
 
 .search-button:hover {
-    background-color: #A52A2A; /* Tono de Vinotinto más oscuro */
+    background-color: #A52A2A; 
     transform: translateY(-1px);
 }
 
 /* Área de resultados */
 .search-result-area {
     margin-top: 10px;
-    min-height: 50px; /* Para evitar saltos de layout */
+    min-height: 50px;
 }
 
 .search-message {
@@ -286,9 +283,9 @@ input:focus, select:focus {
 }
 
 .not-found-athlete {
-    color: #800020; /* Vinotinto */
-    background-color: #FFEBEE; /* Fondo muy claro rojizo */
-    border: 1px solid #DC143C; /* Borde Rojo Brillante */
+    color: #800020; 
+    background-color: #FFEBEE;
+    border: 1px solid #DC143C;
 }
 
 .athlete-card {
@@ -307,7 +304,7 @@ input:focus, select:focus {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA (Sin cambios, solo para referencia) */
+/* ESTILOS DE LA TABLA */
 /* -------------------------------------------------------------------------- */
 
 .table-responsive-wrapper {
