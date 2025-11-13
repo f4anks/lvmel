@@ -1,425 +1,244 @@
-// 1. IMPORTACIONES DE FIREBASE
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-// Se añade getDocs y where para la nueva funcionalidad de búsqueda
-import { getFirestore, collection, query, addDoc, onSnapshot, getDocs, where, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// CONFIGURACIÓN DE FIREBASE (REQUIERE QUE TUS CLAVES ESTÉN AQUÍ)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
-// VARIABLES DE ESTADO Y FIREBASE
-let db;
-let auth;
-let userId = '';	
-let athletesData = []; 
-let searchResultData = null; // VARIABLE PARA EL RESULTADO DE BÚSQUEDA
-let currentSortKey = 'apellido';	
-let sortDirection = 'asc';	
-
-setLogLevel('Debug');
-
-// =========================================================================
-// !!! ATENCIÓN: CONFIGURACIÓN PARA AMBIENTE EXTERNO (GitHub Pages) !!!
-// REEMPLAZA ESTO CON TUS CLAVES REALES DE FIREBASE
-// =========================================================================
-const EXTERNAL_FIREBASE_CONFIG = {
-	apiKey: "AIzaSyA5u1whBdu_fVb2Kw7SDRZbuyiM77RXVDE",
-	authDomain: "datalvmel.firebaseapp.com",
-	projectId: "datalvmel",
-	storageBucket: "datalvmel.firebasestorage.app",
-	messagingSenderId: "733536533303",
-	appId: "1:733536533303:web:3d2073504aefb2100378b2"
+// Reemplaza con tus credenciales de configuración de Firebase
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
-/**
- * Muestra un mensaje temporal de estado en la interfaz.
- */
-function displayStatusMessage(message, type) {
-	let statusEl = document.getElementById('statusMessage');
-	
-	if (!statusEl) {
-		statusEl = document.createElement('div');
-		statusEl.id = 'statusMessage';
-		statusEl.style.position = 'fixed';
-		statusEl.style.top = '10px';
-		statusEl.style.right = '10px';
-		statusEl.style.padding = '10px 20px';
-		statusEl.style.borderRadius = '8px';
-		statusEl.style.zIndex = '1000';
-		statusEl.style.color = '#fff';
-		statusEl.style.transition = 'opacity 0.5s ease-in-out';
-		statusEl.style.opacity = '0';
-		
-        if (document.body) {
-            document.body.appendChild(statusEl);
-        } else {
-            console.error("No se pudo mostrar el mensaje de estado: El cuerpo del documento aún no está disponible.");
-            return; 
-        }
-	}
-	
-	statusEl.textContent = message; 
-	// Colores simples originales
-	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
-	statusEl.style.opacity = '1';
+// Inicializa Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const atletasCollection = collection(db, "atletas");
 
-	setTimeout(() => {
-		statusEl.style.opacity = '0';
-	}, 4000);
-}
+// Estado de ordenamiento global
+let currentSortColumn = 'cedula';
+let currentSortDirection = 'asc';
 
+// -------------------------------------------------------------------------
+// UTILIDADES
+// -------------------------------------------------------------------------
 
 /**
- * 2. INICIALIZACIÓN Y AUTENTICACIÓN
- */
-async function initFirebaseAndLoadData() {
-	console.log("Iniciando Firebase y autenticación...");
-	try {
-		let configToUse;
-		let appIdToUse;
-		let tokenToUse = '';
+ * Muestra un mensaje de estado temporal en la esquina superior derecha.
+ * @param {string} message - El mensaje a mostrar.
+ * @param {boolean} isError - Si es un mensaje de error (true) o éxito/info (false).
+ */
+function displayStatusMessage(message, isError) {
+    const statusMessageElement = document.getElementById('statusMessage');
+    statusMessageElement.textContent = message;
+    statusMessageElement.style.backgroundColor = isError ? '#DC143C' : '#800020'; // Rojo Brillante o Vinotinto
+    statusMessageElement.style.opacity = '1';
 
-		if (typeof __firebase_config !== 'undefined' && __firebase_config.length > 2) {
-			configToUse = JSON.parse(__firebase_config);
-			appIdToUse = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-			tokenToUse = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
-		} else {
-			configToUse = EXTERNAL_FIREBASE_CONFIG;
-			appIdToUse = configToUse.projectId;	
-		}
-
-		const app = initializeApp(configToUse);
-		db = getFirestore(app);
-		auth = getAuth(app);
-		
-		if (tokenToUse.length > 0) {
-			await signInWithCustomToken(auth, tokenToUse);
-		} else {
-			await signInAnonymously(auth);
-		}
-		
-		onAuthStateChanged(auth, (user) => {
-			if (user) {
-				userId = user.uid;
-				console.log("Usuario autenticado. UID:", userId);
-				setupRealtimeListener(appIdToUse);
-			} else {
-				console.error("No se pudo autenticar al usuario.");
-				userId = crypto.randomUUID();	
-				setupRealtimeListener(appIdToUse);
-			}
-		});
-
-	} catch (e) {
-		console.error("Error al inicializar Firebase:", e);
-	}
+    setTimeout(() => {
+        statusMessageElement.style.opacity = '0';
+    }, 4000); // El mensaje desaparece después de 4 segundos
 }
 
 /**
- * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
- */
-function setupRealtimeListener(appId) {
-	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
-	const q = query(athletesColRef);
-
-	onSnapshot(q, (snapshot) => {
-		console.log("Datos de Firestore actualizados. Sincronizando tabla...");
-		const fetchedData = [];
-		snapshot.forEach((doc) => {
-			fetchedData.push({	
-				id: doc.id, 
-				...doc.data()	
-			});
-		});
-		
-		athletesData = fetchedData;
-		
-		if (athletesData.length > 0) {
-			// Al cargar, ordenar por el campo inicial (apellido)
-			sortTable(currentSortKey, false);	
-		} else {
-			renderTable();
-		}
-	}, (error) => {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de lectura
-		console.error("Error en la escucha en tiempo real:", error);
-        if (error.code === 'permission-denied') {
-             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
-        } else {
-             displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
-        }
-	});
+ * Calcula la edad a partir de una fecha de nacimiento (YYYY-MM-DD).
+ * @param {string} dateString - Fecha de nacimiento.
+ * @returns {number} Edad en años.
+ */
+function calculateAge(dateString) {
+    const today = new Date();
+    const birthDate = new Date(dateString);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
 }
 
-function setupFormListener() {
-	const form = document.getElementById('athleteForm');
-	if (form) {
-		form.addEventListener('submit', handleFormSubmit);
-		console.log("Listener de formulario de atleta adjunto.");
-	} else {
-		console.error("Error: No se encontró el formulario con ID 'athleteForm'. ¿Está cargado el index.html?");
-	}
-}
+// -------------------------------------------------------------------------
+// REGISTRO DE ATLETAS
+// -------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------
-// 5. LÓGICA DE BÚSQUEDA (NUEVA SECCIÓN)
-// ----------------------------------------------------------------------
-
-function setupSearchListener() {
-	const searchForm = document.getElementById('searchForm');
-	if (searchForm) {
-		searchForm.addEventListener('submit', searchAthleteByCedula);
-		console.log("Listener de formulario de búsqueda adjunto.");
-	}
-}
-
-async function searchAthleteByCedula(event) {
-	event.preventDefault();
-	
-	const cedula = document.getElementById('searchInput').value.trim();
-	const resultsContainer = document.getElementById('searchResults');
-	resultsContainer.innerHTML = '<p class="loading-message">Buscando...</p>';
-
-	if (!cedula) {
-		resultsContainer.innerHTML = '<p class="no-data-message">Por favor, introduce un número de cédula para buscar.</p>';
-		return;
-	}
-
-	if (!db) {
-		resultsContainer.innerHTML = '<p class="no-data-message">Error: Base de datos no inicializada.</p>';
-		return;
-	}
-
-	try {
-		let appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
-		// Consulta usando where para buscar por el campo 'cedula'
-		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
-		const q = query(athletesColRef, where("cedula", "==", cedula));
-		
-		const querySnapshot = await getDocs(q);
-		
-		if (querySnapshot.empty) {
-			searchResultData = null;
-			resultsContainer.innerHTML = `<p class="no-data-message">No se encontró ningún atleta con C.I. ${cedula}.</p>`;
-		} else {
-			// Solo tomamos el primer resultado (asumiendo que la cédula es única)
-			const doc = querySnapshot.docs[0];
-			searchResultData = { id: doc.id, ...doc.data() };
-			renderSearchResults();
-		}
-
-	} catch (error) {
-		console.error("Error en la búsqueda por cédula:", error);
-		resultsContainer.innerHTML = `<p class="no-data-message">Ocurrió un error al buscar: ${error.message}</p>`;
-	}
-}
-
-function renderSearchResults() {
-	const resultsContainer = document.getElementById('searchResults');
-	
-	if (!searchResultData) {
-		resultsContainer.innerHTML = '<p class="no-data-message">Inicia una búsqueda o el atleta no fue encontrado.</p>';
-		return;
-	}
-
-	// Usamos un diseño de lista/tarjeta para la búsqueda para no afectar la tabla principal
-	resultsContainer.innerHTML = `
-		<div class="search-result-card">
-			<h3>Resultado de Búsqueda (C.I.: ${searchResultData.cedula})</h3>
-			<ul>
-				<li><strong>Nombre Completo:</strong> ${searchResultData.nombre} ${searchResultData.apellido}</li>
-				<li><strong>Club/Equipo:</strong> ${searchResultData.club}</li>
-				<li><strong>División:</strong> ${searchResultData.division}</li>
-				<li><strong>Fecha de Nacimiento:</strong> ${searchResultData.fechaNac}</li>
-				<li><strong>Talla:</strong> ${searchResultData.tallaFormatted || 'N/A'}</li>
-				<li><strong>Peso:</strong> ${searchResultData.pesoFormatted || 'N/A'}</li>
-				<li><strong>Correo:</strong> ${searchResultData.correo || 'N/A'}</li>
-				<li><strong>Teléfono:</strong> ${searchResultData.telefono || 'N/A'}</li>
-			</ul>
-		</div>
-	`;
-	
-	// Limpiar el campo de búsqueda después de mostrar el resultado
-	document.getElementById('searchInput').value = '';
-}
-
-
-/**
- * 4. FUNCIÓN DE GUARDADO (handleFormSubmit)
- */
-async function handleFormSubmit(event) {
-	event.preventDefault();	
-
-	if (!db) {
-		console.error("Base de datos no inicializada. No se pudo guardar.");
-		displayStatusMessage("Error: La base de datos no está inicializada.", 'error');
-		return false;
-	}
-
-	const form = document.getElementById('athleteForm');
-
-	// 1. Recolectar datos y preparar el objeto (documento)
-	const tallaValue = form.talla.value; 
-	const pesoValue = form.peso.value; 
-	
-	// Se guardan TODOS los campos del formulario
-	const newAthlete = {
-        cedula: form.cedula.value, 
-		club: form.club.value,
-		nombre: form.nombre.value,
-		apellido: form.apellido.value,
-		fechaNac: form.fechaNac.value,
-		division: form.division.value,	
-		tallaRaw: tallaValue,	
-		pesoRaw: pesoValue,	 	
-		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
-		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
-		correo: form.correo.value,
-		telefono: form.telefono.value,
-		timestamp: Date.now()	
-	};
-	
-	try {
-		let appIdToUse;
-		if (typeof __app_id !== 'undefined') {
-			appIdToUse = __app_id;
-		} else {
-			appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
-		}
-
-		const athletesColRef = collection(db, `artifacts/${appIdToUse}/public/data/athletes`);
-		await addDoc(athletesColRef, newAthlete);	
-		console.log("Atleta registrado y guardado en Firestore con éxito.");
-		displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
-		
-	} catch(error) {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de escritura
-		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
-		if (error.code === 'permission-denied') {
-			displayStatusMessage("❌ ERROR DE PERMISO DE ESCRITURA: No se pudo guardar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
-		} else {
-			displayStatusMessage(`❌ ERROR al guardar: ${error.message}`, 'error');
-		}
-
-	} finally {
-		console.log("handleFormSubmit ha finalizado. Reseteando formulario.");
-		form.reset();
-	}
-	
-	return false;	
-}
-
-/**
- * LÓGICA DE ORDENAMIENTO Y RENDERIZADO
- */
-function sortTable(key, toggleDirection = true) {
-	if (currentSortKey === key && toggleDirection) {
-		sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
-	} else if (currentSortKey !== key) {
-		currentSortKey = key;
-		sortDirection = 'asc';
-	}
-
-	athletesData.sort((a, b) => {
-		let valA = a[key];
-		let valB = b[key];
-
-		// Ordenar correctamente los campos numéricos
-		if (key === 'tallaRaw' || key === 'pesoRaw') {
-			valA = parseFloat(valA) || 0;
-			valB = parseFloat(valB) || 0;
-		} else if (key === 'fechaNac') {
-			valA = new Date(valA);
-			valB = new Date(valB);
-		} else {
-			valA = String(valA).toLowerCase();
-			valB = String(valB).toLowerCase();
-		}
-
-		let comparison = 0;
-		if (valA > valB) { comparison = 1; }	
-		else if (valA < valB) { comparison = -1; }
-		
-		return (sortDirection === 'desc') ? (comparison * -1) : comparison;
-	});
-
-	renderTable();
-}
-
-/**
- * RENDERIZADO DE LA TABLA (Muestra solo: Cédula, Nombre, Apellido, Club, F. Nac., División)
- */
-function renderTable() {
-    const registeredDataContainer = document.getElementById('registeredData');
-    
-    if (athletesData.length === 0) {
-        registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
-        return;
-    }
-
-    let table = document.getElementById('athleteTable');
-    let tableBody = document.getElementById('athleteTableBody');
-
-    if (!table) {
-        registeredDataContainer.innerHTML = `
-            <div class="table-responsive-wrapper">
-                <table id="athleteTable" class="athlete-data-table">
-                    <thead>
-                        <tr class="table-header-row">
-                            <th data-sort-key="cedula">Cédula</th>
-                            <th data-sort-key="nombre">Nombre</th>
-                            <th data-sort-key="apellido">Apellido</th>
-                            <th data-sort-key="club">Club</th> 
-                            <th data-sort-key="fechaNac">F. Nac.</th>
-                            <th data-sort-key="division">División</th>
-                        </tr>
-                    </thead>
-                    <tbody id="athleteTableBody">
-                    </tbody>
-                </table>
-            </div>
-            <p class="table-note-message">Haz clic en cualquier encabezado de la tabla para ordenar los resultados.</p>
-        `;
-        tableBody = document.getElementById('athleteTableBody');
-        setupSorting();	
-    } else {
-        tableBody.innerHTML = '';
-    }
-    
-    athletesData.forEach(data => {
-        const newRow = tableBody.insertRow(-1);	
-        newRow.classList.add('athlete-table-row');
-        
-        // Celdas (TD) que coinciden con el orden de encabezados
-        newRow.innerHTML = `
-            <td data-label="Cédula" class="table-data">${data.cedula}</td>
-            <td data-label="Nombre" class="table-data">${data.nombre}</td>
-            <td data-label="Apellido" class="table-data">${data.apellido}</td>
-            <td data-label="Club" class="table-data">${data.club}</td>
-            <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
-            <td data-label="División" class="table-data">${data.division}</td>
-        `;
-    });
-
-    document.querySelectorAll('#athleteTable th').forEach(th => {
-        th.classList.remove('sorted-asc', 'sorted-desc');
-        if (th.getAttribute('data-sort-key') === currentSortKey) {
-            th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
-        }
-    });
-}
-
-function setupSorting() {
-	document.querySelectorAll('#athleteTable th').forEach(header => {
-		const key = header.getAttribute('data-sort-key');
-		if (key) {
-			header.style.cursor = 'pointer';	
-			header.addEventListener('click', () => sortTable(key, true));	
-		}
-	});
-}
-
-// Inicializar Firebase y los Listeners al cargar el contenido
 document.addEventListener('DOMContentLoaded', () => {
-	initFirebaseAndLoadData();
-	setupFormListener();
-	setupSearchListener(); // INICIALIZA EL LISTENER DE BÚSQUEDA
-	renderSearchResults(); // INICIALIZA EL CONTENEDOR DE RESULTADOS VACÍO
+    // Escuchar el envío del formulario de registro
+    const athleteForm = document.getElementById('athleteForm');
+    if (athleteForm) {
+        athleteForm.addEventListener('submit', handleAthleteFormSubmit);
+    }
+    
+    // Iniciar el listener de la tabla de datos
+    setupRealtimeDataListener();
 });
+
+/**
+ * Maneja el evento de envío del formulario de registro de atletas.
+ * @param {Event} event - El evento de envío del formulario.
+ */
+async function handleAthleteFormSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const athleteData = {
+        cedula: form.cedula.value.trim(),
+        club: form.club.value,
+        nombre: form.nombre.value.trim(),
+        apellido: form.apellido.value.trim(),
+        fechaNac: form.fechaNac.value,
+        division: form.division.value,
+        talla: parseFloat(form.talla.value) || null,
+        peso: parseFloat(form.peso.value) || null,
+        correo: form.correo.value.trim() || null,
+        telefono: form.telefono.value.trim() || null,
+        timestamp: new Date() // Marca de tiempo del registro
+    };
+
+    try {
+        // Chequeo de duplicidad simple usando la cédula como ID del documento
+        const docRef = doc(db, "atletas", athleteData.cedula);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            displayStatusMessage(`Error: El atleta con Cédula ${athleteData.cedula} ya está registrado.`, true);
+            return;
+        }
+
+        // Registrar atleta, permitiendo que Firestore genere un ID automático
+        await addDoc(atletasCollection, athleteData);
+
+        displayStatusMessage("Atleta registrado con éxito.", false);
+        form.reset(); // Limpiar el formulario
+        document.getElementById('club').value = ""; // Resetear select manualmente
+        document.getElementById('division').value = "";
+    } catch (e) {
+        console.error("Error al añadir documento: ", e);
+        displayStatusMessage(`Error al registrar: ${e.message}`, true);
+    }
+}
+
+// -------------------------------------------------------------------------
+// CARGA Y RENDERIZADO DE DATOS EN TIEMPO REAL
+// -------------------------------------------------------------------------
+
+/**
+ * Configura el listener de datos en tiempo real de Firestore.
+ */
+function setupRealtimeDataListener() {
+    // Consulta con ordenación por la columna y dirección actual
+    const q = query(atletasCollection, orderBy(currentSortColumn, currentSortDirection));
+
+    onSnapshot(q, (snapshot) => {
+        const athletes = [];
+        snapshot.forEach((doc) => {
+            athletes.push({ id: doc.id, ...doc.data() });
+        });
+        // Renderizar los datos en la tabla
+        renderAthleteTable(athletes);
+    }, (error) => {
+        console.error("Error al escuchar cambios en Firestore: ", error);
+        document.getElementById('registeredData').innerHTML = '<p class="no-data-message">Error al cargar datos. Verifica la conexión a Firebase.</p>';
+    });
+}
+
+/**
+ * Renderiza la tabla de atletas.
+ * @param {Array<Object>} athletes - Lista de objetos de atletas.
+ */
+function renderAthleteTable(athletes) {
+    const container = document.getElementById('registeredData');
+    if (athletes.length === 0) {
+        container.innerHTML = '<p class="no-data-message">No hay atletas registrados aún.</p>';
+        return;
+    }
+
+    // Encabezados de la tabla y su clave de ordenamiento
+    const headers = [
+        { name: 'Cédula', key: 'cedula' },
+        { name: 'Nombre Completo', key: 'nombre' },
+        { name: 'Edad', key: 'fechaNac' }, // Se ordenará por fechaNac para precisión
+        { name: 'Club', key: 'club' },
+        { name: 'División', key: 'division' },
+        { name: 'Talla (m)', key: 'talla' },
+        { name: 'Peso (kg)', key: 'peso' },
+        { name: 'Registro', key: 'timestamp' }
+    ];
+
+    let tableHTML = `
+        <div class="table-responsive-wrapper">
+            <table class="athlete-data-table">
+                <thead>
+                    <tr>
+                        ${headers.map(header => `
+                            <th data-key="${header.key}" 
+                                class="${currentSortColumn === header.key ? 'sorted-' + currentSortDirection : ''}">
+                                ${header.name}
+                            </th>
+                        `).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    // Cuerpo de la tabla
+    athletes.forEach(athlete => {
+        const fullName = `${athlete.nombre || ''} ${athlete.apellido || ''}`;
+        const age = athlete.fechaNac ? calculateAge(athlete.fechaNac) : 'N/A';
+        const tallaDisplay = athlete.talla ? athlete.talla.toFixed(2) : 'N/A';
+        const pesoDisplay = athlete.peso ? athlete.peso.toFixed(2) : 'N/A';
+        
+        // Formatear el timestamp
+        const timestampDate = athlete.timestamp && athlete.timestamp.toDate ? 
+                              athlete.timestamp.toDate().toLocaleDateString('es-VE', { year: 'numeric', month: 'short', day: 'numeric' }) : 
+                              'N/A';
+
+        tableHTML += `
+            <tr>
+                <td>${athlete.cedula || 'N/A'}</td>
+                <td>${fullName.trim() || 'N/A'}</td>
+                <td>${age}</td>
+                <td>${athlete.club || 'N/A'}</td>
+                <td>${athlete.division || 'N/A'}</td>
+                <td>${tallaDisplay}</td>
+                <td>${pesoDisplay}</td>
+                <td>${timestampDate}</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+        <p class="table-note-message">Clic en el encabezado de la columna para ordenar.</p>
+    `;
+
+    container.innerHTML = tableHTML;
+
+    // Agregar event listeners para el ordenamiento
+    document.querySelectorAll('.athlete-data-table th').forEach(header => {
+        header.addEventListener('click', handleSortChange);
+    });
+}
+
+/**
+ * Maneja el cambio de ordenamiento de la tabla.
+ * @param {Event} event - El evento de clic en el encabezado.
+ */
+function handleSortChange(event) {
+    const newSortColumn = event.target.dataset.key;
+
+    if (!newSortColumn) return;
+
+    if (newSortColumn === currentSortColumn) {
+        // Cambiar dirección
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        // Nueva columna, ordenar por ascendente
+        currentSortColumn = newSortColumn;
+        currentSortDirection = 'asc';
+    }
+
+    // Reestablecer el listener de tiempo real con el nuevo orden
+    setupRealtimeDataListener();
+}
