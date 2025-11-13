@@ -7,10 +7,10 @@
     - Borde Base/Raya: #F0DADA (Gris rojizo suave)
 */
 
-/* 1. Estilos Base y Reset (Aquí debe estar el problema) */
+/* 1. Estilos Base y Reset */
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #FFF8F8; /* <--- Fondo suave Vinotinto/Rojo Brillante */
+    background-color: #FFF8F8; /* Fondo suave */
     color: #333333; 
     margin: 0;
     padding: 0;
@@ -18,7 +18,7 @@ body {
 }
 
 .page-header {
-    background-color: #800020; /* <--- Vinotinto Oscuro para la cabecera */
+    background-color: #800020; /* Vinotinto Oscuro */
     color: white;
     padding: 20px 0;
     text-align: center;
@@ -87,14 +87,13 @@ h2 {
     margin: 30px 0; 
 }
 
-/* Estilos de Formulario: Estrecho, Centrado y Vertical */
+/* 2. Estilos de Formulario y Campos */
 .athlete-form {
     max-width: 700px !important; 
     margin: 0 auto !important; 
     
     display: flex !important;
     flex-wrap: wrap !important;
-    /* Espaciado uniforme de 20px entre filas y columnas */
     gap: 20px; 
     
     background: #ffffff;
@@ -104,7 +103,6 @@ h2 {
 }
 
 .form-group {
-    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
     margin-bottom: 0 !important; 
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -116,12 +114,9 @@ h2 {
     flex: 1 1 100%;
 }
 
-/* **CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA** */
 .form-group.half-width {
     margin-left: 0 !important; 
     margin-right: 0 !important; 
-    
-    /* Recalculado para acomodar el gap uniforme de 20px */
     flex: 1 1 calc(50% - 10px) !important; 
 }
 
@@ -167,23 +162,18 @@ input:focus, select:focus {
     outline: none !important;
 }
 
-/* Contenedor del botón para centrarlo (dentro del form) */
+/* Estilos del Botón Registrar */
 .button-container {
     flex: 1 1 100%;
     display: flex;
-    /* CENTRADO FLEXBOX */
     justify-content: center; 
-    /* CENTRADO DE TEXTO (Medida de seguridad) */
     text-align: center; 
     margin-top: 5px; 
 }
 
-/* Estilos del Botón Registrar (Vinotinto Oscuro) */
 .submit-button {
-    /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
     display: block; 
     margin: 0 auto;
-    
     background-color: #800020 !important; 
     color: white;
     padding: 12px 30px !important; 
@@ -203,10 +193,7 @@ input:focus, select:focus {
     box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
 }
 
-/* -------------------------------------------------------------------------- */
-/* ESTILOS AÑADIDOS PARA LA BÚSQUEDA */
-/* -------------------------------------------------------------------------- */
-
+/* 3. Estilos de Búsqueda (Caja y Controles) */
 .search-container {
     max-width: 500px; 
     margin: 10px auto 30px auto;
@@ -230,10 +217,9 @@ input:focus, select:focus {
     margin-bottom: 15px;
 }
 
-/* Ajustes específicos para el campo de búsqueda */
 #searchCedula {
     flex-grow: 1;
-    border: 1px solid #DC143C; /* Borde sólido para destacarlo */
+    border: 1px solid #DC143C; 
     border-bottom: 2px solid #DC143C !important;
     padding: 10px !important;
     background-color: #FFFFFF !important;
@@ -264,7 +250,7 @@ input:focus, select:focus {
     transform: translateY(-1px);
 }
 
-/* Área de resultados */
+/* Área de resultados y mensajes */
 .search-result-area {
     margin-top: 10px;
     min-height: 50px;
@@ -277,17 +263,6 @@ input:focus, select:focus {
     text-align: center;
 }
 
-.empty-search {
-    color: #6c757d;
-    border: 1px dashed #ced4da;
-}
-
-.not-found-athlete {
-    color: #800020; 
-    background-color: #FFEBEE;
-    border: 1px solid #DC143C;
-}
-
 .athlete-card {
     border: 2px solid #DC143C;
     padding: 15px;
@@ -298,15 +273,7 @@ input:focus, select:focus {
     box-shadow: 0 4px 10px rgba(220, 20, 60, 0.1);
 }
 
-.athlete-card p {
-    margin: 3px 0;
-    font-size: 0.95rem;
-}
-
-/* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA */
-/* -------------------------------------------------------------------------- */
-
+/* 4. Estilos de la Tabla */
 .table-responsive-wrapper {
     overflow-x: auto;
     background: #ffffff;
@@ -339,41 +306,11 @@ input:focus, select:focus {
     transition: background-color 0.2s;
 }
 
-.athlete-data-table th:hover {
-    background-color: #FFCCCC;
-}
-
-/* Filas */
 .athlete-data-table tr:nth-child(even) {
     background-color: #FFF8F8;
 }
 
-.athlete-data-table tr:hover {
-    background-color: #FFEBEB;
-}
-
-/* Indicadores de Ordenamiento */
-.athlete-data-table th.sorted-asc::after {
-    content: ' ▲';
-    color: #A52A2A;
-}
-
-.athlete-data-table th.sorted-desc::after {
-    content: ' ▼';
-    color: #A52A2A;
-}
-
-.no-data-message, .loading-message, .table-note-message {
-    text-align: center;
-    padding: 15px;
-    color: #6c757d;
-    font-style: italic;
-    border: 1px dashed #F0DADA;
-    border-radius: 8px;
-    margin-top: 15px;
-}
-
-/* Estilos Responsivos */
+/* 5. Estilos Responsivos */
 @media (max-width: 768px) {
     .container {
         padding: 0 10px;
@@ -381,16 +318,9 @@ input:focus, select:focus {
     .page-header h1 {
         font-size: 1.8rem;
     }
-    /* Ajuste responsivo para que el input y botón de búsqueda se apilen */
     .search-input-group {
         flex-direction: column;
         gap: 5px;
-    }
-    .search-button {
-        border-radius: 5px;
-    }
-    #searchCedula {
-        border-radius: 5px;
     }
     .form-group.half-width {
         flex: 1 1 100% !important;
