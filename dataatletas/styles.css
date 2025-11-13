@@ -7,18 +7,18 @@
     - Borde Base/Raya: #F0DADA (Gris rojizo suave)
 */
 
-/* Estilos Base y Reset */
+/* 1. Estilos Base y Reset (Aquí debe estar el problema) */
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #FFF8F8; /* Fondo suave */
-    color: #333333; /* Gris oscuro */
+    background-color: #FFF8F8; /* <--- Fondo suave Vinotinto/Rojo Brillante */
+    color: #333333; 
     margin: 0;
     padding: 0;
     line-height: 1.4;
 }
 
 .page-header {
-    background-color: #800020; /* Vinotinto Oscuro */
+    background-color: #800020; /* <--- Vinotinto Oscuro para la cabecera */
     color: white;
     padding: 20px 0;
     text-align: center;
