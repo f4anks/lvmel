@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data de Atletas - Registro O</title>
-    <link rel="stylesheet" href="styles.css?v=6">
+    <link rel="stylesheet" href="styles.css?v=6"> 
     <style>
         /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
         #statusMessage {
@@ -18,6 +18,27 @@
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
+        
+        /* Estilo para el botón de navegación */
+        .nav-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .nav-button {
+            display: inline-block;
+            background-color: #DC143C; /* Rojo Brillante */
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .nav-button:hover {
+            background-color: #800020; /* Vinotinto Oscuro */
+        }
     </style>
   </head>
   <body> 
@@ -28,6 +49,11 @@
     </header>
     
     <main class="container">
+      
+      <div class="nav-button-container">
+          <a href="atletas_edit.html" class="nav-button">Ir a la Data (Visualización y Edición)</a>
+      </div>
+      
       <section class="form-section"> 
         <h2>Formulario para el Registro de Atletas</h2>
         
@@ -94,19 +120,9 @@
             
             <div class="form-group button-container">
               <button type="submit" id="submitButton" class="submit-button">Registrar Atleta</button>
-              <button type="button" id="cancelEditButton" class="cancel-button" style="display: none;">Cancelar Edición</button>
             </div>
         </form>
         
-      </section>
-      
-      <hr class="separator">
-      
-      <section class="data-section">
-        <h2>Lista de Atletas Registrados</h2>
-        <div id="registeredData" class="registered-data-container"> 
-          <p class="loading-message">Cargando datos...</p>
-        </div>
       </section>
       
     </main>
