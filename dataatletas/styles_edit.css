@@ -323,4 +323,49 @@ input:focus, select:focus {
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
+
+    /* ========================================================================= */
+/* ESTILOS ESPECÍFICOS PARA BOTONES DE ACCIÓN (EDITAR/ELIMINAR) */
+/* ========================================================================= */
+
+.action-button {
+    padding: 6px 10px;
+    margin: 2px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.1s;
+    font-size: 0.85rem;
+    white-space: nowrap; /* Evita que el texto se rompa */
+}
+
+/* 1. ESTILO PARA EL BOTÓN DE EDICIÓN (Vinotinto Oscuro) */
+.edit-button {
+    background-color: #800020; /* Vinotinto Oscuro */
+    color: #FFFFFF; /* Texto blanco */
+}
+
+.edit-button:hover {
+    background-color: #DC143C; /* Rojo Brillante al pasar el ratón */
+    transform: translateY(-1px);
+}
+
+/* 2. ESTILO PARA EL BOTÓN DE ELIMINACIÓN (Rojo Fuerte) */
+.delete-button {
+    background-color: #DC143C; /* Rojo Brillante */
+    color: #FFFFFF; /* Texto blanco */
+}
+
+.delete-button:hover {
+    background-color: #A52A2A; /* Marrón para un efecto de 'peligro' */
+    transform: translateY(-1px);
+}
+
+/* Asegurar que se vean bien en pantallas pequeñas */
+.table-data .action-button {
+    display: block;
+    width: 90%;
+    margin: 5px auto;
+}   
 }
