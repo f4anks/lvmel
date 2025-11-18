@@ -1,4 +1,4 @@
-// 1. IMPORTACIONES DE FIREBASE (COMPLETO: Lectura, Update y Delete)
+// 1. IMPORTACIONES DE FIREBASE (Solo Lectura, Update y Delete)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, onSnapshot, setLogLevel, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -101,6 +101,7 @@ async function initFirebaseAndLoadData() {
 
 	} catch (e) {
 		console.error("Error al inicializar Firebase:", e);
+        displayStatusMessage(`❌ Error CRÍTICO al iniciar Firebase: ${e.message}`, 'error');
 	}
 }
 
@@ -126,7 +127,7 @@ function setupRealtimeListener(appId) {
 		if (athletesData.length > 0) {
 			sortTable(currentSortKey, false);	
 		} else {
-			renderTable();
+			renderTable(); // Si está vacía, renderiza la tabla con el mensaje "No hay datos"
 		}
 	}, (error) => {
 		console.error("Error en la escucha en tiempo real:", error);
@@ -140,7 +141,7 @@ function setupRealtimeListener(appId) {
 
 
 /**
- * 4. FUNCIÓN DE EDICIÓN/ACTUALIZACIÓN (handleFormSubmit)
+ * 4. FUNCIÓN DE ACTUALIZACIÓN (handleFormSubmit) - Solo Edición
  */
 async function handleFormSubmit(event) {
 	event.preventDefault();	
@@ -162,6 +163,7 @@ async function handleFormSubmit(event) {
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
 	
+    // SOLO INCLUIMOS LOS CAMPOS QUE SE PUEDEN EDITAR.
 	const athleteData = {
 		club: form.club.value,
 		nombre: form.nombre.value,
@@ -205,7 +207,6 @@ async function handleFormSubmit(event) {
 	
 	return false;	
 }
-
 
 /**
  * 5. FUNCIÓN DE EDICIÓN (Carga de datos)
@@ -266,16 +267,21 @@ async function deleteAthlete(id, name) {
     }
 }
 
+
 /**
- * Lógica para mostrar/ocultar el formulario y resetearlo
+ * Lógica para mostrar/ocultar el formulario de edición
  */
 function setFormMode(isEditing) {
     const formSection = document.getElementById('editFormSection');
     const form = document.getElementById('athleteForm');
     const cedulaInput = form.cedula;
+    const submitBtn = document.getElementById('submitButton');
+    const cancelBtn = document.getElementById('cancelEditButton');
 
     if (isEditing) {
         formSection.style.display = 'block'; // Mostrar el formulario
+        submitBtn.textContent = 'Guardar Cambios';
+        cancelBtn.style.display = 'inline-block';
         cedulaInput.disabled = true; // No permitir cambiar la cédula durante la edición
     } else {
         formSection.style.display = 'none'; // Ocultar el formulario
@@ -323,7 +329,7 @@ function sortTable(key, toggleDirection = true) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (7 columnas visibles)
+ * RENDERIZADO DE LA TABLA (7 columnas)
  */
 function renderTable() {
     const registeredDataContainer = document.getElementById('registeredData');
@@ -369,6 +375,7 @@ function renderTable() {
         const newRow = tableBody.insertRow(-1);    
         newRow.classList.add('athlete-table-row');
         
+        // **IMPORTANTE:** Aquí solo se renderizan 7 celdas (TD) para que coincidan con los 7 encabezados (TH).
         newRow.innerHTML = `
             <td data-label="Cédula" class="table-data">${data.cedula}</td>
             <td data-label="Nombre" class="table-data">${data.nombre}</td>
@@ -383,6 +390,7 @@ function renderTable() {
         `;
     });
 
+    // ... [El resto de la función para el indicador de ordenamiento se mantiene igual] ...
     document.querySelectorAll('#athleteTable th').forEach(th => {
         th.classList.remove('sorted-asc', 'sorted-desc');
         if (th.getAttribute('data-sort-key') === currentSortKey) {
