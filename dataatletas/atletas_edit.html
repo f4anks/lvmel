@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data de Atletas - Edición y Visualización</title>
-    <link rel="stylesheet" href="styles_edit.css?v=1">
+    <title>Data de Atletas - Edición y Consulta</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Estilos en línea para el mensaje de estado */
         #statusMessage {
@@ -18,120 +19,107 @@
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
-        /* Estilo para el botón de navegación */
-        .nav-button-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .nav-button {
-            display: inline-block;
-            background-color: #DC143C; /* Rojo Brillante */
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background-color 0.3s;
-        }
-        .nav-button:hover {
-            background-color: #800020; /* Vinotinto Oscuro */
-        }
     </style>
   </head>
   <body> 
     <header class="page-header">
       <br>
       <h1>Data de Atletas</h1>
-      <p class="subtitle">Visualización, Edición y Eliminación</p>
+      <p class="subtitle">Liga de Voleibol Menor del Estado Lara - Módulo de Edición</p>
     </header>
     
     <main class="container">
+      
+      <section id="editFormSection" class="form-section" style="display: none;">
+        <h2>Editar Registro de Atleta</h2>
         
-        <div class="nav-button-container">
-            <a href="frm_atletas.html" class="nav-button">Ir al Formulario (Registro)</a>
-        </div>
-        
-        <section class="form-section" id="editFormSection" style="display: none;">
-            <h2>Editar Atleta</h2>
+        <form id="athleteForm" class="athlete-form">
             
-            <form id="athleteForm" class="athlete-form">
-                <input type="hidden" id="athleteId" name="athleteId" value="">
-
-                <div class="form-group half-width">
-                  <label for="cedula">Cédula de Identidad:</label> 
-                  <input id="cedula" name="cedula" placeholder="Ej: 34123100" required="" type="text">
-                </div>
-                <div class="form-group half-width">
-                  <label for="club">Club/Equipo:</label>
-                  <select id="club" name="club" required="">
-                    <option value="" disabled="disabled" selected="selected">Selecciona un Club</option>
-                    <option value="Bertha Carrero">Bertha Carrero</option>
-                    <option value="Olimpikus">Olimpikus</option>
-                    <option value="Villa Cantevista">Villa Cantevista</option>
-                    <option value="MG">MG</option>
-                    <option value="JPD">JPD</option>
-                  </select>
-                </div>
-                
-                <div class="form-group half-width">
-                  <label for="nombre">Nombre:</label>
-                  <input id="nombre" name="nombre" required="" type="text"> 
-                </div>
-                <div class="form-group half-width">
-                  <label for="apellido">Apellido:</label>
-                  <input id="apellido" name="apellido" required="" type="text"> 
-                </div>
-                
-                <div class="form-group half-width">
-                  <label for="fechaNac">Fecha de Nacimiento:</label> 
-                  <input id="fechaNac" name="fechaNac" required="" type="date"> 
-                </div>
-                <div class="form-group half-width">
-                  <label for="division">División:</label>
-                  <select id="division" name="division" required="">
-                    <option value="" disabled="disabled" selected="selected">Selecciona una División</option>
-                    <option value="CIAR">CIAR</option>
-                    <option value="1ra Division">1ra Division</option>
-                    <option value="2da Division">2da Division</option>
-                    <option value="3ra Division">3ra Division</option>
-                  </select>
-                </div>
-                
-                <div class="form-group half-width">
-                  <label for="talla">Talla (m):</label>
-                  <input id="talla" name="talla" step="0.01" min="0.5" max="3" placeholder="Ej: 1.75" type="number">
-                </div>
-                <div class="form-group half-width">
-                  <label for="peso">Peso (kg):</label>
-                  <input id="peso" name="peso" step="0.01" min="10" max="300" placeholder="Ej: 50.80" type="number"> 
-                </div>
-                
-                <div class="form-group half-width">
-                  <label for="correo">Correo Electrónico:</label> 
-                  <input id="correo" name="correo" placeholder="opcional@ejemplo.com" type="email">
-                </div>
-                <div class="form-group half-width">
-                  <label for="telefono">Teléfono:</label>
-                  <input id="telefono" name="telefono" placeholder="Ej: 04261234455" type="tel">
-                </div>
-                
-                <div class="form-group button-container">
-                    <button type="submit" id="submitButton" class="submit-button">Guardar Cambios</button>
-                    <button type="button" id="cancelEditButton" class="cancel-button">Cancelar Edición</button>
-                </div>
-            </form>
-        </section>
-        
-        <hr class="separator">
-        
-        <section class="data-section">
-            <h2>Lista de Atletas Registrados</h2>
-            <div id="registeredData" class="registered-data-container"> 
-                <p class="loading-message">Cargando datos...</p>
+            <input type="hidden" id="athleteId" name="athleteId">
+            
+            <div class="form-group half-width">
+              <label for="cedula">Cédula de Identidad:</label> 
+              <input id="cedula" name="cedula" placeholder="Ej: 34123100" required="" type="text" disabled>
             </div>
-        </section>
+            <div class="form-group half-width">
+              <label for="club">Club/Equipo:</label>
+              <select id="club" name="club" required="">
+                <option value="" disabled selected>Selecciona un Club</option>
+                <option value="Bertha Carrero">Bertha Carrero</option>
+                <option value="Olimpikus">Olimpikus</option>
+                <option value="Villa Cantevista">Villa Cantevista</option>
+                <option value="MG">MG</option>
+                <option value="JPD">JPD</option>
+              </select>
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="nombre">Nombre:</label>
+              <input id="nombre" name="nombre" required="" type="text"> 
+            </div>
+            <div class="form-group half-width">
+              <label for="apellido">Apellido:</label>
+              <input id="apellido" name="apellido" required="" type="text"> 
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="fechaNac">Fecha de Nacimiento:</label> 
+              <input id="fechaNac" name="fechaNac" required="" type="date"> 
+            </div>
+            <div class="form-group half-width">
+              <label for="division">División:</label>
+              <select id="division" name="division" required="">
+                <option value="" disabled selected>Selecciona una División</option>
+                <option value="CIAR">CIAR</option>
+                <option value="1ra Division">1ra Division</option>
+                <option value="2da Division">2da Division</option>
+                <option value="3ra Division">3ra Division</option>
+              </select>
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="talla">Talla (m):</label>
+              <input id="talla" name="talla" step="0.01" min="0.5" max="3" placeholder="Ej: 1.75" type="number">
+            </div>
+            <div class="form-group half-width">
+              <label for="peso">Peso (kg):</label>
+              <input id="peso" name="peso" step="0.01" min="10" max="300" placeholder="Ej: 50.80" type="number"> 
+            </div>
+            
+            <div class="form-group half-width">
+              <label for="correo">Correo Electrónico:</label> 
+              <input id="correo" name="correo" placeholder="opcional@ejemplo.com" type="email">
+            </div>
+            <div class="form-group half-width">
+              <label for="telefono">Teléfono:</label>
+              <input id="telefono" name="telefono" placeholder="Ej: 04261234455" type="tel">
+            </div>
+            
+            <div class="form-group button-container">
+              <button type="submit" id="submitButton" class="submit-button">Guardar Cambios</button>
+              <button type="button" id="cancelEditButton" class="reset-button">Cancelar Edición</button>
+            </div>
+        </form>
+      </section>
+      <hr class="separator">
+      
+      <section class="data-section">
+        <h2>Atletas Registrados (Edición Rápida)</h2>
+        
+        <div class="search-bar-container">
+            <input type="text" id="searchInput" name="searchInput" placeholder="Buscar por Cédula o ID" class="search-input" maxlength="15">
+            <button id="searchButton" class="search-button">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            <button type="button" id="resetButton" class="reset-button" style="display: none;">
+                Mostrar Todos
+            </button>
+        </div>
+        <hr class="separator"> 
+        <div id="registeredData" class="registered-data-container"> 
+          <p class="loading-message">Cargando datos...</p>
+        </div>
+      </section>
       
     </main>
     
