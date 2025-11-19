@@ -1,7 +1,7 @@
-// 1. IMPORTACIONES DE FIREBASE (ACTUALIZADO: Añadir updateDoc, doc, deleteDoc)
+// 1. IMPORTACIONES DE FIREBASE (SOLO LO NECESARIO PARA REGISTRO Y LECTURA)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, query, addDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // VARIABLES DE ESTADO Y FIREBASE
 let db;
@@ -71,12 +71,10 @@ async function initFirebaseAndLoadData() {
 	try {
 		let configToUse;
 		let appIdToUse;
-		let tokenToUse = '';
 
 		if (typeof __firebase_config !== 'undefined' && __firebase_config.length > 2) {
 			configToUse = JSON.parse(__firebase_config);
 			appIdToUse = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-			tokenToUse = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
 		} else {
 			configToUse = EXTERNAL_FIREBASE_CONFIG;
 			appIdToUse = configToUse.projectId;	
@@ -86,7 +84,7 @@ async function initFirebaseAndLoadData() {
 		db = getFirestore(app);
 		auth = getAuth(app);
 		
-		// Simplificado a autenticación anónima para este contexto
+		// Autenticación anónima para permitir la lectura (onSnapshot) y escritura (addDoc)
 		await signInAnonymously(auth);
 		
 		onAuthStateChanged(auth, (user) => {
@@ -132,10 +130,9 @@ function setupRealtimeListener(appId) {
 			renderTable();
 		}
 	}, (error) => {
-        // MANEJO DE ERROR MEJORADO: Indica problema de permisos de lectura
 		console.error("Error en la escucha en tiempo real:", error);
         if (error.code === 'permission-denied') {
-             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
         } else {
              displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
         }
@@ -148,37 +145,12 @@ function setupFormListener() {
 		form.addEventListener('submit', handleFormSubmit);
 		console.log("Listener de formulario de atleta adjunto.");
 	} else {
-		console.error("Error: No se encontró el formulario con ID 'athleteForm'. ¿Está cargado el index.html?");
+		console.error("Error: No se encontró el formulario con ID 'athleteForm'.");
 	}
 }
 
 /**
- * Lógica para alternar el formulario entre "Registro" y "Edición"
- */
-function setFormMode(isEditing) {
-    const form = document.getElementById('athleteForm');
-    const submitBtn = form.querySelector('.submit-button');
-    const cancelBtn = document.getElementById('cancelEditButton');
-    const cedulaInput = form.cedula;
-
-    if (isEditing) {
-        submitBtn.textContent = 'Guardar Cambios';
-        if (cancelBtn) cancelBtn.style.display = 'inline-block';
-        cedulaInput.disabled = true; 
-        form.classList.add('editing');
-    } else {
-        submitBtn.textContent = 'Registrar Atleta';
-        if (cancelBtn) cancelBtn.style.display = 'none';
-        cedulaInput.disabled = false;
-        if (form.athleteId) form.athleteId.value = '';
-        form.reset();
-        form.classList.remove('editing');
-    }
-}
-
-
-/**
- * 4. FUNCIÓN DE GUARDADO/ACTUALIZACIÓN (handleFormSubmit)
+ * 4. FUNCIÓN DE REGISTRO (addDoc)
  */
 async function handleFormSubmit(event) {
 	event.preventDefault();	
@@ -190,8 +162,7 @@ async function handleFormSubmit(event) {
 	}
 
 	const form = document.getElementById('athleteForm');
-    const athleteId = form.athleteId ? form.athleteId.value : '';
-
+	
 	// 1. Recolectar datos y preparar el objeto (documento)
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
@@ -203,8 +174,10 @@ async function handleFormSubmit(event) {
 		apellido: form.apellido.value,
 		fechaNac: form.fechaNac.value,
 		division: form.division.value,	
+		// Guardamos el valor raw para ordenar correctamente
 		tallaRaw: tallaValue,	
 		pesoRaw: pesoValue,	 	
+		// Guardamos el valor formateado para mostrar en la tabla
 		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
 		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
 		correo: form.correo.value,
@@ -219,54 +192,26 @@ async function handleFormSubmit(event) {
 		appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
 	}
     const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+    const athletesColRef = collection(db, athletesColPath);
 
 	try {
-        if (athleteId) {
-            // **MODO EDICIÓN (updateDoc)** - Si se habilita en esta página
-            const athleteDocRef = doc(db, athletesColPath, athleteId);
-            await updateDoc(athleteDocRef, athleteData);
-            console.log("Atleta actualizado en Firestore con éxito. ID:", athleteId);
-            displayStatusMessage("¡Atleta actualizado con éxito! (Sincronizando tabla...)", 'success');
-        } else {
-            // **MODO REGISTRO (addDoc)**
-            const athletesColRef = collection(db, athletesColPath);
-            await addDoc(athletesColRef, athleteData);	
-            console.log("Atleta registrado y guardado en Firestore con éxito.");
-            displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
-        }
+        // **MODO REGISTRO (addDoc)**
+        await addDoc(athletesColRef, athleteData);	
+        console.log("Atleta registrado y guardado en Firestore con éxito.");
+        displayStatusMessage("¡Atleta registrado con éxito! (Sincronizando tabla...)", 'success');
+        form.reset(); // Limpiar formulario después de guardar
 
 	} catch(error) {
-		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR/ACTUALIZAR !!!", error.message);
+		console.error("!!! ERROR CRÍTICO AL INTENTAR GUARDAR !!!", error.message);
 		if (error.code === 'permission-denied') {
-			displayStatusMessage("❌ ERROR DE PERMISO: No se pudo guardar/actualizar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+			displayStatusMessage("❌ ERROR DE PERMISO: No se pudo guardar. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
 		} else {
-			displayStatusMessage(`❌ ERROR al guardar: ${error.message}`, 'error');
+			displayStatusMessage(`❌ ERROR al registrar: ${error.message}`, 'error');
 		}
-
-	} finally {
-		console.log("handleFormSubmit ha finalizado. Reseteando formulario.");
-		setFormMode(false); // Resetear el formulario al modo registro
 	}
 	
 	return false;	
 }
-
-/**
- * 5. FUNCIÓN DE EDICIÓN (Necesaria para los onclick, pero muestra un mensaje de error)
- */
-function editAthlete(id) {
-    displayStatusMessage("Función de Edición no disponible en esta página. Usa la página de Edición.", 'error');
-    console.log("Intento de editar atleta:", id);
-}
-
-/**
- * 6. FUNCIÓN DE ELIMINACIÓN (Necesaria para los onclick, pero muestra un mensaje de error)
- */
-async function deleteAthlete(id, name) {
-    displayStatusMessage("Función de Eliminación no disponible en esta página. Usa la página de Edición.", 'error');
-    console.log("Intento de eliminar atleta:", id);
-}
-
 
 /**
  * LÓGICA DE ORDENAMIENTO
@@ -304,87 +249,23 @@ function sortTable(key, toggleDirection = true) {
 	renderTable(athletesData);
 }
 
-/**
- * FUNCIÓN DE BÚSQUEDA POR CÉDULA/ID (NUEVO)
- */
-function searchAthlete() {
-    const searchInput = document.getElementById('searchInput');
-    const searchValue = searchInput.value.trim();
-
-    if (searchValue === '') {
-        // Si el campo de búsqueda está vacío, restablece la vista (mostrar todos).
-        sortTable(currentSortKey, false);
-        return;
-    }
-
-    // 1. Filtrar los datos: Usamos includes para buscar la cédula en la lista
-    const filteredData = athletesData.filter(athlete => 
-        athlete.cedula && String(athlete.cedula).includes(searchValue)
-    );
-
-    // 2. Renderizar la tabla con los resultados filtrados
-    renderTable(filteredData);
-}
 
 /**
- * CONFIGURACIÓN DE LISTENERS para BÚSQUEDA (NUEVO)
- */
-function setupSearchListeners() {
-    const searchButton = document.getElementById('searchButton');
-    const resetButton = document.getElementById('resetButton');
-    const searchInput = document.getElementById('searchInput');
-    
-    if (searchButton) {
-        searchButton.addEventListener('click', searchAthlete);
-    }
-    
-    if (resetButton) {
-        resetButton.addEventListener('click', () => {
-            searchInput.value = ''; // Limpiar el input
-            sortTable(currentSortKey, false); // Vuelve a cargar y ordenar toda la data
-        });
-    }
-    
-    if (searchInput) {
-        // Permitir búsqueda al presionar ENTER
-        searchInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                searchAthlete();
-            }
-        });
-    }
-}
-
-
-/**
- * RENDERIZADO DE LA TABLA (Maneja el filtro de búsqueda y el mensaje de no encontrado)
+ * RENDERIZADO DE LA TABLA (Sin botones de Acción, solo listado)
  */
 function renderTable(dataToDisplay = athletesData) {
     const registeredDataContainer = document.getElementById('registeredData');
     let table = document.getElementById('athleteTable');
     let tableBody = document.getElementById('athleteTableBody');
-    
-    // 1. Manejo de mensajes (No hay data general o No hay resultados de búsqueda)
+
+    // 1. Manejo de mensajes (No hay data general)
     if (dataToDisplay.length === 0) {
-        // Comprobamos si fue una búsqueda la que falló
-        if (document.getElementById('searchInput') && document.getElementById('searchInput').value.trim() !== '') {
-            registeredDataContainer.innerHTML = `
-                <p class="no-results-message">
-                    ❌ **Atleta No Registrado:** No se encontró ningún atleta con la Cédula/ID introducida.
-                </p>
-            `;
-        } else {
-            // Mensaje estándar cuando no hay registros en la DB
-            registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
-        }
-        
-        // Si no hay datos, ocultar la tabla si existe y el botón de reset
+        registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
         if (table) table.remove();
-        if (document.getElementById('resetButton')) document.getElementById('resetButton').style.display = 'none';
         return;
     }
 
-	// 2. DIBUJAR LA ESTRUCTURA DE LA TABLA
+	// 2. DIBUJAR LA ESTRUCTURA DE LA TABLA (6 columnas)
 	if (!table) {
 		registeredDataContainer.innerHTML = `
 			<div class="table-responsive-wrapper">
@@ -397,7 +278,7 @@ function renderTable(dataToDisplay = athletesData) {
 							<th data-sort-key="club">Club</th> 
 							<th data-sort-key="fechaNac">F. Nac.</th>
 							<th data-sort-key="division">División</th>
-							<th class="no-sort">Acciones</th>                         </tr>
+                        </tr>
 					</thead>
 					<tbody id="athleteTableBody">
 					</tbody>
@@ -412,6 +293,7 @@ function renderTable(dataToDisplay = athletesData) {
 		tableBody.innerHTML = '';
 	}
 	
+	// 3. LLENAR EL CUERPO DE LA TABLA (6 celdas de datos por fila)
 	dataToDisplay.forEach(data => {
         const newRow = tableBody.insertRow(-1);	
         newRow.classList.add('athlete-table-row');
@@ -423,27 +305,18 @@ function renderTable(dataToDisplay = athletesData) {
             <td data-label="Club" class="table-data">${data.club}</td>
             <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
             <td data-label="División" class="table-data">${data.division}</td>
-            <td data-label="Acciones" class="table-data">
-                <button class="action-button edit-button" onclick="editAthlete('${data.id}')">Editar</button>
-                <button class="action-button delete-button" onclick="deleteAthlete('${data.id}', '${data.nombre} ${data.apellido}')">Eliminar</button>
-            </td>
         `;
     });
 
     // 4. Actualizar el indicador de ordenamiento
     document.querySelectorAll('#athleteTable th').forEach(th => {
         th.classList.remove('sorted-asc', 'sorted-desc');
-        // Solo aplica el indicador si estamos mostrando la data completa y ordenada
-        if (dataToDisplay === athletesData && th.getAttribute('data-sort-key') === currentSortKey) {
+        if (th.getAttribute('data-sort-key') === currentSortKey) {
             th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
         }
     });
-    
-    // Si la data mostrada es filtrada, mostrar el botón de reset.
-    if (document.getElementById('resetButton')) {
-        document.getElementById('resetButton').style.display = (dataToDisplay.length > 0 && dataToDisplay !== athletesData) ? 'inline-block' : 'none';
-    }
 }
+
 
 function setupSorting() {
 	document.querySelectorAll('#athleteTable th').forEach(header => {
@@ -455,22 +328,9 @@ function setupSorting() {
 	});
 }
 
-function setupCancelButton() {
-    const cancelBtn = document.getElementById('cancelEditButton');
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => setFormMode(false));
-    }
-}
 
 // Inicializar Firebase y los Listeners al cargar el contenido
 document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
 	setupFormListener();
-    setupCancelButton(); 
-    setupSearchListeners(); // <--- ¡Importante: Inicializa la nueva lógica de búsqueda!
 });
-
-// Exponer funciones globales para que los onclick de la tabla funcionen
-window.editAthlete = editAthlete;
-window.deleteAthlete = deleteAthlete;
-window.setFormMode = setFormMode;
