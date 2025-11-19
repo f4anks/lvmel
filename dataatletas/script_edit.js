@@ -1,4 +1,4 @@
-// 1. IMPORTACIONES DE FIREBASE (Solo Lectura, Update y Delete)
+// 1. IMPORTACIONES DE FIREBASE (COMPLETO: Lectura, Update y Delete)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, onSnapshot, setLogLevel, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -85,7 +85,7 @@ async function initFirebaseAndLoadData() {
 		auth = getAuth(app);
 		
 		// Autenticación anónima: NECESARIA para Edición/Eliminación
-        await signInAnonymously(auth);
+        await signInAnonymously(auth);
 		
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
@@ -95,13 +95,12 @@ async function initFirebaseAndLoadData() {
 			} else {
 				console.error("No se pudo autenticar al usuario.");
 				// Si falla la autenticación, la lectura aún podría funcionar si las reglas lo permiten.
-				setupRealtimeListener(appIdToUse); 
+				setupRealtimeListener(appIdToUse); 
 			}
 		});
 
 	} catch (e) {
 		console.error("Error al inicializar Firebase:", e);
-        displayStatusMessage(`❌ Error CRÍTICO al iniciar Firebase: ${e.message}`, 'error');
 	}
 }
 
@@ -125,10 +124,9 @@ function setupRealtimeListener(appId) {
 		athletesData = fetchedData;
 		
 		if (athletesData.length > 0) {
-			// Nota: sortTable llama a renderTable(athletesData)
 			sortTable(currentSortKey, false);	
 		} else {
-			renderTable(); // Si está vacía, renderiza la tabla con el mensaje "No hay datos"
+			renderTable();
 		}
 	}, (error) => {
 		console.error("Error en la escucha en tiempo real:", error);
@@ -142,8 +140,8 @@ function setupRealtimeListener(appId) {
 
 
 /**
- * 4. FUNCIÓN DE ACTUALIZACIÓN (handleFormSubmit) - Solo Edición
- */
+ * 4. FUNCIÓN DE EDICIÓN/ACTUALIZACIÓN (handleFormSubmit)
+ */
 async function handleFormSubmit(event) {
 	event.preventDefault();	
 
@@ -153,18 +151,17 @@ async function handleFormSubmit(event) {
 	}
 
 	const form = document.getElementById('athleteForm');
-    const athleteId = form.athleteId.value; 
+    const athleteId = form.athleteId.value; 
 
 	if (!athleteId) {
-        displayStatusMessage("Error: ID de atleta no encontrado para la edición.", 'error');
-        return false;
-    }
-    
+        displayStatusMessage("Error: ID de atleta no encontrado para la edición.", 'error');
+        return false;
+    }
+    
 	// 1. Recolectar datos y preparar el objeto (documento)
 	const tallaValue = form.talla.value; 
 	const pesoValue = form.peso.value; 
 	
-    // SOLO INCLUIMOS LOS CAMPOS QUE SE PUEDEN EDITAR.
 	const athleteData = {
 		club: form.club.value,
 		nombre: form.nombre.value,
@@ -186,13 +183,13 @@ async function handleFormSubmit(event) {
 	} else {
 		appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
 	}
-    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
 
 	try {
-        const athleteDocRef = doc(db, athletesColPath, athleteId);
-        await updateDoc(athleteDocRef, athleteData);
-        console.log("Atleta actualizado en Firestore con éxito. ID:", athleteId);
-        displayStatusMessage("¡Atleta actualizado con éxito! (Sincronizando tabla...)", 'success');
+        const athleteDocRef = doc(db, athletesColPath, athleteId);
+        await updateDoc(athleteDocRef, athleteData);
+        console.log("Atleta actualizado en Firestore con éxito. ID:", athleteId);
+        displayStatusMessage("¡Atleta actualizado con éxito! (Sincronizando tabla...)", 'success');
 
 	} catch(error) {
 		console.error("!!! ERROR CRÍTICO AL INTENTAR ACTUALIZAR !!!", error.message);
@@ -209,110 +206,85 @@ async function handleFormSubmit(event) {
 	return false;	
 }
 
-/**
- * 5. FUNCIÓN DE EDICIÓN (Carga de datos)
- */
-function editAthlete(id) {
-    const athlete = athletesData.find(a => a.id === id);
-    if (!athlete) {
-        displayStatusMessage("Error: No se encontró el atleta para editar.", 'error');
-        return;
-    }
-
-    const form = document.getElementById('athleteForm');
-
-    // Cargar los datos al formulario
-    form.athleteId.value = id; // Clave: Guardar el ID
-    form.cedula.value = athlete.cedula || '';
-    form.club.value = athlete.club || '';
-    form.nombre.value = athlete.nombre || '';
-    form.apellido.value = athlete.apellido || '';
-    form.fechaNac.value = athlete.fechaNac || '';
-    form.division.value = athlete.division || '';
-    form.talla.value = athlete.tallaRaw || '';
-    form.peso.value = athlete.pesoRaw || '';
-    form.correo.value = athlete.correo || '';
-    form.telefono.value = athlete.telefono || '';
-
-    setFormMode(true); // Mostrar el formulario en modo edición
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mover la vista al formulario
-}
 
 /**
- * 6. FUNCIÓN DE ELIMINACIÓN
- */
-async function deleteAthlete(id, name) {
-    if (!confirm(`¿Estás seguro de que quieres ELIMINAR al atleta ${name}? Esta acción es irreversible.`)) {
-        return;
-    }
-    
-    let appIdToUse;
-    if (typeof __app_id !== 'undefined') {
-        appIdToUse = __app_id;
-    } else {
-        appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
-    }
-    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
-
-    try {
-        const athleteDocRef = doc(db, athletesColPath, id);
-        await deleteDoc(athleteDocRef);
-        displayStatusMessage(`✅ Atleta ${name} eliminado con éxito. (Sincronizando tabla...)`, 'success');
-    } catch (error) {
-        console.error("!!! ERROR CRÍTICO AL INTENTAR ELIMINAR !!!", error);
-        if (error.code === 'permission-denied') {
-            displayStatusMessage("❌ ERROR DE PERMISO DE ELIMINACIÓN: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
-        } else {
-            displayStatusMessage(`❌ ERROR al eliminar a ${name}: ${error.message}`, 'error');
-        }
-    }
-}
-
-
-/**
- * Lógica para mostrar/ocultar y resetear el formulario de edición
- */
-function setFormMode(isEditing) {
-    const formSection = document.getElementById('editFormSection');
-    const form = document.getElementById('athleteForm');
-    const cedulaInput = form.cedula;
-    const submitBtn = document.getElementById('submitButton');
-    const cancelBtn = document.getElementById('cancelEditButton');
-
-    if (isEditing) {
-        formSection.style.display = 'block'; // Mostrar el formulario
-        submitBtn.textContent = 'Guardar Cambios';
-        cancelBtn.style.display = 'inline-block';
-        cedulaInput.disabled = true; // No permitir cambiar la cédula durante la edición
-    } else {
-        formSection.style.display = 'none'; // Ocultar el formulario
-        cedulaInput.disabled = false;
-        form.athleteId.value = ''; // Limpiar el ID
-        form.reset();
-    }
-}
-
-/**
- * FUNCIÓN DE BÚSQUEDA POR CÉDULA/ID (NUEVO)
+ * 5. FUNCIÓN DE EDICIÓN (Carga de datos)
  */
-function searchAthlete() {
-    const searchInput = document.getElementById('searchInput');
-    const searchValue = searchInput.value.trim();
-
-    if (searchValue === '') {
-        // Si el campo de búsqueda está vacío, restablece la vista (mostrar todos).
-        sortTable(currentSortKey, false);
+function editAthlete(id) {
+    const athlete = athletesData.find(a => a.id === id);
+    if (!athlete) {
+        displayStatusMessage("Error: No se encontró el atleta para editar.", 'error');
         return;
     }
 
-    // 1. Filtrar los datos: Usamos includes para buscar la cédula en la lista
-    const filteredData = athletesData.filter(athlete => 
-        athlete.cedula && String(athlete.cedula).includes(searchValue)
-    );
+    const form = document.getElementById('athleteForm');
 
-    // 2. Renderizar la tabla con los resultados filtrados
-    renderTable(filteredData);
+    // Cargar los datos al formulario
+    form.athleteId.value = id; // Clave: Guardar el ID
+    form.cedula.value = athlete.cedula || '';
+    form.club.value = athlete.club || '';
+    form.nombre.value = athlete.nombre || '';
+    form.apellido.value = athlete.apellido || '';
+    form.fechaNac.value = athlete.fechaNac || '';
+    form.division.value = athlete.division || '';
+    form.talla.value = athlete.tallaRaw || '';
+    form.peso.value = athlete.pesoRaw || '';
+    form.correo.value = athlete.correo || '';
+    form.telefono.value = athlete.telefono || '';
+
+    setFormMode(true); // Mostrar el formulario en modo edición
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mover la vista al formulario
 }
+
+/**
+ * 6. FUNCIÓN DE ELIMINACIÓN
+ */
+async function deleteAthlete(id, name) {
+    if (!confirm(`¿Estás seguro de que quieres ELIMINAR al atleta ${name}?`)) {
+        return;
+    }
+    
+    let appIdToUse;
+    if (typeof __app_id !== 'undefined') {
+        appIdToUse = __app_id;
+    } else {
+        appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+    }
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+
+    try {
+        const athleteDocRef = doc(db, athletesColPath, id);
+        await deleteDoc(athleteDocRef);
+        displayStatusMessage(`✅ Atleta ${name} eliminado con éxito. (Sincronizando tabla...)`, 'success');
+    } catch (error) {
+        console.error("!!! ERROR CRÍTICO AL INTENTAR ELIMINAR !!!", error);
+        if (error.code === 'permission-denied') {
+            displayStatusMessage("❌ ERROR DE PERMISO DE ELIMINACIÓN: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+            displayStatusMessage(`❌ ERROR al eliminar a ${name}: ${error.message}`, 'error');
+        }
+    }
+}
+
+/**
+ * Lógica para mostrar/ocultar el formulario y resetearlo
+ */
+function setFormMode(isEditing) {
+    const formSection = document.getElementById('editFormSection');
+    const form = document.getElementById('athleteForm');
+    const cedulaInput = form.cedula;
+
+    if (isEditing) {
+        formSection.style.display = 'block'; // Mostrar el formulario
+        cedulaInput.disabled = true; // No permitir cambiar la cédula durante la edición
+    } else {
+        formSection.style.display = 'none'; // Ocultar el formulario
+        cedulaInput.disabled = false;
+        form.athleteId.value = ''; // Limpiar el ID
+        form.reset();
+    }
+}
+
 
 /**
  * LÓGICA DE ORDENAMIENTO
@@ -347,100 +319,77 @@ function sortTable(key, toggleDirection = true) {
 		return (sortDirection === 'desc') ? (comparison * -1) : comparison;
 	});
 
-	renderTable(athletesData);
+	renderTable();
 }
 
 /**
- * RENDERIZADO DE LA TABLA (Maneja el filtro de búsqueda y el mensaje de no encontrado)
+ * RENDERIZADO DE LA TABLA (7 columnas visibles)
  */
-function renderTable(dataToDisplay = athletesData) {
-    const registeredDataContainer = document.getElementById('registeredData');
-    let table = document.getElementById('athleteTable');
-    let tableBody = document.getElementById('athleteTableBody');
+function renderTable() {
+    const registeredDataContainer = document.getElementById('registeredData');
     
-    // 1. Manejo de mensajes (No hay data general o No hay resultados de búsqueda)
-    if (dataToDisplay.length === 0) {
-        // Comprobamos si fue una búsqueda la que falló
-        if (document.getElementById('searchInput') && document.getElementById('searchInput').value.trim() !== '') {
-            registeredDataContainer.innerHTML = `
-                <p class="no-results-message">
-                    ❌ **Atleta No Registrado:** No se encontró ningún atleta con la Cédula/ID introducida.
-                </p>
-            `;
-        } else {
-            // Mensaje estándar cuando no hay registros en la DB
-            registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
-        }
-        
-        // Si no hay datos, ocultar la tabla si existe y el botón de reset
-        if (table) table.remove();
-        if (document.getElementById('resetButton')) document.getElementById('resetButton').style.display = 'none';
+    if (athletesData.length === 0) {
+        registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
         return;
     }
 
-	// 2. DIBUJAR LA ESTRUCTURA DE LA TABLA (7 columnas)
-	if (!table) {
-		registeredDataContainer.innerHTML = `
-			<div class="table-responsive-wrapper">
-				<table id="athleteTable" class="athlete-data-table">
-					<thead>
-						<tr class="table-header-row">
-							<th data-sort-key="cedula">Cédula</th>
-							<th data-sort-key="nombre">Nombre</th>
-							<th data-sort-key="apellido">Apellido</th>
-							<th data-sort-key="club">Club</th> 
-							<th data-sort-key="fechaNac">F. Nac.</th>
-							<th data-sort-key="division">División</th>
-							<th class="no-sort">Acciones</th> 
-                        </tr>
-					</thead>
-					<tbody id="athleteTableBody">
-					</tbody>
-				</table>
-			</div>
-			<p class="table-note-message">Haz clic en cualquier encabezado de la tabla para ordenar los resultados.</p>
-		`;
-		tableBody = document.getElementById('athleteTableBody');
-		setupSorting();	
-        table = document.getElementById('athleteTable');
-	} else {
-		tableBody.innerHTML = '';
-	}
-	
-	// 3. LLENAR EL CUERPO DE LA TABLA (7 celdas de datos por fila)
-	dataToDisplay.forEach(data => {
-        const newRow = tableBody.insertRow(-1);	
-        newRow.classList.add('athlete-table-row');
-        
-        newRow.innerHTML = `
-            <td data-label="Cédula" class="table-data">${data.cedula}</td>
-            <td data-label="Nombre" class="table-data">${data.nombre}</td>
-            <td data-label="Apellido" class="table-data">${data.apellido}</td>
-            <td data-label="Club" class="table-data">${data.club}</td>
-            <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
-            <td data-label="División" class="table-data">${data.division}</td>
-            <td data-label="Acciones" class="table-data">
-                <button class="action-button edit-button" onclick="editAthlete('${data.id}')">Editar</button>
-                <button class="action-button delete-button" onclick="deleteAthlete('${data.id}', '${data.nombre} ${data.apellido}')">Eliminar</button>
-            </td>
-        `;
-    });
+    let table = document.getElementById('athleteTable');
+    let tableBody = document.getElementById('athleteTableBody');
 
-    // 4. Actualizar el indicador de ordenamiento
+    // 1. DIBUJAR LA ESTRUCTURA DE LA TABLA (7 columnas)
+    if (!table) {
+        registeredDataContainer.innerHTML = `
+            <div class="table-responsive-wrapper">
+                <table id="athleteTable" class="athlete-data-table">
+                    <thead>
+                        <tr class="table-header-row">
+                            <th data-sort-key="cedula">Cédula</th>
+                            <th data-sort-key="nombre">Nombre</th>
+                            <th data-sort-key="apellido">Apellido</th>
+                            <th data-sort-key="club">Club</th>    
+                            <th data-sort-key="fechaNac">F. Nac.</th>
+                            <th data-sort-key="division">División</th>
+                            <th class="no-sort">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="athleteTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note-message">Haz clic en cualquier encabezado de la tabla para ordenar los resultados.</p>
+        `;
+        tableBody = document.getElementById('athleteTableBody');
+        setupSorting();    
+    } else {
+        tableBody.innerHTML = '';
+    }
+    
+    // 2. LLENAR EL CUERPO DE LA TABLA (7 celdas de datos por fila)
+    athletesData.forEach(data => {
+        const newRow = tableBody.insertRow(-1);    
+        newRow.classList.add('athlete-table-row');
+        
+        newRow.innerHTML = `
+            <td data-label="Cédula" class="table-data">${data.cedula}</td>
+            <td data-label="Nombre" class="table-data">${data.nombre}</td>
+            <td data-label="Apellido" class="table-data">${data.apellido}</td>
+            <td data-label="Club" class="table-data">${data.club}</td>
+            <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
+            <td data-label="División" class="table-data">${data.division}</td>
+            <td data-label="Acciones" class="table-data">
+                <button class="action-button edit-button" onclick="editAthlete('${data.id}')">Editar</button>
+                <button class="action-button delete-button" onclick="deleteAthlete('${data.id}', '${data.nombre} ${data.apellido}')">Eliminar</button>
+            </td>
+        `;
+    });
+
     document.querySelectorAll('#athleteTable th').forEach(th => {
         th.classList.remove('sorted-asc', 'sorted-desc');
-        // Solo aplica el indicador si estamos mostrando la data completa y ordenada
-        if (dataToDisplay === athletesData && th.getAttribute('data-sort-key') === currentSortKey) {
+        if (th.getAttribute('data-sort-key') === currentSortKey) {
             th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
         }
     });
-    
-    // Si la data mostrada es filtrada, mostrar el botón de reset.
-    if (document.getElementById('resetButton')) {
-        document.getElementById('resetButton').style.display = (dataToDisplay.length > 0 && dataToDisplay !== athletesData) ? 'inline-block' : 'none';
-    }
 }
-
 
 function setupSorting() {
 	document.querySelectorAll('#athleteTable th').forEach(header => {
@@ -452,45 +401,16 @@ function setupSorting() {
 	});
 }
 
-/**
- * CONFIGURACIÓN DE LISTENERS para BÚSQUEDA (NUEVO)
- */
-function setupSearchListeners() {
-    const searchButton = document.getElementById('searchButton');
-    const resetButton = document.getElementById('resetButton');
-    const searchInput = document.getElementById('searchInput');
-    
-    if (searchButton) {
-        searchButton.addEventListener('click', searchAthlete);
-    }
-    
-    if (resetButton) {
-        resetButton.addEventListener('click', () => {
-            searchInput.value = ''; // Limpiar el input
-            sortTable(currentSortKey, false); // Vuelve a cargar y ordenar toda la data
-        });
-    }
-    
-    if (searchInput) {
-        // Permitir búsqueda al presionar ENTER
-        searchInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                searchAthlete();
-            }
-        });
-    }
-}
-
 function setupEditListeners() {
-    const form = document.getElementById('athleteForm');
-    const cancelBtn = document.getElementById('cancelEditButton');
-    
-    if (form) {
-        form.addEventListener('submit', handleFormSubmit);
-    }
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => setFormMode(false));
-    }
+    const form = document.getElementById('athleteForm');
+    const cancelBtn = document.getElementById('cancelEditButton');
+    
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => setFormMode(false));
+    }
 }
 
 
@@ -498,11 +418,9 @@ function setupEditListeners() {
 document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
 	setupEditListeners();
-    setupSearchListeners(); // <--- ¡Importante: Inicializa la nueva lógica de búsqueda!
 });
 
 // Exponer funciones globales para que los onclick de la tabla funcionen
 window.editAthlete = editAthlete;
 window.deleteAthlete = deleteAthlete;
 window.setFormMode = setFormMode;
-window.searchAthlete = searchAthlete; // Por si se necesita llamar desde otro lado
