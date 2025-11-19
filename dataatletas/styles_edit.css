@@ -169,7 +169,7 @@ input:focus, select:focus {
     margin-top: 5px; 
 }
 
-/* Estilos del Botón Registrar (Vinotinto Oscuro) */
+/* Estilos del Botón Registrar/Guardar (Vinotinto Oscuro) */
 .submit-button {
     /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
     display: block; 
@@ -191,6 +191,25 @@ input:focus, select:focus {
     background-color: #DC143C; 
     transform: translateY(-2px); 
     box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
+}
+
+/* Estilos para el botón de Cancelar/Reset */
+.cancel-button {
+    background-color: #F0DADA !important; /* Gris rojizo suave */
+    color: #800020; /* Vinotinto Oscuro */
+    padding: 12px 30px !important;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: 10px; /* Separación del botón de Submit */
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.cancel-button:hover {
+    background-color: #DC143C; /* Rojo Brillante */
+    color: white;
 }
 
 /* -------------------------------------------------------------------------- */
