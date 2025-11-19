@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data de Atletas - Registro O</title>
     <link rel="stylesheet" href="styles.css?v=5">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
         #statusMessage {
@@ -104,16 +103,6 @@
       <section class="data-section">
         <h2>Lista de Atletas Registrados</h2>
         
-        <div class="search-bar-container">
-            <input type="text" id="searchInput" name="searchInput" placeholder="Buscar por Cédula o ID" class="search-input" maxlength="15">
-            <button id="searchButton" class="search-button">
-                <i class="fas fa-search"></i> Buscar
-            </button>
-            <button id="resetButton" class="reset-button" style="display: none;">
-                Mostrar Todos
-            </button>
-        </div>
-        <hr class="separator"> 
         <div id="registeredData" class="registered-data-container"> 
           <p class="loading-message">Cargando datos...</p>
         </div>
