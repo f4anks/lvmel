@@ -1,655 +1,426 @@
-/* Paleta de Colores - Vinotinto y Rojos Brillantes:
+// 1. IMPORTACIONES DE FIREBASE (COMPLETO: Lectura, Update y Delete)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, query, onSnapshot, setLogLevel, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    - Primario (Vinotinto Oscuro): #800020
+// VARIABLES DE ESTADO Y FIREBASE
+let db;
+let auth;
+let userId = '';	
+let athletesData = []; 
+let currentSortKey = 'apellido';	
+let sortDirection = 'asc';	
 
-    - Secundario (Rojo Brillante): #DC143C
+setLogLevel('Debug');
 
-    - Fondo Principal: #FFF8F8 (Blanco con un toque rosado/crema)
+// =========================================================================
+// !!! ATENCIÓN: CONFIGURACIÓN PARA AMBIENTE EXTERNO (GitHub Pages) !!!
+// REEMPLAZA ESTO CON TUS CLAVES REALES DE FIREBASE
+// =========================================================================
+const EXTERNAL_FIREBASE_CONFIG = {
+	apiKey: "AIzaSyA5u1whBdu_fVb2Kw7SDRZbuyiM77RXVDE",
+	authDomain: "datalvmel.firebaseapp.com",
+	projectId: "datalvmel",
+	storageBucket: "datalvmel.firebasestorage.app",
+	messagingSenderId: "733536533303",
+	appId: "1:733536533303:web:3d2073504aefb2100378b2"
+};
 
-    - Fondo de Elementos: #FFFFFF
+/**
+ * Muestra un mensaje temporal de estado en la interfaz.
+ */
+function displayStatusMessage(message, type) {
+	let statusEl = document.getElementById('statusMessage');
+	
+	if (!statusEl) {
+		statusEl = document.createElement('div');
+		statusEl.id = 'statusMessage';
+		statusEl.style.position = 'fixed';
+		statusEl.style.top = '10px';
+		statusEl.style.right = '10px';
+		statusEl.style.padding = '10px 20px';
+		statusEl.style.borderRadius = '8px';
+		statusEl.style.zIndex = '1000';
+		statusEl.style.color = '#fff';
+		statusEl.style.transition = 'opacity 0.5s ease-in-out';
+		statusEl.style.opacity = '0';
+		
+        if (document.body) {
+            document.body.appendChild(statusEl);
+        } else {
+            console.error("No se pudo mostrar el mensaje de estado: El cuerpo del documento aún no está disponible.");
+            return; 
+        }
+	}
+	
+	statusEl.textContent = message; 
+	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+	statusEl.style.opacity = '1';
 
-    - Texto: #333333 (Gris oscuro)
-
-    - Borde Base/Raya: #F0DADA (Gris rojizo suave)
-
-*/
-
-
-
-/* Estilos Base y Reset */
-
-body {
-
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-
-    background-color: #FFF8F8; /* Fondo suave */
-
-    color: #333333; /* Gris oscuro */
-
-    margin: 0;
-
-    padding: 0;
-
-    line-height: 1.4;
-
+	setTimeout(() => {
+		statusEl.style.opacity = '0';
+	}, 4000);
 }
 
 
+/**
+ * 2. INICIALIZACIÓN Y AUTENTICACIÓN
+ */
+async function initFirebaseAndLoadData() {
+	console.log("Iniciando Firebase y autenticación para Data...");
+	try {
+		let configToUse;
+		let appIdToUse;
+		
+		if (typeof __firebase_config !== 'undefined' && __firebase_config.length > 2) {
+			configToUse = JSON.parse(__firebase_config);
+			appIdToUse = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+		} else {
+			configToUse = EXTERNAL_FIREBASE_CONFIG;
+			appIdToUse = configToUse.projectId;	
+		}
 
-.page-header {
+		const app = initializeApp(configToUse);
+		db = getFirestore(app);
+		auth = getAuth(app);
+		
+		// Autenticación anónima: NECESARIA para Edición/Eliminación
+        await signInAnonymously(auth);
+		
+		onAuthStateChanged(auth, (user) => {
+			if (user) {
+				userId = user.uid;
+				console.log("Usuario autenticado para CRUD. UID:", userId);
+				setupRealtimeListener(appIdToUse);
+			} else {
+				console.error("No se pudo autenticar al usuario.");
+				// Si falla la autenticación, la lectura aún podría funcionar si las reglas lo permiten.
+				setupRealtimeListener(appIdToUse); 
+			}
+		});
 
-    background-color: #800020; /* Vinotinto Oscuro */
+	} catch (e) {
+		console.error("Error al inicializar Firebase:", e);
+	}
+}
 
-    color: white;
+/**
+ * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
+ */
+function setupRealtimeListener(appId) {
+	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
+	const q = query(athletesColRef);
 
-    padding: 20px 0;
-
-    text-align: center;
-
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
+	onSnapshot(q, (snapshot) => {
+		console.log("Datos de Firestore actualizados. Sincronizando tabla...");
+		const fetchedData = [];
+		snapshot.forEach((doc) => {
+			fetchedData.push({	
+				id: doc.id, 
+				...doc.data()	
+			});
+		});
+		
+		athletesData = fetchedData;
+		
+		if (athletesData.length > 0) {
+			sortTable(currentSortKey, false);	
+		} else {
+			renderTable();
+		}
+	}, (error) => {
+		console.error("Error en la escucha en tiempo real:", error);
+        if (error.code === 'permission-denied') {
+             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+             displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
+        }
+	});
 }
 
 
-
-.page-header h1 {
-
-    font-size: 2.2rem;
-
-    margin-bottom: 3px;
-
-}
-
-
-
-.subtitle {
-
-    font-size: 1rem;
-
-    color: rgba(255, 255, 255, 0.85); 
-
-    margin: 0;
-
-}
-
-
-
-.container {
-
-    max-width: 1200px;
-
-    margin: 20px auto; 
-
-    padding: 0 20px;
-
-}
-
-
-
-h2 {
-
-    color: #DC143C; /* Rojo Brillante */
-
-    font-weight: 700;
-
-    padding-bottom: 8px;
-
-    margin-top: 25px; 
-
-    font-size: 1.6rem; 
-
-    margin-left: unset;
-
-    margin-right: unset;
-
-}
-
-
-
-/* Contenedor del Título del Formulario */
-
-.form-section {
-
-    text-align: center;
-
-    margin-bottom: 10px;
-
-}
-
-
-
-.form-section h2 {
-
-    text-align: center;
-
-    border-bottom: none; 
-
-    margin-top: 0; 
-
-    padding-bottom: 0;
-
-}
-
-
-
-/* Centrar el título de la sección de resultados (Lista de Atletas...) */
-
-.data-section h2 {
-
-    text-align: center;
-
-    border-bottom: 2px solid #F0DADA; 
-
-}
-
-
-
-.separator {
-
-    border: 0;
-
-    height: 1px;
-
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(220, 20, 60, 0.5), rgba(0, 0, 0, 0));
-
-    margin: 30px 0; 
-
-}
-
-
-
-/* Estilos de Formulario: Estrecho, Centrado y Vertical */
-
-.athlete-form {
-
-    max-width: 700px !important; 
-
-    margin: 0 auto !important; 
-
+/**
+ * 4. FUNCIÓN DE EDICIÓN/ACTUALIZACIÓN (handleFormSubmit)
+ */
+async function handleFormSubmit(event) {
+	event.preventDefault();	
+
+	if (!db) {
+		displayStatusMessage("Error: La base de datos no está inicializada.", 'error');
+		return false;
+	}
+
+	const form = document.getElementById('athleteForm');
+    const athleteId = form.athleteId.value; 
+
+	if (!athleteId) {
+        displayStatusMessage("Error: ID de atleta no encontrado para la edición.", 'error');
+        return false;
+    }
     
+	// 1. Recolectar datos y preparar el objeto (documento)
+	const tallaValue = form.talla.value; 
+	const pesoValue = form.peso.value; 
+	
+	const athleteData = {
+		club: form.club.value,
+		nombre: form.nombre.value,
+		apellido: form.apellido.value,
+		fechaNac: form.fechaNac.value,
+		division: form.division.value,	
+		tallaRaw: tallaValue,	
+		pesoRaw: pesoValue,	 	
+		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
+		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
+		correo: form.correo.value,
+		telefono: form.telefono.value,
+		timestamp: Date.now()	
+	};
+	
+	let appIdToUse;
+	if (typeof __app_id !== 'undefined') {
+		appIdToUse = __app_id;
+	} else {
+		appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+	}
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
 
-    display: flex !important;
+	try {
+        const athleteDocRef = doc(db, athletesColPath, athleteId);
+        await updateDoc(athleteDocRef, athleteData);
+        console.log("Atleta actualizado en Firestore con éxito. ID:", athleteId);
+        displayStatusMessage("¡Atleta actualizado con éxito! (Sincronizando tabla...)", 'success');
 
-    flex-wrap: wrap !important;
+	} catch(error) {
+		console.error("!!! ERROR CRÍTICO AL INTENTAR ACTUALIZAR !!!", error.message);
+		if (error.code === 'permission-denied') {
+			displayStatusMessage("❌ ERROR DE PERMISO: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+		} else {
+			displayStatusMessage(`❌ ERROR al actualizar: ${error.message}`, 'error');
+		}
 
-    /* Espaciado uniforme de 20px entre filas y columnas */
-
-    gap: 20px; 
-
-    
-
-    background: #ffffff;
-
-    padding: 40px 30px !important; 
-
-    border-radius: 15px; 
-
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
-
+	} finally {
+		setFormMode(false); // Resetear el formulario al modo registro/oculto
+	}
+	
+	return false;	
 }
 
 
-
-.form-group {
-
-    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
-
-    margin-bottom: 0 !important; 
-
-    padding-left: 0 !important;
-
-    padding-right: 0 !important;
-
-    
-
-    display: flex !important;
-
-    flex-direction: column !important;
-
-    align-items: flex-start !important; 
-
-    
-
-    flex: 1 1 100%;
-
-}
-
-
-
-/* **CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA** */
-
-.form-group.half-width {
-
-    margin-left: 0 !important; 
-
-    margin-right: 0 !important; 
-
-    
-
-    /* Recalculado para acomodar el gap uniforme de 20px */
-
-    flex: 1 1 calc(50% - 10px) !important; 
-
-}
-
-
-
-label {
-
-    text-align: left !important;
-
-    margin-bottom: 0 !important;
-
-    padding: 0 !important; 
-
-    font-weight: 600;
-
-    color: #333333;
-
-    font-size: 0.95rem; 
-
-}
-
-
-
-input[type="text"],
-
-input[type="number"],
-
-input[type="date"],
-
-input[type="email"],
-
-input[type="tel"],
-
-select {
-
-    width: 100% !important; 
-
-    box-sizing: border-box !important; 
-
-    
-
-    padding: 8px 0 !important; 
-
-    border: none !important; 
-
-    border-bottom: 2px solid #F0DADA !important; 
-
-    border-radius: 0 !important; 
-
-    font-size: 16px;
-
-    background-color: transparent !important; 
-
-    outline: none !important; 
-
-
-
-    appearance: none;
-
-    -webkit-appearance: none;
-
-    /* Color de flecha Vinotinto/Rojo Brillante */
-
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DC143C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C/svg%3E');
-
-    background-repeat: no-repeat;
-
-    background-position: right 0 center;
-
-    background-size: 10px auto;
-
-    padding-right: 20px !important; 
-
-}
-
-
-
-input:focus, select:focus {
-
-    border-color: #DC143C !important; 
-
-    box-shadow: none !important; 
-
-    outline: none !important;
-
-}
-
-
-
-/* Contenedor del botón para centrarlo (dentro del form) */
-
-.button-container {
-
-    flex: 1 1 100%;
-
-    display: flex;
-
-    /* CENTRADO FLEXBOX */
-
-    justify-content: center; 
-
-    /* CENTRADO DE TEXTO (Medida de seguridad) */
-
-    text-align: center; 
-
-    margin-top: 5px; 
-
-}
-
-
-
-/* Estilos del Botón Registrar (Vinotinto Oscuro) */
-
-.submit-button {
-
-    /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
-
-    display: block; 
-
-    
-
-    background-color: #800020 !important; 
-
-    color: white;
-
-    padding: 12px 30px !important; 
-
-    border: none;
-
-    border-radius: 50px; 
-
-    cursor: pointer;
-
-    font-size: 16px;
-
-    font-weight: 600;
-
-    letter-spacing: 0.5px;
-
-    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-
-    box-shadow: 0 4px 6px rgba(128, 0, 32, 0.3);
-
-}
-
-
-
-.submit-button:hover {
-
-    background-color: #DC143C; 
-
-    transform: translateY(-2px); 
-
-    box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
-
-}
-
-
-
-/* **NUEVO** Estilos para el botón de Cancelar/Reset */
-
-.cancel-button {
-
-    background-color: #F0DADA !important; /* Gris rojizo suave */
-
-    color: #800020; /* Vinotinto Oscuro */
-
-    padding: 12px 30px !important;
-
-    border: none;
-
-    border-radius: 50px;
-
-    cursor: pointer;
-
-    font-size: 16px;
-
-    font-weight: 600;
-
-    margin-left: 10px; /* Separación del botón de Submit */
-
-    transition: background-color 0.3s, transform 0.1s;
-
-}
-
-
-
-.cancel-button:hover {
-
-    background-color: #DC143C; /* Rojo Brillante */
-
-    color: white;
-
-}
-
-/* FIN NUEVO */
-
-
-
-/* -------------------------------------------------------------------------- */
-
-/* ESTILOS DE LA TABLA */
-
-/* -------------------------------------------------------------------------- */
-
-
-
-.table-responsive-wrapper {
-
-    overflow-x: auto;
-
-    background: #ffffff;
-
-    padding: 15px;
-
-    border-radius: 8px; 
-
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
-
-    margin-top: 20px; 
-
-}
-
-
-
-.athlete-data-table {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    margin-top: 15px; 
-
-    min-width: 700px;
-
-}
-
-
-
-.athlete-data-table th, .athlete-data-table td {
-
-    padding: 12px 10px; 
-
-    text-align: center;
-
-    border-bottom: 1px solid #F0DADA;
-
-}
-
-
-
-.athlete-data-table th {
-
-    background-color: #FFE5E5; 
-
-    color: #DC143C; 
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    position: relative;
-
-    white-space: nowrap;
-
-    transition: background-color 0.2s;
-
-}
-
-
-
-.athlete-data-table th:hover {
-
-    background-color: #FFCCCC;
-
-}
-
-
-
-/* Filas */
-
-.athlete-data-table tr:nth-child(even) {
-
-    background-color: #FFF8F8;
-
-}
-
-
-
-.athlete-data-table tr:hover {
-
-    background-color: #FFEBEB;
-
-}
-
-
-
-/* Indicadores de Ordenamiento */
-
-.athlete-data-table th.sorted-asc::after {
-
-    content: ' ▲';
-
-    color: #A52A2A;
-
-}
-
-
-
-.athlete-data-table th.sorted-desc::after {
-
-    content: ' ▼';
-
-    color: #A52A2A;
-
-}
-
-
-
-.no-data-message, .loading-message, .table-note-message {
-
-    text-align: center;
-
-    padding: 15px;
-
-    color: #6c757d;
-
-    font-style: italic;
-
-    border: 1px dashed #F0DADA;
-
-    border-radius: 8px;
-
-    margin-top: 15px;
-
-}
-
-
-
-/* **NUEVO** Estilos para los botones de Editar y Eliminar dentro de la tabla */
-
-.action-button {
-
-    background: none;
-
-    border: none;
-
-    cursor: pointer;
-
-    font-size: 1rem;
-
-    padding: 5px 8px;
-
-    margin: 0 5px;
-
-    border-radius: 4px;
-
-    transition: background-color 0.2s;
-
-}
-
-
-
-.edit-button {
-
-    color: #007bff; /* Azul para editar */
-
-}
-
-.edit-button:hover {
-
-    color: white;
-
-    background-color: #007bff;
-
-}
-
-
-
-.delete-button {
-
-    color: #DC143C; /* Rojo Brillante para eliminar */
-
-}
-
-.delete-button:hover {
-
-    color: white;
-
-    background-color: #DC143C;
-
-}
-
-/* FIN NUEVO */
-
-
-
-/* Estilos Responsivos */
-
-@media (max-width: 768px) {
-
-    .container {
-
-        padding: 0 10px;
-
+/**
+ * 5. FUNCIÓN DE EDICIÓN (Carga de datos)
+ */
+function editAthlete(id) {
+    const athlete = athletesData.find(a => a.id === id);
+    if (!athlete) {
+        displayStatusMessage("Error: No se encontró el atleta para editar.", 'error');
+        return;
     }
 
-    .page-header h1 {
+    const form = document.getElementById('athleteForm');
 
-        font-size: 1.8rem;
+    // Cargar los datos al formulario
+    form.athleteId.value = id; // Clave: Guardar el ID
+    form.cedula.value = athlete.cedula || '';
+    form.club.value = athlete.club || '';
+    form.nombre.value = athlete.nombre || '';
+    form.apellido.value = athlete.apellido || '';
+    form.fechaNac.value = athlete.fechaNac || '';
+    form.division.value = athlete.division || '';
+    form.talla.value = athlete.tallaRaw || '';
+    form.peso.value = athlete.pesoRaw || '';
+    form.correo.value = athlete.correo || '';
+    form.telefono.value = athlete.telefono || '';
 
-    }
-
-    .form-group.half-width {
-
-        flex: 1 1 100% !important;
-
-        margin-left: 0 !important;
-
-        margin-right: 0 !important;
-
-    }
-
+    setFormMode(true); // Mostrar el formulario en modo edición
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mover la vista al formulario
 }
+
+/**
+ * 6. FUNCIÓN DE ELIMINACIÓN
+ */
+async function deleteAthlete(id, name) {
+    if (!confirm(`¿Estás seguro de que quieres ELIMINAR al atleta ${name}?`)) {
+        return;
+    }
+    
+    let appIdToUse;
+    if (typeof __app_id !== 'undefined') {
+        appIdToUse = __app_id;
+    } else {
+        appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+    }
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+
+    try {
+        const athleteDocRef = doc(db, athletesColPath, id);
+        await deleteDoc(athleteDocRef);
+        displayStatusMessage(`✅ Atleta ${name} eliminado con éxito. (Sincronizando tabla...)`, 'success');
+    } catch (error) {
+        console.error("!!! ERROR CRÍTICO AL INTENTAR ELIMINAR !!!", error);
+        if (error.code === 'permission-denied') {
+            displayStatusMessage("❌ ERROR DE PERMISO DE ELIMINACIÓN: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+            displayStatusMessage(`❌ ERROR al eliminar a ${name}: ${error.message}`, 'error');
+        }
+    }
+}
+
+/**
+ * Lógica para mostrar/ocultar el formulario y resetearlo
+ */
+function setFormMode(isEditing) {
+    const formSection = document.getElementById('editFormSection');
+    const form = document.getElementById('athleteForm');
+    const cedulaInput = form.cedula;
+
+    if (isEditing) {
+        formSection.style.display = 'block'; // Mostrar el formulario
+        cedulaInput.disabled = true; // No permitir cambiar la cédula durante la edición
+    } else {
+        formSection.style.display = 'none'; // Ocultar el formulario
+        cedulaInput.disabled = false;
+        form.athleteId.value = ''; // Limpiar el ID
+        form.reset();
+    }
+}
+
+
+/**
+ * LÓGICA DE ORDENAMIENTO
+ */
+function sortTable(key, toggleDirection = true) {
+	if (currentSortKey === key && toggleDirection) {
+		sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+	} else if (currentSortKey !== key) {
+		currentSortKey = key;
+		sortDirection = 'asc';
+	}
+
+	athletesData.sort((a, b) => {
+		let valA = a[key];
+		let valB = b[key];
+
+		if (key === 'tallaRaw' || key === 'pesoRaw') {
+			valA = parseFloat(valA) || 0;
+			valB = parseFloat(valB) || 0;
+		} else if (key === 'fechaNac') {
+			valA = new Date(valA);
+			valB = new Date(valB);
+		} else {
+			valA = String(valA).toLowerCase();
+			valB = String(valB).toLowerCase();
+		}
+
+		let comparison = 0;
+		if (valA > valB) { comparison = 1; }	
+		else if (valA < valB) { comparison = -1; }
+		
+		return (sortDirection === 'desc') ? (comparison * -1) : comparison;
+	});
+
+	renderTable();
+}
+
+/**
+ * RENDERIZADO DE LA TABLA (7 columnas visibles)
+ */
+function renderTable() {
+    const registeredDataContainer = document.getElementById('registeredData');
+    
+    if (athletesData.length === 0) {
+        registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
+        return;
+    }
+
+    let table = document.getElementById('athleteTable');
+    let tableBody = document.getElementById('athleteTableBody');
+
+    // 1. DIBUJAR LA ESTRUCTURA DE LA TABLA (7 columnas)
+    if (!table) {
+        registeredDataContainer.innerHTML = `
+            <div class="table-responsive-wrapper">
+                <table id="athleteTable" class="athlete-data-table">
+                    <thead>
+                        <tr class="table-header-row">
+                            <th data-sort-key="cedula">Cédula</th>
+                            <th data-sort-key="nombre">Nombre</th>
+                            <th data-sort-key="apellido">Apellido</th>
+                            <th data-sort-key="club">Club</th>    
+                            <th data-sort-key="fechaNac">F. Nac.</th>
+                            <th data-sort-key="division">División</th>
+                            <th class="no-sort">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="athleteTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note-message">Haz clic en cualquier encabezado de la tabla para ordenar los resultados.</p>
+        `;
+        tableBody = document.getElementById('athleteTableBody');
+        setupSorting();    
+    } else {
+        tableBody.innerHTML = '';
+    }
+    
+    // 2. LLENAR EL CUERPO DE LA TABLA (7 celdas de datos por fila)
+    athletesData.forEach(data => {
+        const newRow = tableBody.insertRow(-1);    
+        newRow.classList.add('athlete-table-row');
+        
+        newRow.innerHTML = `
+            <td data-label="Cédula" class="table-data">${data.cedula}</td>
+            <td data-label="Nombre" class="table-data">${data.nombre}</td>
+            <td data-label="Apellido" class="table-data">${data.apellido}</td>
+            <td data-label="Club" class="table-data">${data.club}</td>
+            <td data-label="F. Nac." class="table-data">${data.fechaNac}</td>
+            <td data-label="División" class="table-data">${data.division}</td>
+            <td data-label="Acciones" class="table-data">
+                <button class="action-button edit-button" onclick="editAthlete('${data.id}')">Editar</button>
+                <button class="action-button delete-button" onclick="deleteAthlete('${data.id}', '${data.nombre} ${data.apellido}')">Eliminar</button>
+            </td>
+        `;
+    });
+
+    document.querySelectorAll('#athleteTable th').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        if (th.getAttribute('data-sort-key') === currentSortKey) {
+            th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        }
+    });
+}
+
+function setupSorting() {
+	document.querySelectorAll('#athleteTable th').forEach(header => {
+		const key = header.getAttribute('data-sort-key');
+		if (key) {
+			header.style.cursor = 'pointer';	
+			header.addEventListener('click', () => sortTable(key, true));	
+		}
+	});
+}
+
+function setupEditListeners() {
+    const form = document.getElementById('athleteForm');
+    const cancelBtn = document.getElementById('cancelEditButton');
+    
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => setFormMode(false));
+    }
+}
+
+
+// Inicializar Firebase y los Listeners al cargar el contenido
+document.addEventListener('DOMContentLoaded', () => {
+	initFirebaseAndLoadData();
+	setupEditListeners();
+});
+
+// Exponer funciones globales para que los onclick de la tabla funcionen
+window.editAthlete = editAthlete;
+window.deleteAthlete = deleteAthlete;
+window.setFormMode = setFormMode;
