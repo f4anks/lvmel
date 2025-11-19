@@ -65,19 +65,6 @@ h2 {
     padding-bottom: 0;
 }
 
-/* Centrar el título de la sección de resultados (Lista de Atletas...) */
-.data-section h2 {
-    text-align: center;
-    border-bottom: 2px solid #F0DADA; 
-}
-
-.separator {
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(220, 20, 60, 0.5), rgba(0, 0, 0, 0));
-    margin: 30px 0; 
-}
-
 /* Estilos de Formulario: Estrecho, Centrado y Vertical */
 .athlete-form {
     max-width: 700px !important; 
@@ -191,76 +178,6 @@ input:focus, select:focus {
     background-color: #DC143C; 
     transform: translateY(-2px); 
     box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
-}
-
-/* -------------------------------------------------------------------------- */
-/* ESTILOS DE LA TABLA */
-/* -------------------------------------------------------------------------- */
-
-.table-responsive-wrapper {
-    overflow-x: auto;
-    background: #ffffff;
-    padding: 15px;
-    border-radius: 8px; 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
-    margin-top: 20px; 
-}
-
-.athlete-data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px; 
-    min-width: 700px;
-}
-
-.athlete-data-table th, .athlete-data-table td {
-    padding: 12px 10px; 
-    text-align: center;
-    border-bottom: 1px solid #F0DADA;
-}
-
-.athlete-data-table th {
-    background-color: #FFE5E5; 
-    color: #DC143C; 
-    font-weight: 700;
-    cursor: pointer;
-    position: relative;
-    white-space: nowrap;
-    transition: background-color 0.2s;
-}
-
-.athlete-data-table th:hover {
-    background-color: #FFCCCC;
-}
-
-/* Filas */
-.athlete-data-table tr:nth-child(even) {
-    background-color: #FFF8F8;
-}
-
-.athlete-data-table tr:hover {
-    background-color: #FFEBEB;
-}
-
-/* Indicadores de Ordenamiento */
-.athlete-data-table th.sorted-asc::after {
-    content: ' ▲';
-    color: #A52A2A;
-}
-
-.athlete-data-table th.sorted-desc::after {
-    content: ' ▼';
-    color: #A52A2A;
-}
-
-.no-data-message, .loading-message, .table-note-message {
-    text-align: center;
-    padding: 15px;
-    color: #6c757d;
-    font-style: italic;
-    border: 1px dashed #F0DADA;
-    border-radius: 8px;
-    margin-top: 15px;
 }
 
 /* Estilos Responsivos */
