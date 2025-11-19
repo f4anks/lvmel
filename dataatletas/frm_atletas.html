@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data de Atletas - Registro O</title>
-    <link rel="stylesheet" href="styles.css?v=6"> 
+    <link rel="stylesheet" href="styles.css?v=5">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
         #statusMessage {
@@ -18,27 +19,6 @@
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
-        
-        /* Estilo para el botón de navegación */
-        .nav-button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .nav-button {
-            display: inline-block;
-            background-color: #DC143C; /* Rojo Brillante */
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background-color 0.3s;
-        }
-        .nav-button:hover {
-            background-color: #800020; /* Vinotinto Oscuro */
-        }
     </style>
   </head>
   <body> 
@@ -49,17 +29,11 @@
     </header>
     
     <main class="container">
-      
-      <div class="nav-button-container">
-          <a href="atletas_edit.html" class="nav-button">Ir a la Data (Visualización y Edición)</a>
-      </div>
-      
       <section class="form-section"> 
         <h2>Formulario para el Registro de Atletas</h2>
         
         <form id="athleteForm" class="athlete-form">
-            <input type="hidden" id="athleteId" name="athleteId" value="">
-
+            
             <div class="form-group half-width">
               <label for="cedula">Cédula de Identidad:</label> 
               <input id="cedula" name="cedula" placeholder="Ej: 34123100" required="" type="text">
@@ -119,10 +93,30 @@
             </div>
             
             <div class="form-group button-container">
-              <button type="submit" id="submitButton" class="submit-button">Registrar Atleta</button>
+              <button type="submit" class="submit-button">Registrar Atleta</button>
             </div>
         </form>
         
+      </section>
+      
+      <hr class="separator">
+      
+      <section class="data-section">
+        <h2>Lista de Atletas Registrados</h2>
+        
+        <div class="search-bar-container">
+            <input type="text" id="searchInput" name="searchInput" placeholder="Buscar por Cédula o ID" class="search-input" maxlength="15">
+            <button id="searchButton" class="search-button">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            <button id="resetButton" class="reset-button" style="display: none;">
+                Mostrar Todos
+            </button>
+        </div>
+        <hr class="separator"> 
+        <div id="registeredData" class="registered-data-container"> 
+          <p class="loading-message">Cargando datos...</p>
+        </div>
       </section>
       
     </main>
