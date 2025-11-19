@@ -11,7 +11,7 @@ import { getFirestore, collection, addDoc, setLogLevel, getDoc, doc, updateDoc }
 let db;
 let auth;
 let userId = '';	
-let athleteIdToEdit = null; // NUEVA variable para almacenar el ID si estamos editando
+let athleteIdToEdit = null; // Variable para almacenar el ID si estamos editando
 
 setLogLevel('Debug');
 
@@ -25,7 +25,9 @@ const EXTERNAL_FIREBASE_CONFIG = {
 	appId: "1:733536533303:web:3d2073504aefb2100378b2"
 };
 
-// ... (displayStatusMessage se mantiene igual) ...
+/**
+ * Muestra un mensaje temporal de estado en la interfaz.
+ */
 function displayStatusMessage(message, type) {
 	let statusEl = document.getElementById('statusMessage');
 	
@@ -83,7 +85,6 @@ async function initFirebase() {
 			if (user) {
 				userId = user.uid;
 				console.log("Usuario autenticado para registro/edición. UID:", userId);
-                // Una vez autenticado, revisamos si debemos cargar datos
                 checkEditMode(); 
 			} else {
 				signInAnonymously(auth).then(userCredential => {
@@ -180,15 +181,18 @@ async function loadAthleteData(id) {
 function setEditModeUI(isEditing) {
     const title = document.getElementById('pageTitle');
     const subtitle = document.getElementById('pageSubtitle');
-    const submitButton = document.querySelector('.submit-button');
+    const formHeader = document.getElementById('formHeader');
+    const submitButton = document.getElementById('submitButton'); // Usamos el ID agregado al HTML
 
     if (isEditing) {
         if (title) title.textContent = "Edición de Atleta";
         if (subtitle) subtitle.textContent = "Modifica y guarda los cambios del atleta seleccionado";
+        if (formHeader) formHeader.textContent = "Formulario para la Edición de Atletas";
         if (submitButton) submitButton.textContent = "Guardar Cambios";
     } else {
         if (title) title.textContent = "Registro de Atletas";
         if (subtitle) subtitle.textContent = "Ingresa la información del nuevo atleta";
+        if (formHeader) formHeader.textContent = "Formulario para el Registro de Atletas";
         if (submitButton) submitButton.textContent = "Registrar Atleta";
     }
 }
