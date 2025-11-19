@@ -31,7 +31,7 @@ function displayStatusMessage(message, type) {
 	
 	if (!statusEl) {
 		// ... [Lógica de creación de #statusMessage se mantiene igual] ...
-        statusEl = document.createElement('div');
+        statusEl = document.createElement('div');
 		statusEl.id = 'statusMessage';
 		statusEl.style.position = 'fixed';
 		statusEl.style.top = '10px';
@@ -86,12 +86,12 @@ async function initFirebase() {
 				console.log("Usuario autenticado para registro. UID:", userId);
 			} else {
 				signInAnonymously(auth).then(userCredential => {
-                    userId = userCredential.user.uid;
-                    console.log("Autenticación anónima exitosa. UID:", userId);
-                }).catch(error => {
-                    console.error("Error al iniciar sesión anónimamente:", error);
-                    displayStatusMessage("Error de autenticación. No se podrá registrar.", 'error');
-                });
+                    userId = userCredential.user.uid;
+                    console.log("Autenticación anónima exitosa. UID:", userId);
+                }).catch(error => {
+                    console.error("Error al iniciar sesión anónimamente:", error);
+                    displayStatusMessage("Error de autenticación. No se podrá registrar.", 'error');
+                });
 			}
 		});
 
@@ -128,7 +128,7 @@ async function handleFormSubmit(event) {
 	const pesoValue = form.peso.value; 
 	
 	const athleteData = {
-        cedula: form.cedula.value, 
+        cedula: form.cedula.value, 
 		club: form.club.value,
 		nombre: form.nombre.value,
 		apellido: form.apellido.value,
@@ -149,14 +149,14 @@ async function handleFormSubmit(event) {
 	} else {
 		appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
 	}
-    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
 
 	try {
-        // MODO REGISTRO (addDoc)
-        const athletesColRef = collection(db, athletesColPath);
-        await addDoc(athletesColRef, athleteData);	
-        console.log("Atleta registrado y guardado en Firestore con éxito.");
-        displayStatusMessage("¡Atleta registrado con éxito!", 'success');
+        // MODO REGISTRO (addDoc)
+        const athletesColRef = collection(db, athletesColPath);
+        await addDoc(athletesColRef, athleteData);	
+        console.log("Atleta registrado y guardado en Firestore con éxito.");
+        displayStatusMessage("¡Atleta registrado con éxito!", 'success');
 
 	} catch(error) {
 		console.error("!!! ERROR CRÍTICO AL INTENTAR REGISTRAR !!!", error.message);
