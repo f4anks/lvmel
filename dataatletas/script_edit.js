@@ -111,7 +111,7 @@ async function initFirebaseAndLoadData() {
 }
 
 /**
- * 3. ESCUCHA EN TIEMPO REAL (onSnapshot) - CORREGIDA
+ * 3. ESCUCHA EN TIEMPO REAL (onSnapshot)
  */
 function setupRealtimeListener(appId) {
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
@@ -140,8 +140,7 @@ function setupRealtimeListener(appId) {
 				clearSearchFilter(); 
 			}
 		} else {
-			// CORRECCIÓN: Llamamos a sortTable siempre. Esto asegura que la tabla 
-            // se renderice con datos o con el mensaje de "No hay atletas..."
+			// CORRECCIÓN: Llamamos a sortTable siempre.
 			sortTable(currentSortKey, false);	
 		}
 	}, (error) => {
@@ -155,102 +154,29 @@ function setupRealtimeListener(appId) {
 }
 
 
-/**
- * 4. FUNCIÓN DE EDICIÓN/ACTUALIZACIÓN (handleFormSubmit)
- */
-async function handleFormSubmit(event) {
-	event.preventDefault();	
-
-	if (!db) {
-		displayStatusMessage("Error: La base de datos no está inicializada.", 'error');
-		return false;
-	}
-
-	const form = document.getElementById('athleteForm');
-    const athleteId = form.athleteId.value; 
-
-	if (!athleteId) {
-        displayStatusMessage("Error: ID de atleta no encontrado para la edición.", 'error');
-        return false;
-    }
-    
-	// 1. Recolectar datos y preparar el objeto (documento)
-	const tallaValue = form.talla.value; 
-	const pesoValue = form.peso.value; 
-	
-	const athleteData = {
-		club: form.club.value,
-		nombre: form.nombre.value,
-		apellido: form.apellido.value,
-		fechaNac: form.fechaNac.value,
-		division: form.division.value,	
-		tallaRaw: tallaValue,	
-		pesoRaw: pesoValue,	 	
-		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
-		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
-		correo: form.correo.value,
-		telefono: form.telefono.value,
-		timestamp: Date.now()	
-	};
-	
-	let appIdToUse;
-	if (typeof __app_id !== 'undefined') {
-		appIdToUse = __app_id;
-	} else {
-		appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
-	}
-    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
-
-	try {
-        const athleteDocRef = doc(db, athletesColPath, athleteId);
-        await updateDoc(athleteDocRef, athleteData);
-        console.log("Atleta actualizado en Firestore con éxito. ID:", athleteId);
-        displayStatusMessage("¡Atleta actualizado con éxito! (Sincronizando tabla...)", 'success');
-
-	} catch(error) {
-		console.error("!!! ERROR CRÍTICO AL INTENTAR ACTUALIZAR !!!", error.message);
-		if (error.code === 'permission-denied') {
-			displayStatusMessage("❌ ERROR DE PERMISO: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
-		} else {
-			displayStatusMessage(`❌ ERROR al actualizar: ${error.message}`, 'error');
-		}
-
-	} finally {
-		setFormMode(false); // Resetear el formulario al modo registro/oculto
-	}
-	
-	return false;	
-}
-
+// ** FUNCIÓN DE EDICIÓN ORIGINAL ELIMINADA **
+// ** Se reemplaza por la función de redirección a frm_atletas.html **
 
 /**
- * 5. FUNCIÓN DE EDICIÓN (Carga de datos)
+ * 5. FUNCIÓN DE EDICIÓN (Redirección a la página de formulario) - MODIFICADA
+ * Ahora redirige a frm_atletas.html pasando el ID del atleta.
  */
 function editAthlete(id) {
-    const athlete = athletesData.find(a => a.id === id);
-    if (!athlete) {
-        displayStatusMessage("Error: No se encontró el atleta para editar.", 'error');
-        return;
-    }
+    const athlete = athletesData.find(a => a.id === id);
+    if (!athlete) {
+        displayStatusMessage("Error: No se encontró el atleta para editar.", 'error');
+        return;
+    }
 
-    const form = document.getElementById('athleteForm');
+    // Construir la URL con el ID del atleta como parámetro
+    const redirectUrl = `frm_atletas.html?id=${id}`;
 
-    // Cargar los datos al formulario
-    form.athleteId.value = id; // Clave: Guardar el ID
-    form.cedula.value = athlete.cedula || '';
-    form.club.value = athlete.club || '';
-    form.nombre.value = athlete.nombre || '';
-    form.apellido.value = athlete.apellido || '';
-    form.fechaNac.value = athlete.fechaNac || '';
-    form.division.value = athlete.division || '';
-    form.talla.value = athlete.tallaRaw || '';
-    form.peso.value = athlete.pesoRaw || '';
-    form.correo.value = athlete.correo || '';
-    form.telefono.value = athlete.telefono || '';
-
-    setFormMode(true); // Mostrar el formulario en modo edición
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mover la vista al formulario
+    console.log(`Redirigiendo a: ${redirectUrl}`);
+    
+    // Navegar a la página del formulario
+    window.location.href = redirectUrl;
 }
+
 
 /**
  * 6. FUNCIÓN DE ELIMINACIÓN
@@ -279,25 +205,6 @@ async function deleteAthlete(id, name) {
         } else {
             displayStatusMessage(`❌ ERROR al eliminar a ${name}: ${error.message}`, 'error');
         }
-    }
-}
-
-/**
- * Lógica para mostrar/ocultar el formulario y resetearlo
- */
-function setFormMode(isEditing) {
-    const formSection = document.getElementById('editFormSection');
-    const form = document.getElementById('athleteForm');
-    const cedulaInput = form.cedula;
-
-    if (isEditing) {
-        formSection.style.display = 'block'; // Mostrar el formulario
-        cedulaInput.disabled = true; // No permitir cambiar la cédula durante la edición
-    } else {
-        formSection.style.display = 'none'; // Ocultar el formulario
-        cedulaInput.disabled = false;
-        form.athleteId.value = ''; // Limpiar el ID
-        form.reset();
     }
 }
 
@@ -377,7 +284,7 @@ function clearSearchFilter() {
 
 
 // --------------------------------------------------------------------------
-// LÓGICA DE ORDENAMIENTO
+// LÓGICA DE ORDENAMIENTO Y RENDERIZADO
 // --------------------------------------------------------------------------
 
 /**
@@ -392,7 +299,6 @@ function sortTable(key, toggleDirection = true, dataToSort = null) {
 		sortDirection = 'asc';
 	}
     
-    // Determinar qué datos ordenar: usa dataToSort, sino los filtrados, sino todos.
     const data = dataToSort || (isFiltered ? filteredData : athletesData);
 
 	data.sort((a, b) => {
@@ -424,19 +330,17 @@ function sortTable(key, toggleDirection = true, dataToSort = null) {
  * RENDERIZADO DE LA TABLA - Acepta un array opcional para renderizar
  */
 function renderTable(dataToRender = null) {
-    // Determinar los datos a usar: dataToRender tiene prioridad, luego los filtrados, luego todos.
     const data = dataToRender || (isFiltered ? filteredData : athletesData); 
     const registeredDataContainer = document.getElementById('registeredData');
     
     if (data.length === 0) {
-        // Mensaje diferente si no hay datos debido a un filtro
+        // ... (Lógica para mostrar mensajes si no hay datos) ...
         if (isFiltered) {
             registeredDataContainer.innerHTML = '<p class="no-data-message">No se encontraron resultados para la búsqueda.</p>';
         } else {
             registeredDataContainer.innerHTML = '<p class="no-data-message">No hay atletas registrados aún. ¡Registra el primero!</p>';
         }
         
-        // Limpiar indicadores y eliminar tabla si existe
         document.querySelectorAll('#athleteTable th').forEach(th => th.classList.remove('sorted-asc', 'sorted-desc'));
         let table = document.getElementById('athleteTable');
         if (table) table.remove();
@@ -512,18 +416,6 @@ function setupSorting() {
 	});
 }
 
-function setupEditListeners() {
-    const form = document.getElementById('athleteForm');
-    const cancelBtn = document.getElementById('cancelEditButton');
-    
-    if (form) {
-        form.addEventListener('submit', handleFormSubmit);
-    }
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => setFormMode(false));
-    }
-}
-
 function setupSearchListeners() {
     const searchButton = document.getElementById('searchButton');
     const clearButton = document.getElementById('clearSearchButton');
@@ -550,11 +442,10 @@ function setupSearchListeners() {
 // Inicializar Firebase y los Listeners al cargar el contenido
 document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
-	setupEditListeners();
 	setupSearchListeners(); 
 });
 
 // Exponer funciones globales para que los onclick de la tabla funcionen
 window.editAthlete = editAthlete;
 window.deleteAthlete = deleteAthlete;
-window.setFormMode = setFormMode;
+// setFormMode y handleFormSubmit ya no son necesarios en este script
