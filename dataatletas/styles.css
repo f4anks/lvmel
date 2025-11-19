@@ -95,7 +95,6 @@ h2 {
 }
 
 .form-group {
-    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
     margin-bottom: 0 !important; 
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -264,123 +263,6 @@ input:focus, select:focus {
     margin-top: 15px;
 }
 
-/* ========================================================================= */
-/* ESTILOS ESPECÍFICOS PARA BOTONES DE ACCIÓN (EDITAR/ELIMINAR) */
-/* ========================================================================= */
-
-.action-button {
-    padding: 6px 10px;
-    margin: 2px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s, transform 0.1s;
-    font-size: 0.85rem;
-    white-space: nowrap; /* Evita que el texto se rompa */
-}
-
-/* 1. ESTILO PARA EL BOTÓN DE EDICIÓN (Vinotinto Oscuro) */
-.edit-button {
-    background-color: #800020; /* Vinotinto Oscuro */
-    color: #FFFFFF; /* Texto blanco */
-}
-
-.edit-button:hover {
-    background-color: #DC143C; /* Rojo Brillante al pasar el ratón */
-    transform: translateY(-1px);
-}
-
-/* 2. ESTILO PARA EL BOTÓN DE ELIMINACIÓN (Rojo Fuerte) */
-.delete-button {
-    background-color: #DC143C; /* Rojo Brillante */
-    color: #FFFFFF; /* Texto blanco */
-}
-
-.delete-button:hover {
-    background-color: #A52A2A; /* Marrón para un efecto de 'peligro' */
-    transform: translateY(-1px);
-}
-
-/* Asegurar que se vean bien en pantallas pequeñas */
-.table-data .action-button {
-    display: block;
-    width: 90%;
-    margin: 5px auto;
-}
-
-/* ========================================================================= */
-/* ESTILOS PARA LA BARRA DE BÚSQUEDA (NUEVO) */
-/* ========================================================================= */
-
-.search-bar-container {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
-    padding: 10px;
-    background-color: #ffffff; /* Fondo blanco para destacar */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.search-input {
-    flex-grow: 1;
-    padding: 10px 15px;
-    border: 2px solid #F0DADA; /* Borde suave */
-    border-radius: 6px;
-    font-size: 1rem;
-    max-width: 400px;
-    transition: border-color 0.2s;
-}
-
-.search-input:focus {
-    border-color: #DC143C; /* Rojo Brillante al enfocarse */
-    outline: none;
-}
-
-.search-button, .reset-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: background-color 0.2s;
-    white-space: nowrap;
-}
-
-.search-button {
-    background-color: #DC143C; /* Rojo Brillante */
-    color: white;
-}
-
-.search-button:hover {
-    background-color: #A52A2A; /* Marrón/Vinotinto al pasar el ratón */
-}
-
-.reset-button {
-    background-color: #800020; /* Vinotinto Oscuro */
-    color: white;
-}
-
-.reset-button:hover {
-    background-color: #580017;
-}
-
-/* Estilo para el mensaje de no encontrado */
-.no-results-message {
-    text-align: center;
-    padding: 20px;
-    background-color: #FFE5E5;
-    color: #DC143C;
-    border: 1px dashed #DC143C;
-    border-radius: 8px;
-    margin-top: 20px;
-    font-weight: 600;
-}
-
 /* Estilos Responsivos */
 @media (max-width: 768px) {
     .container {
@@ -393,12 +275,5 @@ input:focus, select:focus {
         flex: 1 1 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
-    }
-    .search-bar-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .search-input {
-        max-width: 100%;
     }
 }
