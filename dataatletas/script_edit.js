@@ -1,4 +1,8 @@
-// 1. IMPORTACIONES DE FIREBASE (Mismo contenido)
+// =========================================================================
+// script_edit.js: Lógica CRUD (Read, Update, Delete) y Ordenamiento/Búsqueda
+// =========================================================================
+
+// 1. IMPORTACIONES DE FIREBASE (COMPLETO: Lectura, Update y Delete)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, onSnapshot, setLogLevel, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -7,35 +11,107 @@ import { getFirestore, collection, query, onSnapshot, setLogLevel, updateDoc, do
 let db;
 let auth;
 let userId = '';	
-let athletesData = [];	
+let athletesData = [];	// Datos brutos sin filtrar, obtenidos de Firestore
 let currentSortKey = 'apellido';	
 let sortDirection = 'asc';	
 // === NUEVAS VARIABLES PARA BÚSQUEDA ===
-let isFiltered = false;
-let filteredData = [];
+let isFiltered = false; // Indica si la tabla está mostrando datos filtrados
+let filteredData = []; // Los datos filtrados (si isFiltered es true)
 // ======================================
 
 setLogLevel('Debug');
 
-// ... (EXTERNAL_FIREBASE_CONFIG - Mismo contenido)
+// !!! ATENCIÓN: CONFIGURACIÓN PARA AMBIENTE EXTERNO (GitHub Pages) !!!
+// REEMPLAZA ESTO CON TUS CLAVES REALES DE FIREBASE
+const EXTERNAL_FIREBASE_CONFIG = {
+	apiKey: "AIzaSyA5u1whBdu_fVb2Kw7SDRZbuyiM77RXVDE",
+	authDomain: "datalvmel.firebaseapp.com",
+	projectId: "datalvmel",
+	storageBucket: "datalvmel.firebasestorage.app",
+	messagingSenderId: "733536533303",
+	appId: "1:733536533303:web:3d2073504aefb2100378b2"
+};
 
 /**
- * Muestra un mensaje temporal de estado en la interfaz. (Mismo contenido)
+ * Muestra un mensaje temporal de estado en la interfaz.
  */
 function displayStatusMessage(message, type) {
-	// ... (Mismo contenido)
+	let statusEl = document.getElementById('statusMessage');
+	
+	if (!statusEl) {
+		statusEl = document.createElement('div');
+		statusEl.id = 'statusMessage';
+		statusEl.style.position = 'fixed';
+		statusEl.style.top = '10px';
+		statusEl.style.right = '10px';
+		statusEl.style.padding = '10px 20px';
+		statusEl.style.borderRadius = '8px';
+		statusEl.style.zIndex = '1000';
+		statusEl.style.color = '#fff';
+		statusEl.style.transition = 'opacity 0.5s ease-in-out';
+		statusEl.style.opacity = '0';
+		
+        if (document.body) {
+            document.body.appendChild(statusEl);
+        } else {
+            console.error("No se pudo mostrar el mensaje de estado: El cuerpo del documento aún no está disponible.");
+            return; 
+        }
+	}
+	
+	statusEl.textContent = message; 
+	statusEl.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+	statusEl.style.opacity = '1';
+
+	setTimeout(() => {
+		statusEl.style.opacity = '0';
+	}, 4000);
 }
 
 
 /**
- * 2. INICIALIZACIÓN Y AUTENTICACIÓN (Mismo contenido)
+ * 2. INICIALIZACIÓN Y AUTENTICACIÓN
  */
 async function initFirebaseAndLoadData() {
-	// ... (Mismo contenido)
+	console.log("Iniciando Firebase y autenticación para Data...");
+	try {
+		let configToUse;
+		let appIdToUse;
+		
+		if (typeof __firebase_config !== 'undefined' && __firebase_config.length > 2) {
+			configToUse = JSON.parse(__firebase_config);
+			appIdToUse = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+		} else {
+			configToUse = EXTERNAL_FIREBASE_CONFIG;
+			appIdToUse = configToUse.projectId;	
+		}
+
+		const app = initializeApp(configToUse);
+		db = getFirestore(app);
+		auth = getAuth(app);
+		
+		// Autenticación anónima: NECESARIA para Edición/Eliminación
+        await signInAnonymously(auth);
+		
+		onAuthStateChanged(auth, (user) => {
+			if (user) {
+				userId = user.uid;
+				console.log("Usuario autenticado para CRUD. UID:", userId);
+				setupRealtimeListener(appIdToUse);
+			} else {
+				console.error("No se pudo autenticar al usuario.");
+				// Si falla la autenticación, la lectura aún podría funcionar si las reglas lo permiten.
+				setupRealtimeListener(appIdToUse); 
+			}
+		});
+
+	} catch (e) {
+		console.error("Error al inicializar Firebase:", e);
+	}
 }
 
 /**
- * 3. ESCUCHA EN TIEMPO REAL (onSnapshot) - MODIFICADA
+ * 3. ESCUCHA EN TIEMPO REAL (onSnapshot) - CORREGIDA
  */
 function setupRealtimeListener(appId) {
 	const athletesColRef = collection(db, `artifacts/${appId}/public/data/athletes`);
@@ -57,62 +133,177 @@ function setupRealtimeListener(appId) {
 		if (isFiltered) {
 			const currentSearchTerm = document.getElementById('searchInput').value;
 			if (currentSearchTerm) {
-				// Si hay un filtro activo, volvemos a aplicarlo a los datos recién sincronizados
+				// Vuelve a aplicar el filtro al nuevo conjunto de datos
 				applySearchFilter(currentSearchTerm);
 			} else {
-				// Si el input está vacío pero isFiltered es true (estado inconsistente), reseteamos.
+				// Resetea si el filtro está activo pero el campo de búsqueda está vacío
 				clearSearchFilter(); 
 			}
 		} else {
-			// Si no estamos filtrando, ordenamos y renderizamos la lista completa.
-			if (athletesData.length > 0) {
-				sortTable(currentSortKey, false);	
-			} else {
-				renderTable();
-			}
+			// CORRECCIÓN: Llamamos a sortTable siempre. Esto asegura que la tabla 
+            // se renderice con datos o con el mensaje de "No hay atletas..."
+			sortTable(currentSortKey, false);	
 		}
 	}, (error) => {
 		console.error("Error en la escucha en tiempo real:", error);
-        if (error.code === 'permission-denied') {
-            displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
-        } else {
-            displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
-        }
+        if (error.code === 'permission-denied') {
+             displayStatusMessage("❌ ERROR DE PERMISO DE LECTURA: No se pueden mostrar los datos. ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+             displayStatusMessage(`❌ Error al cargar datos: ${error.message}`, 'error');
+        }
 	});
 }
 
 
 /**
- * 4. FUNCIÓN DE EDICIÓN/ACTUALIZACIÓN (handleFormSubmit) (Mismo contenido)
+ * 4. FUNCIÓN DE EDICIÓN/ACTUALIZACIÓN (handleFormSubmit)
  */
 async function handleFormSubmit(event) {
-	// ... (Mismo contenido)
+	event.preventDefault();	
+
+	if (!db) {
+		displayStatusMessage("Error: La base de datos no está inicializada.", 'error');
+		return false;
+	}
+
+	const form = document.getElementById('athleteForm');
+    const athleteId = form.athleteId.value; 
+
+	if (!athleteId) {
+        displayStatusMessage("Error: ID de atleta no encontrado para la edición.", 'error');
+        return false;
+    }
+    
+	// 1. Recolectar datos y preparar el objeto (documento)
+	const tallaValue = form.talla.value; 
+	const pesoValue = form.peso.value; 
+	
+	const athleteData = {
+		club: form.club.value,
+		nombre: form.nombre.value,
+		apellido: form.apellido.value,
+		fechaNac: form.fechaNac.value,
+		division: form.division.value,	
+		tallaRaw: tallaValue,	
+		pesoRaw: pesoValue,	 	
+		tallaFormatted: tallaValue ? `${tallaValue} m` : 'N/A',
+		pesoFormatted: pesoValue ? `${pesoValue} kg` : 'N/A',
+		correo: form.correo.value,
+		telefono: form.telefono.value,
+		timestamp: Date.now()	
+	};
+	
+	let appIdToUse;
+	if (typeof __app_id !== 'undefined') {
+		appIdToUse = __app_id;
+	} else {
+		appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+	}
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+
+	try {
+        const athleteDocRef = doc(db, athletesColPath, athleteId);
+        await updateDoc(athleteDocRef, athleteData);
+        console.log("Atleta actualizado en Firestore con éxito. ID:", athleteId);
+        displayStatusMessage("¡Atleta actualizado con éxito! (Sincronizando tabla...)", 'success');
+
+	} catch(error) {
+		console.error("!!! ERROR CRÍTICO AL INTENTAR ACTUALIZAR !!!", error.message);
+		if (error.code === 'permission-denied') {
+			displayStatusMessage("❌ ERROR DE PERMISO: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+		} else {
+			displayStatusMessage(`❌ ERROR al actualizar: ${error.message}`, 'error');
+		}
+
+	} finally {
+		setFormMode(false); // Resetear el formulario al modo registro/oculto
+	}
+	
+	return false;	
 }
 
 
 /**
- * 5. FUNCIÓN DE EDICIÓN (Carga de datos) (Mismo contenido)
+ * 5. FUNCIÓN DE EDICIÓN (Carga de datos)
  */
 function editAthlete(id) {
-	// ... (Mismo contenido)
+    const athlete = athletesData.find(a => a.id === id);
+    if (!athlete) {
+        displayStatusMessage("Error: No se encontró el atleta para editar.", 'error');
+        return;
+    }
+
+    const form = document.getElementById('athleteForm');
+
+    // Cargar los datos al formulario
+    form.athleteId.value = id; // Clave: Guardar el ID
+    form.cedula.value = athlete.cedula || '';
+    form.club.value = athlete.club || '';
+    form.nombre.value = athlete.nombre || '';
+    form.apellido.value = athlete.apellido || '';
+    form.fechaNac.value = athlete.fechaNac || '';
+    form.division.value = athlete.division || '';
+    form.talla.value = athlete.tallaRaw || '';
+    form.peso.value = athlete.pesoRaw || '';
+    form.correo.value = athlete.correo || '';
+    form.telefono.value = athlete.telefono || '';
+
+    setFormMode(true); // Mostrar el formulario en modo edición
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mover la vista al formulario
 }
 
 /**
- * 6. FUNCIÓN DE ELIMINACIÓN (Mismo contenido)
+ * 6. FUNCIÓN DE ELIMINACIÓN
  */
 async function deleteAthlete(id, name) {
-	// ... (Mismo contenido)
+    if (!confirm(`¿Estás seguro de que quieres ELIMINAR al atleta ${name}?`)) {
+        return;
+    }
+    
+    let appIdToUse;
+    if (typeof __app_id !== 'undefined') {
+        appIdToUse = __app_id;
+    } else {
+        appIdToUse = EXTERNAL_FIREBASE_CONFIG.projectId;
+    }
+    const athletesColPath = `artifacts/${appIdToUse}/public/data/athletes`;
+
+    try {
+        const athleteDocRef = doc(db, athletesColPath, id);
+        await deleteDoc(athleteDocRef);
+        displayStatusMessage(`✅ Atleta ${name} eliminado con éxito. (Sincronizando tabla...)`, 'success');
+    } catch (error) {
+        console.error("!!! ERROR CRÍTICO AL INTENTAR ELIMINAR !!!", error);
+        if (error.code === 'permission-denied') {
+            displayStatusMessage("❌ ERROR DE PERMISO DE ELIMINACIÓN: ¡REVISA TUS REGLAS DE FIRESTORE!", 'error');
+        } else {
+            displayStatusMessage(`❌ ERROR al eliminar a ${name}: ${error.message}`, 'error');
+        }
+    }
 }
 
 /**
- * Lógica para mostrar/ocultar el formulario y resetearlo (Mismo contenido)
+ * Lógica para mostrar/ocultar el formulario y resetearlo
  */
 function setFormMode(isEditing) {
-	// ... (Mismo contenido)
+    const formSection = document.getElementById('editFormSection');
+    const form = document.getElementById('athleteForm');
+    const cedulaInput = form.cedula;
+
+    if (isEditing) {
+        formSection.style.display = 'block'; // Mostrar el formulario
+        cedulaInput.disabled = true; // No permitir cambiar la cédula durante la edición
+    } else {
+        formSection.style.display = 'none'; // Ocultar el formulario
+        cedulaInput.disabled = false;
+        form.athleteId.value = ''; // Limpiar el ID
+        form.reset();
+    }
 }
 
+
 // --------------------------------------------------------------------------
-// LÓGICA DE BÚSQUEDA (NUEVAS FUNCIONES)
+// LÓGICA DE BÚSQUEDA
 // --------------------------------------------------------------------------
 
 /**
@@ -143,7 +334,7 @@ function applySearchFilter(cedula) {
     } else {
         resultMessageEl.textContent = "⚠️ Este Atleta no está registrado.";
         resultMessageEl.classList.remove('success');
-        resultMessageEl.classList.add('success'); // El estilo de error se aplica con el CSS
+        resultMessageEl.classList.add('error');
     }
 
     clearButton.style.display = 'inline-flex'; // Mostrar botón de Borrar
@@ -181,15 +372,12 @@ function clearSearchFilter() {
     document.getElementById('clearSearchButton').style.display = 'none';
 
     // Recargar la tabla completa (ordenada)
-    if (athletesData.length > 0) {
-        sortTable(currentSortKey, false);
-    } else {
-        renderTable();
-    }
+    sortTable(currentSortKey, false);
 }
 
+
 // --------------------------------------------------------------------------
-// LÓGICA DE ORDENAMIENTO (MODIFICADA)
+// LÓGICA DE ORDENAMIENTO
 // --------------------------------------------------------------------------
 
 /**
@@ -233,7 +421,7 @@ function sortTable(key, toggleDirection = true, dataToSort = null) {
 }
 
 /**
- * RENDERIZADO DE LA TABLA (MODIFICADA) - Acepta un array opcional para renderizar
+ * RENDERIZADO DE LA TABLA - Acepta un array opcional para renderizar
  */
 function renderTable(dataToRender = null) {
     // Determinar los datos a usar: dataToRender tiene prioridad, luego los filtrados, luego todos.
@@ -259,7 +447,7 @@ function renderTable(dataToRender = null) {
     let table = document.getElementById('athleteTable');
     let tableBody = document.getElementById('athleteTableBody');
 
-    // 1. DIBUJAR LA ESTRUCTURA DE LA TABLA (Mismo contenido)
+    // 1. DIBUJAR LA ESTRUCTURA DE LA TABLA 
     if (!table) {
         registeredDataContainer.innerHTML = `
             <div class="table-responsive-wrapper">
@@ -287,7 +475,7 @@ function renderTable(dataToRender = null) {
         tableBody.innerHTML = '';
     }
     
-    // 2. LLENAR EL CUERPO DE LA TABLA (Ahora itera sobre el array 'data')
+    // 2. LLENAR EL CUERPO DE LA TABLA 
     data.forEach(athlete => { 
         const newRow = tableBody.insertRow(-1);     
         newRow.classList.add('athlete-table-row');
@@ -315,16 +503,27 @@ function renderTable(dataToRender = null) {
 }
 
 function setupSorting() {
-    // ... (Mismo contenido)
+	document.querySelectorAll('#athleteTable th').forEach(header => {
+		const key = header.getAttribute('data-sort-key');
+		if (key) {
+			header.style.cursor = 'pointer';	
+			header.addEventListener('click', () => sortTable(key, true));	
+		}
+	});
 }
 
 function setupEditListeners() {
-    // ... (Mismo contenido)
+    const form = document.getElementById('athleteForm');
+    const cancelBtn = document.getElementById('cancelEditButton');
+    
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => setFormMode(false));
+    }
 }
 
-// --------------------------------------------------------------------------
-// NUEVO SETUP DE LISTENERS PARA LA BÚSQUEDA
-// --------------------------------------------------------------------------
 function setupSearchListeners() {
     const searchButton = document.getElementById('searchButton');
     const clearButton = document.getElementById('clearSearchButton');
@@ -348,14 +547,14 @@ function setupSearchListeners() {
 }
 
 
-// Inicializar Firebase y los Listeners al cargar el contenido (MODIFICADA)
+// Inicializar Firebase y los Listeners al cargar el contenido
 document.addEventListener('DOMContentLoaded', () => {
 	initFirebaseAndLoadData();
 	setupEditListeners();
-	setupSearchListeners(); // <--- NUEVA LLAMADA
+	setupSearchListeners(); 
 });
 
-// Exponer funciones globales para que los onclick de la tabla funcionen (Mismo contenido)
+// Exponer funciones globales para que los onclick de la tabla funcionen
 window.editAthlete = editAthlete;
 window.deleteAthlete = deleteAthlete;
 window.setFormMode = setFormMode;
