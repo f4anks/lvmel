@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data de Atletas - Registro O</title>
+    <title>Data de Atletas - Registro / Edición</title>
     <link rel="stylesheet" href="styles.css?v=6"> 
     <style>
         /* Estilos en línea para el mensaje de estado (necesario para displayStatusMessage en script.js) */
@@ -44,8 +44,8 @@
   <body> 
     <header class="page-header">
       <br>
-      <h1>Data de Atletas</h1>
-      <p class="subtitle">Liga de Voleibol Menor del Estado Lara</p>
+      <h1 id="pageTitle">Registro de Atletas</h1>
+      <p class="subtitle" id="pageSubtitle">Liga de Voleibol Menor del Estado Lara</p>
     </header>
     
     <main class="container">
@@ -55,11 +55,9 @@
       </div>
       
       <section class="form-section"> 
-        <h2>Formulario para el Registro de Atletas</h2>
+        <h2 id="formHeader">Formulario para el Registro de Atletas</h2>
         
         <form id="athleteForm" class="athlete-form">
-            <input type="hidden" id="athleteId" name="athleteId" value="">
-
             <div class="form-group half-width">
               <label for="cedula">Cédula de Identidad:</label> 
               <input id="cedula" name="cedula" placeholder="Ej: 34123100" required="" type="text">
