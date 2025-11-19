@@ -1,128 +1,128 @@
 /* Paleta de Colores - Vinotinto y Rojos Brillantes:
-    - Primario (Vinotinto Oscuro): #800020
-    - Secundario (Rojo Brillante): #DC143C
-    - Fondo Principal: #FFF8F8 (Blanco con un toque rosado/crema)
-    - Fondo de Elementos: #FFFFFF
-    - Texto: #333333 (Gris oscuro)
-    - Borde Base/Raya: #F0DADA (Gris rojizo suave)
+    - Primario (Vinotinto Oscuro): #800020
+    - Secundario (Rojo Brillante): #DC143C
+    - Fondo Principal: #FFF8F8 (Blanco con un toque rosado/crema)
+    - Fondo de Elementos: #FFFFFF
+    - Texto: #333333 (Gris oscuro)
+    - Borde Base/Raya: #F0DADA (Gris rojizo suave)
 */
 
 /* Estilos Base y Reset */
 body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #FFF8F8; /* Fondo suave */
-    color: #333333; /* Gris oscuro */
-    margin: 0;
-    padding: 0;
-    line-height: 1.4;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #FFF8F8; /* Fondo suave */
+    color: #333333; /* Gris oscuro */
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
 }
 
 .page-header {
-    background-color: #800020; /* Vinotinto Oscuro */
-    color: white;
-    padding: 20px 0;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #800020; /* Vinotinto Oscuro */
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h1 {
-    font-size: 2.2rem;
-    margin-bottom: 3px;
+    font-size: 2.2rem;
+    margin-bottom: 3px;
 }
 
 .subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.85); 
-    margin: 0;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.85); 
+    margin: 0;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 20px auto; 
-    padding: 0 20px;
+    max-width: 1200px;
+    margin: 20px auto; 
+    padding: 0 20px;
 }
 
 h2 {
-    color: #DC143C; /* Rojo Brillante */
-    font-weight: 700;
-    padding-bottom: 8px;
-    margin-top: 25px; 
-    font-size: 1.6rem; 
-    margin-left: unset;
-    margin-right: unset;
+    color: #DC143C; /* Rojo Brillante */
+    font-weight: 700;
+    padding-bottom: 8px;
+    margin-top: 25px; 
+    font-size: 1.6rem; 
+    margin-left: unset;
+    margin-right: unset;
 }
 
 /* Contenedor del Título del Formulario */
 .form-section {
-    text-align: center;
-    margin-bottom: 10px;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 .form-section h2 {
-    text-align: center;
-    border-bottom: none; 
-    margin-top: 0; 
-    padding-bottom: 0;
+    text-align: center;
+    border-bottom: none; 
+    margin-top: 0; 
+    padding-bottom: 0;
 }
 
 /* Centrar el título de la sección de resultados (Lista de Atletas...) */
 .data-section h2 {
-    text-align: center;
-    border-bottom: 2px solid #F0DADA; 
+    text-align: center;
+    border-bottom: 2px solid #F0DADA; 
 }
 
 .separator {
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(220, 20, 60, 0.5), rgba(0, 0, 0, 0));
-    margin: 30px 0; 
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(220, 20, 60, 0.5), rgba(0, 0, 0, 0));
+    margin: 30px 0; 
 }
 
 /* Estilos de Formulario: Estrecho, Centrado y Vertical */
 .athlete-form {
-    max-width: 700px !important; 
-    margin: 0 auto !important; 
-    
-    display: flex !important;
-    flex-wrap: wrap !important;
-    /* Espaciado uniforme de 20px entre filas y columnas */
-    gap: 20px; 
-    
-    background: #ffffff;
-    padding: 40px 30px !important; 
-    border-radius: 15px; 
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
+    max-width: 700px !important; 
+    margin: 0 auto !important; 
+    
+    display: flex !important;
+    flex-wrap: wrap !important;
+    /* Espaciado uniforme de 20px entre filas y columnas */
+    gap: 20px; 
+    
+    background: #ffffff;
+    padding: 40px 30px !important; 
+    border-radius: 15px; 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
 }
 
 .form-group {
-    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
-    margin-bottom: 0 !important; 
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important; 
-    
-    flex: 1 1 100%;
+    /* **ANULACIONES DE BOOTSTRAP AQUÍ** */
+    margin-bottom: 0 !important; 
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important; 
+    
+    flex: 1 1 100%;
 }
 
 /* **CORRECCIÓN FINAL PARA CAMPOS DE MEDIA COLUMNA** */
 .form-group.half-width {
-    margin-left: 0 !important; 
-    margin-right: 0 !important; 
-    
-    /* Recalculado para acomodar el gap uniforme de 20px */
-    flex: 1 1 calc(50% - 10px) !important; 
+    margin-left: 0 !important; 
+    margin-right: 0 !important; 
+    
+    /* Recalculado para acomodar el gap uniforme de 20px */
+    flex: 1 1 calc(50% - 10px) !important; 
 }
 
 label {
-    text-align: left !important;
-    margin-bottom: 0 !important;
-    padding: 0 !important; 
-    font-weight: 600;
-    color: #333333;
-    font-size: 0.95rem; 
+    text-align: left !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important; 
+    font-weight: 600;
+    color: #333333;
+    font-size: 0.95rem; 
 }
 
 input[type="text"],
@@ -131,85 +131,110 @@ input[type="date"],
 input[type="email"],
 input[type="tel"],
 select {
-    width: 100% !important; 
-    box-sizing: border-box !important; 
-    
-    padding: 8px 0 !important; 
-    border: none !important; 
-    border-bottom: 2px solid #F0DADA !important; 
-    border-radius: 0 !important; 
-    font-size: 16px;
-    background-color: transparent !important; 
-    outline: none !important; 
+    width: 100% !important; 
+    box-sizing: border-box !important; 
+    
+    padding: 8px 0 !important; 
+    border: none !important; 
+    border-bottom: 2px solid #F0DADA !important; 
+    border-radius: 0 !important; 
+    font-size: 16px;
+    background-color: transparent !important; 
+    outline: none !important; 
 
-    appearance: none;
-    -webkit-appearance: none;
-    /* Color de flecha Vinotinto/Rojo Brillante */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DC143C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C/svg%3E');
-    background-repeat: no-repeat;
-    background-position: right 0 center;
-    background-size: 10px auto;
-    padding-right: 20px !important; 
+    appearance: none;
+    -webkit-appearance: none;
+    /* Color de flecha Vinotinto/Rojo Brillante */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23DC143C%22%20d%3D%22M287%2069.96c-3.13-3.13-8.24-3.13-11.37%200L146.2%20202.77%2016.8%2069.96c-3.13-3.13-8.24-3.13-11.37%200-3.13%203.13-3.13%208.24%200%2011.37l135.5%20135.5c3.13%203.13%208.24%203.13%2011.37%200l135.5-135.5c3.13-3.13%203.13-8.24%200-11.37z%22%2F%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 0 center;
+    background-size: 10px auto;
+    padding-right: 20px !important; 
 }
 
 input:focus, select:focus {
-    border-color: #DC143C !important; 
-    box-shadow: none !important; 
-    outline: none !important;
+    border-color: #DC143C !important; 
+    box-shadow: none !important; 
+    outline: none !important;
 }
 
 /* Contenedor del botón para centrarlo (dentro del form) */
 .button-container {
-    flex: 1 1 100%;
-    display: flex;
-    /* CENTRADO FLEXBOX */
-    justify-content: center; 
-    /* CENTRADO DE TEXTO (Medida de seguridad) */
-    text-align: center; 
-    margin-top: 5px; 
+    flex: 1 1 100%;
+    display: flex;
+    /* CENTRADO FLEXBOX */
+    justify-content: center; 
+    /* CENTRADO DE TEXTO (Medida de seguridad) */
+    text-align: center; 
+    margin-top: 5px; 
 }
 
 /* Estilos del Botón Registrar/Guardar (Vinotinto Oscuro) */
 .submit-button {
-    /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
-    display: block; 
-    
-    background-color: #800020 !important; 
-    color: white;
-    padding: 12px 30px !important; 
-    border: none;
-    border-radius: 50px; 
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-    box-shadow: 0 4px 6px rgba(128, 0, 32, 0.3);
+    /* CLAVE: Lo hacemos bloque y usamos margen auto para garantizar el centrado */
+    display: block; 
+    
+    background-color: #800020 !important; 
+    color: white;
+    padding: 12px 30px !important; 
+    border: none;
+    border-radius: 50px; 
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(128, 0, 32, 0.3);
 }
 
 .submit-button:hover {
-    background-color: #DC143C; 
-    transform: translateY(-2px); 
-    box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
+    background-color: #DC143C; 
+    transform: translateY(-2px); 
+    box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4);
 }
 
 /* Estilos para el botón de Cancelar/Reset */
 .cancel-button {
-    background-color: #F0DADA !important; /* Gris rojizo suave */
-    color: #800020; /* Vinotinto Oscuro */
-    padding: 12px 30px !important;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    margin-left: 10px; /* Separación del botón de Submit */
-    transition: background-color 0.3s, transform 0.1s;
+    background-color: #F0DADA !important; /* Gris rojizo suave */
+    color: #800020; /* Vinotinto Oscuro */
+    padding: 12px 30px !important;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: 10px; /* Separación del botón de Submit */
+    transition: background-color 0.3s, transform 0.1s;
 }
 
 .cancel-button:hover {
-    background-color: #DC143C; /* Rojo Brillante */
-    color: white;
+    background-color: #DC143C; /* Rojo Brillante */
+    color: white;
+}
+
+/* -------------------------------------------------------------------------- */
+/* ESTILOS DE BÚSQUEDA */
+/* -------------------------------------------------------------------------- */
+.search-container {
+    max-width: 700px;
+    margin: 20px auto 20px auto; 
+    padding: 0 10px; /* Añadir un poco de padding para móviles */
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: 2px solid #F0DADA;
+    border-radius: 50px; /* Borde más redondeado */
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    border-color: #DC143C; /* Rojo Brillante al enfocar */
+    box-shadow: 0 0 5px rgba(220, 20, 60, 0.3);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -217,110 +242,110 @@ input:focus, select:focus {
 /* -------------------------------------------------------------------------- */
 
 .table-responsive-wrapper {
-    overflow-x: auto;
-    background: #ffffff;
-    padding: 15px;
-    border-radius: 8px; 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
-    margin-top: 20px; 
+    overflow-x: auto;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 8px; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
+    margin-top: 20px; 
 }
 
 .athlete-data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px; 
-    min-width: 700px;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px; 
+    min-width: 700px;
 }
 
 .athlete-data-table th, .athlete-data-table td {
-    padding: 12px 10px; 
-    text-align: center;
-    border-bottom: 1px solid #F0DADA;
+    padding: 12px 10px; 
+    text-align: center;
+    border-bottom: 1px solid #F0DADA;
 }
 
 .athlete-data-table th {
-    background-color: #FFE5E5; 
-    color: #DC143C; 
-    font-weight: 700;
-    cursor: pointer;
-    position: relative;
-    white-space: nowrap;
-    transition: background-color 0.2s;
+    background-color: #FFE5E5; 
+    color: #DC143C; 
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    transition: background-color 0.2s;
 }
 
 .athlete-data-table th:hover {
-    background-color: #FFCCCC;
+    background-color: #FFCCCC;
 }
 
 /* Filas */
 .athlete-data-table tr:nth-child(even) {
-    background-color: #FFF8F8;
+    background-color: #FFF8F8;
 }
 
 .athlete-data-table tr:hover {
-    background-color: #FFEBEB;
+    background-color: #FFEBEB;
 }
 
 /* Indicadores de Ordenamiento */
 .athlete-data-table th.sorted-asc::after {
-    content: ' ▲';
-    color: #A52A2A;
+    content: ' ▲';
+    color: #A52A2A;
 }
 
 .athlete-data-table th.sorted-desc::after {
-    content: ' ▼';
-    color: #A52A2A;
+    content: ' ▼';
+    color: #A52A2A;
 }
 
 .no-data-message, .loading-message, .table-note-message {
-    text-align: center;
-    padding: 15px;
-    color: #6c757d;
-    font-style: italic;
-    border: 1px dashed #F0DADA;
-    border-radius: 8px;
-    margin-top: 15px;
+    text-align: center;
+    padding: 15px;
+    color: #6c757d;
+    font-style: italic;
+    border: 1px dashed #F0DADA;
+    border-radius: 8px;
+    margin-top: 15px;
 }
 
 /* Estilos para los botones de Editar y Eliminar dentro de la tabla */
 .action-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 5px 8px;
-    margin: 0 5px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px 8px;
+    margin: 0 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
 .edit-button {
-    color: #007bff; /* Azul para editar */
+    color: #007bff; /* Azul para editar */
 }
 .edit-button:hover {
-    color: white;
-    background-color: #007bff;
+    color: white;
+    background-color: #007bff;
 }
 
 .delete-button {
-    color: #DC143C; /* Rojo Brillante para eliminar */
+    color: #DC143C; /* Rojo Brillante para eliminar */
 }
 .delete-button:hover {
-    color: white;
-    background-color: #DC143C;
+    color: white;
+    background-color: #DC143C;
 }
 
 /* Estilos Responsivos */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 10px;
-    }
-    .page-header h1 {
-        font-size: 1.8rem;
-    }
-    .form-group.half-width {
-        flex: 1 1 100% !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
+    .container {
+        padding: 0 10px;
+    }
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+    .form-group.half-width {
+        flex: 1 1 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
 }
